@@ -111,7 +111,7 @@ class SystemAdminIT extends AbstractIT {
     void schedulesListAndReschedule() throws Exception {
         Cookie a = login("admin");
         var list = json(mvc.perform(get("/schedules?size=50").cookie(a)).andExpect(status().isOk()).andReturn());
-        assertThat(list.at("/data/total").asInt()).isEqualTo(6);
+        assertThat(list.at("/data/total").asInt()).isEqualTo(7); // + DON_DEP_TEP (V004)
         long id = 0;
         for (var n : list.at("/data/items")) if ("DONG_BO_HRM".equals(n.get("code").asText())) id = n.get("id").asLong();
         mvc.perform(as(put("/schedules/" + id), a).content(om.writeValueAsString(Map.of("name", "Đồng bộ HRM", "cron", "bad", "enabled", false))))

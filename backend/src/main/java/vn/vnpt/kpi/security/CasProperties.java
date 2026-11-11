@@ -14,7 +14,8 @@ public record CasProperties(
 ) {
     public CasProperties {
         if (protocol == null) protocol = "3.0";
-        if (frontendUrl == null) frontendUrl = "/";
+        if (frontendUrl == null || frontendUrl.isBlank()) frontendUrl = "/";
+        else if (!frontendUrl.endsWith("/")) frontendUrl = frontendUrl + "/"; // ghép "dashboard", "login?error="…
     }
 
     public String loginUrl() {

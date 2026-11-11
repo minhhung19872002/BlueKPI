@@ -14,7 +14,7 @@
 
   <springProfile name="prod">
     <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder class="ch.qos.logback.classic.encoder.JsonEncoder">
+      <encoder class="vn.vnpt.kpi.common.util.MaskingJsonEncoder">
         <withFormattedMessage>true</withFormattedMessage>
         <withMessage>false</withMessage>
         <withArguments>false</withArguments>

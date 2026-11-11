@@ -91,6 +91,10 @@ management:
       probes:
         enabled: true
       show-details: never
+      group:
+        # F5 health check: node chỉ nhận traffic khi kết nối được CSDL (liveness không phụ thuộc DB)
+        readiness:
+          include: readinessState,db
   info:
     build:
       enabled: true
@@ -154,6 +158,8 @@ kpi:
     enabled: ${CLAMAV_ENABLED:false}
     host: ${CLAMAV_HOST:localhost}
     port: ${CLAMAV_PORT:3310}
+    # bật quét mà clamd không phản hồi → từ chối tải tệp (false = cho qua, đánh dấu CHUA_QUET)
+    fail-closed: ${CLAMAV_FAIL_CLOSED:true}
   zalo:
     access-token: ${ZALO_ACCESS_TOKEN:}
   mail:

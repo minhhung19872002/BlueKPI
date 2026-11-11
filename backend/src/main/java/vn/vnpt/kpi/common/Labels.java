@@ -19,7 +19,7 @@ public final class Labels {
     public static final Map<String, String> JOB_TYPE = ordered(
             "DONG_BO_KET_QUA_KPI", "Đồng bộ kết quả KPI", "HOAN_TAT_CHIEN_LUOC", "Hoàn tất chiến lược",
             "NHAC_HAN_CAP_NHAT", "Nhắc hạn cập nhật kết quả", "TINH_LAI_BSC", "Tính lại điểm BSC",
-            "DONG_BO_HRM", "Đồng bộ HRM", "SAO_LUU_LOGIC", "Sao lưu logic dữ liệu");
+            "DONG_BO_HRM", "Đồng bộ HRM", "SAO_LUU_LOGIC", "Sao lưu logic dữ liệu", "DON_DEP_TEP", "Dọn tệp hết hạn lưu giữ");
     public static final Map<String, String> PERIOD = ordered(
             "Q1", "Quý I", "Q2", "Quý II", "H1", "6 tháng đầu năm", "Q3", "Quý III", "Q4", "Quý IV", "Y", "Cả năm");
     public static final Map<String, String> ASSIGN_STATUS = ordered("DANG_SOAN", "Đang soạn", "DA_GIAO", "Đã giao", "DA_DIEU_CHINH", "Đã điều chỉnh");

@@ -83,6 +83,7 @@ public class FileService {
         }
         String scan = scanner.scan(bytes);
         if ("NHIEM".equals(scan)) throw new BusinessException(ErrorCode.ERR_FILE, "Tệp bị phát hiện mã độc, không thể tải lên");
+        if (MalwareScanner.UNAVAILABLE.equals(scan)) throw new BusinessException(ErrorCode.ERR_FILE, "Dịch vụ quét mã độc không sẵn sàng, vui lòng thử lại sau");
 
         String key = LocalDate.now() + "/" + UUID.randomUUID() + "." + ext;
         ensureBucket();

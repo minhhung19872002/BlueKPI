@@ -49,6 +49,10 @@ public class RestKpiSourceClient implements KpiSourceClient {
         String url = path.startsWith("http://") || path.startsWith("https://") ? path : stripSlash(base) + (path.startsWith("/") ? path : "/" + path);
         String method = r.httpMethod() == null ? "GET" : r.httpMethod().toUpperCase();
         String summary = method + " " + url;
+        if (!hostAllowed(url, base, config.getString(SysConfigService.KPI_SOURCE_ALLOWED_HOSTS, ""))) {
+            // chống SSRF + rò rỉ thông tin xác thực: chỉ gọi tới máy chủ nguồn dữ liệu đã cấu hình
+            return new Response(null, "Đường dẫn API không thuộc máy chủ nguồn dữ liệu được phép (KPI_SOURCE_BASE_URL / KPI_SOURCE_ALLOWED_HOSTS)", summary, 0);
+        }
         if (System.currentTimeMillis() < openUntil.get()) {
             return new Response(null, "Nguồn dữ liệu tạm ngắt (circuit breaker mở) do lỗi liên tiếp", summary, 0);
         }
@@ -97,6 +101,24 @@ public class RestKpiSourceClient implements KpiSourceClient {
         }
         if (body != null && "POST".equals(method)) spec.contentType(MediaType.APPLICATION_JSON).body(body);
         return spec.retrieve().body(String.class);
+    }
+
+    /** URL phải là http(s), host trùng host của base URL hoặc nằm trong danh sách cho phép */
+    static boolean hostAllowed(String url, String base, String allowList) {
+        try {
+            java.net.URI u = java.net.URI.create(url);
+            if (u.getScheme() == null || !(u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https")) || u.getHost() == null || u.getUserInfo() != null) return false;
+            String host = u.getHost().toLowerCase(java.util.Locale.ROOT);
+            java.util.Set<String> ok = new java.util.HashSet<>();
+            if (base != null && !base.isBlank()) {
+                String bh = java.net.URI.create(base.trim()).getHost();
+                if (bh != null) ok.add(bh.toLowerCase(java.util.Locale.ROOT));
+            }
+            for (String h : (allowList == null ? "" : allowList).split(",")) if (!h.isBlank()) ok.add(h.trim().toLowerCase(java.util.Locale.ROOT));
+            return ok.contains(host);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     static String expand(String template, Request r) {

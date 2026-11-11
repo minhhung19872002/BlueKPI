@@ -33,6 +33,7 @@ INSERT IGNORE INTO sys_config (config_key, config_value, data_type, config_group
 ('LOGIN_MAX_FAILED','5','NUMBER','BAO_MAT','Số lần đăng nhập sai tối đa trước khi khóa tạm',0,1,'system','system'),
 ('LOGIN_LOCK_MINUTES','15','NUMBER','BAO_MAT','Thời gian khóa tạm (phút)',0,1,'system','system'),
 ('KPI_SOURCE_BASE_URL','http://localhost:8092','STRING','TICH_HOP','URL nguồn dữ liệu KPI',0,1,'system','system'),
+('KPI_SOURCE_ALLOWED_HOSTS','','STRING','TICH_HOP','Máy chủ được phép khi Đường dẫn API là URL tuyệt đối (phân cách dấu phẩy; máy chủ của URL nguồn luôn được phép)',0,1,'system','system'),
 ('KPI_SOURCE_AUTH_TYPE','NONE','STRING','TICH_HOP','Kiểu xác thực nguồn KPI: NONE, API_KEY, BEARER, BASIC',0,1,'system','system'),
 ('NOTIFY_EMAIL_ENABLED','false','BOOLEAN','THONG_BAO','Bật/tắt gửi email',0,1,'system','system'),
 ('NOTIFY_ZALO_ENABLED','false','BOOLEAN','THONG_BAO','Bật/tắt gửi Zalo',0,1,'system','system'),

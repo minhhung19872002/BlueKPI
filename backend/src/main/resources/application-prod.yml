@@ -14,6 +14,9 @@ kpi:
     bypass-sso: ${BYPASS_SSO:false}
 
 springdoc:
+  # Tắt cả UI và đặc tả OpenAPI (/api/docs/api-docs) khi SWAGGER_ENABLED=false
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
   swagger-ui:
     enabled: ${SWAGGER_ENABLED:true}
 

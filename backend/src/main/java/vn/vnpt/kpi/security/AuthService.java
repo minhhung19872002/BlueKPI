@@ -159,7 +159,8 @@ public class AuthService {
             throw new BusinessException(ErrorCode.ERR_UNAUTHORIZED);
         }
         String next = JwtService.newRefreshToken();
-        securityMapper.rotateSession(sid, JwtService.sha256(next), LocalDateTime.now().plus(props.refreshTtl()));
+        // xoay vòng token nhưng giữ hạn tuyệt đối của phiên (refresh TTL 8h tính từ lúc đăng nhập, không trượt)
+        securityMapper.rotateSession(sid, JwtService.sha256(next), exp);
         String method = (String) s.get("authMethod");
         return new Tokens(jwtService.issueAccessToken(userId, (String) u.get("username"), sid, method), next, userId, (String) u.get("username"));
     }

@@ -63,7 +63,7 @@ WHERE c.parent_id = @root AND c.deleted = 0;
 -- Tài khoản quản trị (mật khẩu khởi tạo phải đổi trước khi chạy production — xem docs/TRIEN-KHAI.md)
 INSERT INTO app_user (username, full_name, email, org_unit_id, status, auth_source, password_hash, password_changed_at, created_by, updated_by)
 VALUES ('admin','Quản trị hệ thống','admin@vnpt.vn',@root,'HOAT_DONG','BOTH',
-        '$2a$12$o7K1Xsbln3wG3ZLymyDEHOdud8BZx6YZu9yUsTw4ck/eJLk3YLUpy',NULL,'system','system')
+        NULL,NULL,'system','system') -- mật khẩu: KPI_BOOTSTRAP_ADMIN_PASSWORD (AdminBootstrap); dev đặt trong seed-dev
 ON DUPLICATE KEY UPDATE full_name = full_name;
 
 INSERT INTO user_role (user_id, role_id, org_unit_id, assigned_by)

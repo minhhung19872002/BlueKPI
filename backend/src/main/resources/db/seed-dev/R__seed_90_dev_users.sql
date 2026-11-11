@@ -28,6 +28,8 @@ SET @root = (SELECT id FROM org_unit WHERE code = 'VNPT' AND deleted = 0);
 SET @hni = (SELECT id FROM org_unit WHERE code = 'VNPT_HNI' AND deleted = 0);
 SET @hcm = (SELECT id FROM org_unit WHERE code = 'VNPT_HCM' AND deleted = 0);
 SET @pw = '$2a$12$o7K1Xsbln3wG3ZLymyDEHOdud8BZx6YZu9yUsTw4ck/eJLk3YLUpy';
+-- admin (seed chung không có mật khẩu): chỉ môi trường dev mới gán mật khẩu mặc định
+UPDATE app_user SET password_hash = @pw WHERE username = 'admin' AND password_hash IS NULL AND deleted = 0;
 
 INSERT INTO app_user (username, full_name, email, org_unit_id, status, auth_source, password_hash, created_by, updated_by) VALUES
 ('lanhdao','Nguyễn Văn Lãnh Đạo','lanhdao@vnpt.vn',@root,'HOAT_DONG','BOTH',@pw,'system','system'),

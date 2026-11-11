@@ -25,6 +25,7 @@ public class SysConfigService {
     public static final String LOGIN_MAX_FAILED = "LOGIN_MAX_FAILED";
     public static final String LOGIN_LOCK_MINUTES = "LOGIN_LOCK_MINUTES";
     public static final String KPI_SOURCE_BASE_URL = "KPI_SOURCE_BASE_URL";
+    public static final String KPI_SOURCE_ALLOWED_HOSTS = "KPI_SOURCE_ALLOWED_HOSTS";
     public static final String KPI_SOURCE_AUTH_TYPE = "KPI_SOURCE_AUTH_TYPE";
     public static final String NOTIFY_EMAIL_ENABLED = "NOTIFY_EMAIL_ENABLED";
     public static final String NOTIFY_ZALO_ENABLED = "NOTIFY_ZALO_ENABLED";
@@ -33,15 +34,20 @@ public class SysConfigService {
     public static final String DASHBOARD_DEFAULT_PERIOD = "DASHBOARD_DEFAULT_PERIOD";
 
     private final SysConfigMapper mapper;
+    /** Cụm 2 node: cache mỗi node tự hết hạn sau TTL để nhận thay đổi ghi từ node khác (evict chỉ tác động node xử lý request) */
+    static final long TTL_MS = 30_000;
     private volatile Map<String, SysConfig> cache;
+    private volatile long loadedAt;
     private final Map<String, Object> parsed = new ConcurrentHashMap<>();
 
     private Map<String, SysConfig> all() {
         Map<String, SysConfig> c = cache;
-        if (c == null) {
+        if (c == null || System.currentTimeMillis() - loadedAt > TTL_MS) {
             synchronized (this) {
-                if (cache == null) {
+                if (cache == null || System.currentTimeMillis() - loadedAt > TTL_MS) {
+                    parsed.clear();
                     cache = mapper.findAll().stream().collect(Collectors.toMap(SysConfig::getConfigKey, Function.identity(), (a, b) -> a));
+                    loadedAt = System.currentTimeMillis();
                 }
                 c = cache;
             }

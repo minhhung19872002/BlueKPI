@@ -33,7 +33,7 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1024, height: 768 } } }],
   webServer: [
     {
-      command: `"${java}" -jar "${jar}" --spring.profiles.active=dev --server.port=${BE_PORT} --spring.datasource.url=jdbc:mariadb://localhost:3307/${db} --kpi.demo-seed=true --kpi.security.login-rate-limit-per-minute=1000`,
+      command: `"${java}" -jar "${jar}" --spring.profiles.active=dev --server.port=${BE_PORT} --spring.datasource.url=jdbc:mariadb://localhost:3307/${db} --kpi.demo-seed=true --kpi.security.login-rate-limit-per-minute=1000 --kpi.cas.service-url=http://localhost:${FE_PORT}/api/auth/sso/callback --kpi.cas.frontend-url=http://localhost:${FE_PORT}/`,
       url: `http://localhost:${BE_PORT}/api/actuator/health/readiness`,
       timeout: 300_000,
       reuseExistingServer: !!process.env.E2E_REUSE,

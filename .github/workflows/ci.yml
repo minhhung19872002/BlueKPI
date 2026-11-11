@@ -98,6 +98,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     steps:
+      - uses: actions/checkout@v4 # cần .zap/rules.tsv
       - name: ZAP baseline trên staging
         uses: zaproxy/action-baseline@v0.14.0
         with:

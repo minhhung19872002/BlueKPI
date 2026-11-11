@@ -4,7 +4,7 @@
 set -euo pipefail
 APP=/opt/kpi-bsc
 id kpi >/dev/null 2>&1 || useradd --system --home "$APP" --shell /usr/sbin/nologin kpi
-install -d -o kpi -g kpi "$APP" "$APP/web" "$APP/scripts" /var/log/kpi-bsc /var/lib/kpi-bsc
+install -d -o kpi -g kpi "$APP" "$APP/web" "$APP/scripts" /var/log/kpi-bsc /var/lib/kpi-bsc /var/backups/kpi
 install -d -m 750 -o root -g kpi /etc/kpi
 [[ -f /etc/kpi/secrets.env ]] || { install -m 600 -o root -g kpi env.example /etc/kpi/secrets.env; echo ">> Hãy điền /etc/kpi/secrets.env rồi chạy lại"; exit 1; }
 
