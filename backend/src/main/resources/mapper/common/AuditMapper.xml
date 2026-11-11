@@ -25,7 +25,8 @@
     LIMIT #{q.size} OFFSET #{q.offset}
   </select>
 
+  <!-- Đếm có trần 100.000: COUNT(*) không lọc trên hàng triệu bản ghi mất vài giây; lọc theo khoảng ngày vẫn chính xác -->
   <select id="count" resultType="long">
-    SELECT COUNT(*) FROM audit_log <include refid="where"/>
+    SELECT COUNT(*) FROM (SELECT 1 FROM audit_log <include refid="where"/> LIMIT 100000) t
   </select>
 </mapper>

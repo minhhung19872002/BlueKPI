@@ -7,7 +7,7 @@
 | A3 (c) | Kiến trúc chức năng F01–F07 (§3.1) | `backend/src/main/java/vn/vnpt/kpi/modules/*` | ☑ |
 | A4 (d) | Kiến trúc ứng dụng FE/BE (§3.2–3.3) | `frontend/src/api/http.ts`, `routes/index.tsx`, `authGuards.ts`, `stores/*`; BE `SecurityConfig`, `JwtAuthenticationFilter`, `VnptSsoController` | ☑ |
 | A5 (e) | Kiến trúc dữ liệu (§4) | `backend/src/main/resources/db/migration/V001__init.sql` … | ☑ |
-| A6 (f) | Kiến trúc tích hợp (§8) | `integration/cas`, `integration/kpisource`, `integration/hrm`, `integration/mail`, `integration/zalo` | ☑ |
+| A6 (f) | Kiến trúc tích hợp (§8) | `security/CasTicketValidator`, `security/VnptSsoController`, `integration/kpisource`, `integration/hrm`, `integration/mail`, `integration/zalo` | ☑ |
 | A7 (g,h) | Bảo mật (§9) & hạ tầng (§10) | `config/SecurityConfig`, `StartupSecurityCheck`, `docs/ATTT.md`, `docs/TRIEN-KHAI.md`, `deploy/*` | ☑ |
 
 ## 3. Phi chức năng (Phần 3 E-HSMT — 11 mục, PHẦN D §1)

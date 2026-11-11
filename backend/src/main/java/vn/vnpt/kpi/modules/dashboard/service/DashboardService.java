@@ -128,7 +128,9 @@ public class DashboardService {
             unitId = s.contains(u.getOrgUnitId()) ? u.getOrgUnitId() : s.unitIds().stream().min(Long::compare).orElse(u.getOrgUnitId());
             unit = String.valueOf(unitId);
         }
-        String period = unitId == null ? null : mapper.latestPeriod(unitId, year);
+        // Tham số hệ thống DASHBOARD_DEFAULT_PERIOD: LATEST (mặc định) = kỳ gần nhất đã có kết quả; hoặc cố định Y/Q1..Q4/H1
+        String cfg = config.getString(SysConfigService.DASHBOARD_DEFAULT_PERIOD, "LATEST").trim().toUpperCase(java.util.Locale.ROOT);
+        String period = PERIODS.contains(cfg) ? cfg : unitId == null ? null : mapper.latestPeriod(unitId, year);
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("unit", unit);
         m.put("year", year);

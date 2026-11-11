@@ -5,6 +5,7 @@ import { ConfirmHost } from '@/components/ui/ConfirmDialog';
 import { Toaster } from '@/components/ui/Toast';
 import { LoginPage } from '@/pages/LoginPage';
 import { ForbiddenPage, NotFoundPage, SsoErrorPage } from '@/pages/StatusPages';
+import { z } from 'zod';
 import { firstRoute, requireAuth, requirePerm } from './authGuards';
 
 /** Routing code-based (TanStack Router); trang lazy (code-splitting) */
@@ -12,6 +13,15 @@ import { firstRoute, requireAuth, requirePerm } from './authGuards';
 function optionalSearch<T extends Record<string, unknown>>(fn: (s: Record<string, unknown>) => T) {
   return (s: Record<string, unknown>): Partial<T> => fn(s);
 }
+
+/** Dashboard: unit = GROUP | PROVINCES | id đơn vị; year 2000–2100; period = Y|Q1..Q4|H1|GD:<id giai đoạn> */
+const opt = <T extends z.ZodTypeAny>(t: T) => t.optional().catch(undefined);
+const dashboardSearch = z.object({
+  unit: opt(z.union([z.literal('GROUP'), z.literal('PROVINCES'), z.coerce.string().regex(/^\d+$/)])),
+  year: opt(z.coerce.number().int().min(2000).max(2100)),
+  period: opt(z.string().regex(/^(Y|Q[1-4]|H1|GD:\d+)$/)),
+  map: opt(z.union([z.boolean(), z.enum(['true', 'false']).transform((v) => v === 'true')])),
+});
 
 export interface RouterCtx {
   queryClient: QueryClient;
@@ -62,12 +72,11 @@ const dashboardRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/dashboard',
   beforeLoad: requirePerm('DASHBOARD:VIEW_GROUP', 'DASHBOARD:VIEW_UNIT', 'DASHBOARD:VIEW_PROVINCE'),
-  validateSearch: optionalSearch((s) => ({
-    unit: typeof s.unit === 'string' || typeof s.unit === 'number' ? String(s.unit) : undefined,
-    year: s.year ? Number(s.year) : undefined,
-    period: typeof s.period === 'string' ? s.period : undefined,
-    map: s.map === true || s.map === 'true' || s.map === 1 ? true : undefined,
-  })),
+  // Tham số URL unit/year/period (PHẦN C §II) — validate bằng zod; giá trị sai bị bỏ qua (dùng mặc định 17.1)
+  validateSearch: (s: Record<string, unknown>) => {
+    const r = dashboardSearch.safeParse(s);
+    return r.success ? r.data : {};
+  },
   component: lazyRouteComponent(() => import('@/features/dashboard/pages/DashboardPage'), 'DashboardPage'),
 });
 

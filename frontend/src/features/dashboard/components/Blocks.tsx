@@ -20,12 +20,12 @@ export const CARD_DEFS: { key: keyof Cards; card: string; label: string; icon: R
 /** ▲/▼ % so với kỳ trước */
 export function Change({ value }: { value: Num }) {
   const n = toNum(value);
-  if (n === null) return <span className="text-muted">— so với kỳ trước</span>;
+  if (n === null) return <span className="text-muted">— tỷ lệ so với kỳ trước</span>;
   const up = n > 0;
   const flat = n === 0;
   return (
     <span className={cn('inline-flex items-center gap-0.5', flat ? 'text-slate-500' : up ? 'text-green-700' : 'text-red-700')} data-testid="card-change">
-      {flat ? '■' : up ? '▲' : '▼'} {fmtNum(Math.abs(n), 2)}% <span className="text-muted">so với kỳ trước</span>
+      {flat ? '■' : up ? '▲' : '▼'} {fmtNum(Math.abs(n), 2)}% <span className="text-muted">tỷ lệ so với kỳ trước</span>
     </span>
   );
 }
@@ -186,7 +186,7 @@ export function RankingBlock({ year, period, onView }: { year: number; period: s
       actions={
         total > 10 && (
           <Button size="sm" variant="link" onClick={() => setAll(!all)}>
-            {all ? 'Thu gọn (top 10)' : `Xem tất cả (${total})`}
+            {all ? 'Thu gọn (top 10)' : 'Xem tất cả'}
           </Button>
         )
       }

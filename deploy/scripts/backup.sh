@@ -15,7 +15,8 @@ umask 077
 
 echo "[$(date -Is)] Bắt đầu sao lưu → $DEST"
 START=$(date +%s)
-mariabackup --backup --user="$BACKUP_USER" --password="$BACKUP_PASSWORD" --target-dir="$DEST/physical" --databases="$DB_NAME"
+# Sao lưu vật lý TOÀN instance (gồm schema hệ thống mysql) — restore.sh thay cả datadir nên không dùng --databases (partial)
+mariabackup --backup --user="$BACKUP_USER" --password="$BACKUP_PASSWORD" --target-dir="$DEST/physical"
 mariabackup --prepare --target-dir="$DEST/physical"
 tar -C "$DEST" -czf "$DEST/physical.tar.gz" physical && rm -rf "$DEST/physical"
 

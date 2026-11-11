@@ -11,42 +11,42 @@
 | 1.1 | Đăng nhập hệ thống | `/login` | `POST /api/auth/login` | `(public)` | `p0-auth.spec.ts` | ☑ |
 | 1.2 | Đăng nhập – Thông tin không hợp lệ | `/login` | `POST /api/auth/login` | `(public)` | `p0-auth.spec.ts` | ☑ |
 | 2.1 | Đăng xuất hệ thống | `(Header)` | `POST /api/auth/logout` | `(authenticated)` | `p0-auth.spec.ts` | ☑ |
-| 3.1 | Lấy danh sách – Người dùng | `/system/users` | `GET /api/users` | `USER:VIEW` | `p1-users.spec.ts` | ☑ |
-| 3.2 | Tìm kiếm – Người dùng | `/system/users` | `GET /api/users?keyword&status&orgUnitId` | `USER:VIEW` | `p1-users.spec.ts` | ☑ |
-| 3.3 | Xem chi tiết – Người dùng | `/system/users` | `GET /api/users/{id}` | `USER:VIEW` | `p1-users.spec.ts` | ☑ |
-| 3.4 | Thêm mới – Người dùng | `/system/users` | `POST /api/users` | `USER:CREATE` | `p1-users.spec.ts` | ☑ |
-| 3.5 | Ghi lại – Người dùng | `/system/users` | `PUT /api/users/{id}` | `USER:UPDATE` | `p1-users.spec.ts` | ☑ |
-| 3.6 | Xóa – Người dùng | `/system/users` | `DELETE /api/users/{id}` | `USER:DELETE` | `p1-users.spec.ts` | ☑ |
-| 3.7 | Nhập dữ liệu – Người dùng | `/system/users` | `POST /api/users/import/validate, /commit` | `USER:IMPORT` | `p1-users.spec.ts` | ☑ |
-| 3.8 | Xuất dữ liệu – Người dùng | `/system/users` | `GET /api/users/export` | `USER:EXPORT` | `p1-users.spec.ts` | ☑ |
-| 3.9 | Gán vai trò cho người dùng | `/system/users` | `PUT /api/users/{id}/roles` | `USER:ASSIGN_ROLE` | `p1-users.spec.ts` | ☑ |
-| 3.10 | Bỏ gán vai trò của người dùng | `/system/users` | `PUT /api/users/{id}/roles` | `USER:ASSIGN_ROLE` | `p1-users.spec.ts` | ☑ |
-| 4.1 | Lấy danh sách – Vai trò | `/system/roles` | `GET /api/roles` | `ROLE:VIEW` | `p1-roles.spec.ts` | ☑ |
-| 4.2 | Tìm kiếm – Vai trò | `/system/roles` | `GET /api/roles?keyword&status` | `ROLE:VIEW` | `p1-roles.spec.ts` | ☑ |
-| 4.3 | Xem chi tiết – Vai trò | `/system/roles` | `GET /api/roles/{id}, GET /api/roles/{id}/permissions` | `ROLE:VIEW` | `p1-roles.spec.ts` | ☑ |
-| 4.4 | Thêm mới – Vai trò | `/system/roles` | `POST /api/roles` | `ROLE:CREATE` | `p1-roles.spec.ts` | ☑ |
-| 4.5 | Ghi lại – Vai trò | `/system/roles` | `PUT /api/roles/{id}` | `ROLE:UPDATE` | `p1-roles.spec.ts` | ☑ |
-| 4.6 | Xóa – Vai trò | `/system/roles` | `DELETE /api/roles/{id}` | `ROLE:DELETE` | `p1-roles.spec.ts` | ☑ |
-| 4.7 | Lấy danh sách – Quyền | `/system/permissions` | `GET /api/permissions` | `PERMISSION:VIEW` | `p1-roles.spec.ts` | ☑ |
-| 4.8 | Xem chi tiết – Quyền | `/system/permissions` | `GET /api/permissions/{id}` | `PERMISSION:VIEW` | `p1-roles.spec.ts` | ☑ |
-| 4.9 | Ghi lại – Quyền | `/system/permissions` | `PUT /api/permissions/{id}` | `PERMISSION:UPDATE` | `p1-roles.spec.ts` | ☑ |
-| 5.1 | Lấy danh sách – Đơn vị | `/system/org-units` | `GET /api/org-units, GET /api/org-units/tree` | `ORG:VIEW` | `p1-org.spec.ts` | ☑ |
-| 5.2 | Tìm kiếm – Đơn vị | `/system/org-units` | `GET /api/org-units?keyword&unitType&regionCode` | `ORG:VIEW` | `p1-org.spec.ts` | ☑ |
-| 5.3 | Xem chi tiết – Đơn vị | `/system/org-units` | `GET /api/org-units/{id}` | `ORG:VIEW` | `p1-org.spec.ts` | ☑ |
-| 5.4 | Thêm mới – Đơn vị | `/system/org-units` | `POST /api/org-units` | `ORG:CREATE` | `p1-org.spec.ts` | ☑ |
-| 5.5 | Ghi lại – Đơn vị | `/system/org-units` | `PUT /api/org-units/{id}` | `ORG:UPDATE` | `p1-org.spec.ts` | ☑ |
-| 5.6 | Xóa – Đơn vị | `/system/org-units` | `DELETE /api/org-units/{id}` | `ORG:DELETE` | `p1-org.spec.ts` | ☑ |
-| 5.7 | Nhập dữ liệu – Đơn vị | `/system/org-units` | `POST /api/org-units/import/validate, /commit` | `ORG:IMPORT` | `p1-org.spec.ts` | ☑ |
-| 5.8 | Xuất dữ liệu – Đơn vị | `/system/org-units` | `GET /api/org-units/export` | `ORG:EXPORT` | `p1-org.spec.ts` | ☑ |
+| 3.1 | Lấy danh sách – Người dùng | `/system?tab=users` | `GET /api/users` | `USER:VIEW` | `p1-users.spec.ts` | ☑ |
+| 3.2 | Tìm kiếm – Người dùng | `/system?tab=users` | `GET /api/users?keyword&status&orgUnitId` | `USER:VIEW` | `p1-users.spec.ts` | ☑ |
+| 3.3 | Xem chi tiết – Người dùng | `/system?tab=users` | `GET /api/users/{id}` | `USER:VIEW` | `p1-users.spec.ts` | ☑ |
+| 3.4 | Thêm mới – Người dùng | `/system?tab=users` | `POST /api/users` | `USER:CREATE` | `p1-users.spec.ts` | ☑ |
+| 3.5 | Ghi lại – Người dùng | `/system?tab=users` | `PUT /api/users/{id}` | `USER:UPDATE` | `p1-users.spec.ts` | ☑ |
+| 3.6 | Xóa – Người dùng | `/system?tab=users` | `DELETE /api/users/{id}` | `USER:DELETE` | `p1-users.spec.ts` | ☑ |
+| 3.7 | Nhập dữ liệu – Người dùng | `/system?tab=users` | `POST /api/users/import/validate, /commit` | `USER:IMPORT` | `p1-users.spec.ts` | ☑ |
+| 3.8 | Xuất dữ liệu – Người dùng | `/system?tab=users` | `GET /api/users/export` | `USER:EXPORT` | `p1-users.spec.ts` | ☑ |
+| 3.9 | Gán vai trò cho người dùng | `/system?tab=users` | `PUT /api/users/{id}/roles` | `USER:ASSIGN_ROLE` | `p1-users.spec.ts` | ☑ |
+| 3.10 | Bỏ gán vai trò của người dùng | `/system?tab=users` | `PUT /api/users/{id}/roles` | `USER:ASSIGN_ROLE` | `p1-users.spec.ts` | ☑ |
+| 4.1 | Lấy danh sách – Vai trò | `/system?tab=roles` | `GET /api/roles` | `ROLE:VIEW` | `p1-roles.spec.ts` | ☑ |
+| 4.2 | Tìm kiếm – Vai trò | `/system?tab=roles` | `GET /api/roles?keyword&status` | `ROLE:VIEW` | `p1-roles.spec.ts` | ☑ |
+| 4.3 | Xem chi tiết – Vai trò | `/system?tab=roles` | `GET /api/roles/{id}, GET /api/roles/{id}/permissions` | `ROLE:VIEW` | `p1-roles.spec.ts` | ☑ |
+| 4.4 | Thêm mới – Vai trò | `/system?tab=roles` | `POST /api/roles` | `ROLE:CREATE` | `p1-roles.spec.ts` | ☑ |
+| 4.5 | Ghi lại – Vai trò | `/system?tab=roles` | `PUT /api/roles/{id}` | `ROLE:UPDATE` | `p1-roles.spec.ts` | ☑ |
+| 4.6 | Xóa – Vai trò | `/system?tab=roles` | `DELETE /api/roles/{id}` | `ROLE:DELETE` | `p1-roles.spec.ts` | ☑ |
+| 4.7 | Lấy danh sách – Quyền | `/system?tab=permissions` | `GET /api/permissions` | `PERMISSION:VIEW` | `p1-roles.spec.ts` | ☑ |
+| 4.8 | Xem chi tiết – Quyền | `/system?tab=permissions` | `GET /api/permissions/{id}` | `PERMISSION:VIEW` | `p1-roles.spec.ts` | ☑ |
+| 4.9 | Ghi lại – Quyền | `/system?tab=permissions` | `PUT /api/permissions/{id}` | `PERMISSION:UPDATE` | `p1-roles.spec.ts` | ☑ |
+| 5.1 | Lấy danh sách – Đơn vị | `/system?tab=org-units` | `GET /api/org-units, GET /api/org-units/tree` | `ORG:VIEW` | `p1-org.spec.ts` | ☑ |
+| 5.2 | Tìm kiếm – Đơn vị | `/system?tab=org-units` | `GET /api/org-units?keyword&unitType&regionCode` | `ORG:VIEW` | `p1-org.spec.ts` | ☑ |
+| 5.3 | Xem chi tiết – Đơn vị | `/system?tab=org-units` | `GET /api/org-units/{id}` | `ORG:VIEW` | `p1-org.spec.ts` | ☑ |
+| 5.4 | Thêm mới – Đơn vị | `/system?tab=org-units` | `POST /api/org-units` | `ORG:CREATE` | `p1-org.spec.ts` | ☑ |
+| 5.5 | Ghi lại – Đơn vị | `/system?tab=org-units` | `PUT /api/org-units/{id}` | `ORG:UPDATE` | `p1-org.spec.ts` | ☑ |
+| 5.6 | Xóa – Đơn vị | `/system?tab=org-units` | `DELETE /api/org-units/{id}` | `ORG:DELETE` | `p1-org.spec.ts` | ☑ |
+| 5.7 | Nhập dữ liệu – Đơn vị | `/system?tab=org-units` | `POST /api/org-units/import/validate, /commit` | `ORG:IMPORT` | `p1-org.spec.ts` | ☑ |
+| 5.8 | Xuất dữ liệu – Đơn vị | `/system?tab=org-units` | `GET /api/org-units/export` | `ORG:EXPORT` | `p1-org.spec.ts` | ☑ |
 | 6.1 | Xem biểu tổng hợp Tập đoàn – Năm | `/dashboard?unit=GROUP&period=Y` | `GET /api/dashboard/overview, /ranking-provinces, /corporations` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
 | 7.1 | Xem biểu tổng hợp Tập đoàn – Quý | `/dashboard?unit=GROUP&period=Q1..Q4` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
-| 8.1 | Xem biểu tổng hợp Tập đoàn – Giai đoạn | `/dashboard?unit=GROUP&period=STAGE_x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
+| 8.1 | Xem biểu tổng hợp Tập đoàn – Giai đoạn | `/dashboard?unit=GROUP&period=GD:x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
 | 9.1 | Xem biểu tổng hợp Đơn vị – Năm | `/dashboard?unit={id}&period=Y` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
 | 10.1 | Xem biểu tổng hợp Đơn vị – Quý | `/dashboard?unit={id}&period=Qn` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
-| 11.1 | Xem biểu tổng hợp Đơn vị – Giai đoạn | `/dashboard?unit={id}&period=STAGE_x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 11.1 | Xem biểu tổng hợp Đơn vị – Giai đoạn | `/dashboard?unit={id}&period=GD:x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
 | 12.1 | Xem biểu tổng hợp Tỉnh – Năm (tất cả các tỉnh) | `/dashboard?unit=PROVINCES&period=Y` | `GET /api/dashboard/ranking-provinces` | `DASHBOARD:VIEW_PROVINCE` | `p7-dashboard.spec.ts` | ☑ |
 | 13.1 | Xem biểu tổng hợp Tỉnh – Quý (tất cả các tỉnh) | `/dashboard?unit=PROVINCES&period=Qn` | `GET /api/dashboard/ranking-provinces` | `DASHBOARD:VIEW_PROVINCE` | `p7-dashboard.spec.ts` | ☑ |
-| 14.1 | Xem biểu tổng hợp giai đoạn của 1 tỉnh | `/dashboard?unit={id}&period=STAGE_x` | `GET /api/dashboard/province-stage` | `DASHBOARD:VIEW_PROVINCE` | `p7-dashboard.spec.ts` | ☑ |
+| 14.1 | Xem biểu tổng hợp giai đoạn của 1 tỉnh | `/dashboard?unit={id}&period=GD:x` | `GET /api/dashboard/province-stage` | `DASHBOARD:VIEW_PROVINCE` | `p7-dashboard.spec.ts` | ☑ |
 | 15.1 | Xem bản đồ chiến lược | `/dashboard (dialog)` | `GET /api/dashboard/strategy-map` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
 | 16.1 | Xem Dashboard đơn vị từ bảng xếp hạng | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
 | 16.2 | Quay lại Dashboard Tập đoàn | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
@@ -88,14 +88,14 @@
 | 26.14 | Xóa – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `DELETE /api/perspectives/{id}` | `PERSPECTIVE:DELETE` | `p2-catalog.spec.ts` | ☑ |
 | 26.15 | Nhập dữ liệu – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `POST /api/perspectives/import/validate, /commit` | `PERSPECTIVE:IMPORT` | `p2-catalog.spec.ts` | ☑ |
 | 26.16 | Xuất dữ liệu – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives/export` | `PERSPECTIVE:EXPORT` | `p2-catalog.spec.ts` | ☑ |
-| 26.17 | Lấy danh sách – Lịch đồng bộ | `/system/schedules` | `GET /api/schedules` | `SCHEDULE:VIEW` | `p1-config.spec.ts` | ☑ |
-| 26.18 | Xem chi tiết – Lịch đồng bộ | `/system/schedules` | `GET /api/schedules/{id}` | `SCHEDULE:VIEW` | `p1-config.spec.ts` | ☑ |
-| 26.19 | Ghi lại – Lịch đồng bộ | `/system/schedules` | `PUT /api/schedules/{id}, POST /api/schedules/{id}/run` | `SCHEDULE:UPDATE, SCHEDULE:RUN` | `p1-config.spec.ts` | ☑ |
-| 26.20 | Lấy danh sách – Tham số hệ thống | `/system/sys-configs` | `GET /api/sys-configs` | `SYSCONFIG:VIEW` | `p1-config.spec.ts` | ☑ |
-| 26.21 | Xem chi tiết – Tham số hệ thống | `/system/sys-configs` | `GET /api/sys-configs/{id}` | `SYSCONFIG:VIEW` | `p1-config.spec.ts` | ☑ |
-| 26.22 | Thêm mới – Tham số hệ thống | `/system/sys-configs` | `POST /api/sys-configs` | `SYSCONFIG:CREATE` | `p1-config.spec.ts` | ☑ |
-| 26.23 | Ghi lại – Tham số hệ thống | `/system/sys-configs` | `PUT /api/sys-configs/{id}` | `SYSCONFIG:UPDATE` | `p1-config.spec.ts` | ☑ |
-| 26.24 | Xóa – Tham số hệ thống | `/system/sys-configs` | `DELETE /api/sys-configs/{id}` | `SYSCONFIG:DELETE` | `p1-config.spec.ts` | ☑ |
+| 26.17 | Lấy danh sách – Lịch đồng bộ | `/system?tab=schedules` | `GET /api/schedules` | `SCHEDULE:VIEW` | `p1-config.spec.ts` | ☑ |
+| 26.18 | Xem chi tiết – Lịch đồng bộ | `/system?tab=schedules` | `GET /api/schedules/{id}` | `SCHEDULE:VIEW` | `p1-config.spec.ts` | ☑ |
+| 26.19 | Ghi lại – Lịch đồng bộ | `/system?tab=schedules` | `PUT /api/schedules/{id}, POST /api/schedules/{id}/run` | `SCHEDULE:UPDATE, SCHEDULE:RUN` | `p1-config.spec.ts` | ☑ |
+| 26.20 | Lấy danh sách – Tham số hệ thống | `/system?tab=sys-configs` | `GET /api/sys-configs` | `SYSCONFIG:VIEW` | `p1-config.spec.ts` | ☑ |
+| 26.21 | Xem chi tiết – Tham số hệ thống | `/system?tab=sys-configs` | `GET /api/sys-configs/{id}` | `SYSCONFIG:VIEW` | `p1-config.spec.ts` | ☑ |
+| 26.22 | Thêm mới – Tham số hệ thống | `/system?tab=sys-configs` | `POST /api/sys-configs` | `SYSCONFIG:CREATE` | `p1-config.spec.ts` | ☑ |
+| 26.23 | Ghi lại – Tham số hệ thống | `/system?tab=sys-configs` | `PUT /api/sys-configs/{id}` | `SYSCONFIG:UPDATE` | `p1-config.spec.ts` | ☑ |
+| 26.24 | Xóa – Tham số hệ thống | `/system?tab=sys-configs` | `DELETE /api/sys-configs/{id}` | `SYSCONFIG:DELETE` | `p1-config.spec.ts` | ☑ |
 | 27.1 | Lấy danh sách – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions` | `FORMULA:VIEW` | `p2-catalog.spec.ts` | ☑ |
 | 27.2 | Tìm kiếm – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions?keyword&status` | `FORMULA:VIEW` | `p2-catalog.spec.ts` | ☑ |
 | 27.3 | Xem chi tiết – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions/{id}` | `FORMULA:VIEW` | `p2-catalog.spec.ts` | ☑ |
@@ -123,12 +123,12 @@
 | 32.2 | Tìm kiếm – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi?keyword&year&perspectiveId&status` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
 | 32.3 | Xem chi tiết – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi/{kpiId}/{year}` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
 | 32.4 | Sao chép giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `POST /api/assignments/by-kpi/copy` | `ASSIGN:COPY` | `p3-assign.spec.ts` | ☑ |
-| 33.1 | Thêm mới – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments/kpi/new` | `POST /api/assignments/by-kpi` | `ASSIGN:CREATE` | `p3-assign.spec.ts` | ☑ |
+| 33.1 | Thêm mới – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments/kpi/new/new` | `POST /api/assignments/by-kpi` | `ASSIGN:CREATE` | `p3-assign.spec.ts` | ☑ |
 | 33.2 | Ghi lại – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments/kpi/$kpiId/$year` | `PUT /api/assignments/by-kpi/{kpiId}/{year}` | `ASSIGN:UPDATE` | `p3-assign.spec.ts` | ☑ |
 | 34.1 | Điều chỉnh – Lưu nháp | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `POST /api/assignments/by-kpi/{kpiId}/{year}/adjustment/draft` | `ASSIGN:ADJUST` | `p3-assign.spec.ts` | ☑ |
 | 34.2 | Điều chỉnh – Lưu chốt | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `POST /api/assignments/by-kpi/{kpiId}/{year}/adjustment/commit` | `ASSIGN:ADJUST` | `p3-assign.spec.ts` | ☑ |
 | 34.3 | Điều chỉnh – Xem lịch sử điều chỉnh | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `GET /api/assignments/details/{detailId}/history` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
-| 35.1 | Giao KPI – Nhập dữ liệu | `/kpi-admin/assignments/unit/new, /kpi/new` | `POST /api/assignments/import/parse` | `ASSIGN:IMPORT` | `p3-assign.spec.ts` | ☑ |
+| 35.1 | Giao KPI – Nhập dữ liệu | `/kpi-admin/assignments/unit/new, /kpi-admin/assignments/kpi/new/new` | `POST /api/assignments/import/parse` | `ASSIGN:IMPORT` | `p3-assign.spec.ts` | ☑ |
 | 35.2 | Xuất dữ liệu – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit/export` | `ASSIGN:EXPORT` | `p3-assign.spec.ts` | ☑ |
 | 36.1 | Lấy danh sách – Bản đồ chiến lược | `/kpi-admin/strategies` | `GET /api/strategies` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☑ |
 | 36.2 | Tìm kiếm – Bản đồ chiến lược | `/kpi-admin/strategies` | `GET /api/strategies?keyword&ownerId&fromYear&toYear&status&orgUnitId` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☑ |
@@ -180,7 +180,7 @@
 | 52.2 | Xuất báo cáo TTr94 chi tiết KPI (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/TTR94_CHI_TIET` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
 | 53.1 | Xuất báo cáo KPI từng tỉnh | `/kpi-admin/bsc?tab=summary` | `POST /api/reports/KPI_TUNG_TINH` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
 | 53.2 | Xuất báo cáo KPI từng tỉnh (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/KPI_TUNG_TINH` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
-| 54.1 | Thông báo (notify) trên hệ thống | `(Header – chuông), /notifications` | `GET /api/notifications, /unread-count, POST /{id}/read, /read-all` | `NOTIFY:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 54.1 | Thông báo (notify) trên hệ thống | `(Header – chuông), /notifications` | `GET /api/notifications, /unread-count, POST /{id}/read, /read-all` | `(đăng nhập) isAuthenticated` | `p3-assign.spec.ts` | ☑ |
 
 ## 2. Kiến trúc (Phần 2 E-HSMT — 7 mục, PHẦN B)
 
@@ -191,7 +191,7 @@
 | A3 (c) | Kiến trúc chức năng F01–F07 (§3.1) | `backend/src/main/java/vn/vnpt/kpi/modules/*` | ☑ |
 | A4 (d) | Kiến trúc ứng dụng FE/BE (§3.2–3.3) | `frontend/src/api/http.ts`, `routes/index.tsx`, `authGuards.ts`, `stores/*`; BE `SecurityConfig`, `JwtAuthenticationFilter`, `VnptSsoController` | ☑ |
 | A5 (e) | Kiến trúc dữ liệu (§4) | `backend/src/main/resources/db/migration/V001__init.sql` … | ☑ |
-| A6 (f) | Kiến trúc tích hợp (§8) | `integration/cas`, `integration/kpisource`, `integration/hrm`, `integration/mail`, `integration/zalo` | ☑ |
+| A6 (f) | Kiến trúc tích hợp (§8) | `security/CasTicketValidator`, `security/VnptSsoController`, `integration/kpisource`, `integration/hrm`, `integration/mail`, `integration/zalo` | ☑ |
 | A7 (g,h) | Bảo mật (§9) & hạ tầng (§10) | `config/SecurityConfig`, `StartupSecurityCheck`, `docs/ATTT.md`, `docs/TRIEN-KHAI.md`, `deploy/*` | ☑ |
 
 ## 3. Phi chức năng (Phần 3 E-HSMT — 11 mục, PHẦN D §1)

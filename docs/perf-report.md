@@ -63,6 +63,20 @@ Khi đo, đặt `KPI_LOGIN_RATE_LIMIT` (hoặc `--kpi.security.login-rate-limit-
 
 Môi trường triển khai thật (PHẦN B §10) có 2 node ứng dụng sau F5 và MariaDB riêng — năng lực dự kiến cao hơn môi trường đo. Khối lượng “hàng trăm GB” chưa được đo (OPEN-QUESTIONS #17); script `deploy/scripts/seed-volume.sh` dùng để sinh dữ liệu lớn khi có hạ tầng.
 
+## 5b. Kết quả trên dữ liệu khối lượng lớn (`deploy/scripts/seed-volume.sh`)
+
+CSDL ≈ 580 MB: 14.802 người dùng, 49.057 kết quả đánh giá (12 năm), 3.740 dòng tổng hợp BSC, **2.000.000 bản ghi `audit_log`**.
+
+| API (đơn lẻ, sau khi khởi động) | Thời gian |
+|---|---|
+| `/dashboard/overview` Tập đoàn – Quý / Giai đoạn / Khối tỉnh | 41–139 ms |
+| `/dashboard/ranking-provinces` (tất cả tỉnh), `/corporations`, `/kpi-list`, `/province-stage` | 26–69 ms |
+| `/dashboard/strategy-map` | 122 ms |
+| “Nhật ký hệ thống” `/audit-logs` (2 triệu bản ghi) | **4.477 ms → 248 ms** sau tối ưu (lọc theo ngày: 41 ms; theo người dùng: 21 ms) |
+| Danh sách người dùng tìm kiếm (15.000 tài khoản) | 133 ms |
+
+k6 100 TPS × 5 phút trên dữ liệu này (`perf/k6-summary-volume.json`): 109,6 req/s, lỗi 0,003 % (1/33.246), p95 đọc 1,10 s / ghi 0,72 s / đăng nhập 1,51 s — **đạt ngưỡng p95 < 2 s**. Lưu ý: máy đo đồng thời chạy nhiều ứng dụng khác (CPU nền ≈ 79 % khi chưa có tải), nên độ trễ cao hơn lần đo 100 TPS ở §3; từng API đơn lẻ đều < 150 ms, không có điểm nghẽn tập trung (thread dump dưới tải phân tán đều).
+
 ## 6. Vấn đề phát hiện và đã khắc phục trong quá trình đo
 
 | # | Hiện tượng | Nguyên nhân | Khắc phục |
@@ -70,3 +84,4 @@ Môi trường triển khai thật (PHẦN B §10) có 2 node ứng dụng sau F
 | 1 | Cạn pool kết nối (`Connection is not available … active=30, waiting=178`), đăng nhập trả 500 | `LoginAttemptLogger` dùng `REQUIRES_NEW` bên trong transaction đăng nhập → mỗi lượt đăng nhập cần 2 kết nối; dưới tải 30 transaction giữ kết nối chờ kết nối thứ hai (deadlock pool) | `LoginAttemptLogger` → `REQUIRED`; bcrypt chạy ngoài transaction (`AuthService.login`), phần ghi trong `TransactionTemplate` |
 | 2 | Lỗi ghi `Duplicate entry 'DVDxxx' for key 'uk_uom_code'` (1,4 % lượt ghi) | Mã đơn vị đo sinh bằng `LPAD(id, 3, '0')` — cắt chuỗi khi id ≥ 1000 | `CONCAT('DVD', IF(id < 1000, LPAD(id,3,'0'), id))` |
 | 3 | k6 mất phiên sau lượt đầu (401) | k6 mặc định xóa cookie mỗi iteration | `noCookiesReset: true` |
+| 4 | “Nhật ký hệ thống” 4,5 s với 2 triệu bản ghi | `ORDER BY at DESC LIMIT` filesort toàn bảng (không có index trên `at`) + `COUNT(*)` toàn bảng | V006 `idx_audit_at (at, id)`; đếm có trần 100.000 (lọc theo ngày vẫn chính xác) → 248 ms |

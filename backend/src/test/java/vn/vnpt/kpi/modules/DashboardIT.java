@@ -44,6 +44,29 @@ class DashboardIT extends AbstractIT {
         assertThat(x.getResponse().getContentAsByteArray().length).isGreaterThan(1000);
     }
 
+    @Autowired vn.vnpt.kpi.modules.sysconfig.service.SysConfigService sysConfig;
+
+    @Test
+    void defaultPeriodFromSystemParameterAndExportForViewRoles() throws Exception {
+        Cookie a = login("admin");
+        // 17.1: DASHBOARD_DEFAULT_PERIOD cố định → kỳ mặc định theo tham số; LATEST → kỳ gần nhất có kết quả
+        jdbc.update("UPDATE sys_config SET config_value = 'Y' WHERE config_key = 'DASHBOARD_DEFAULT_PERIOD'");
+        sysConfig.evict();
+        try {
+            mvc.perform(get("/dashboard/filters").cookie(a)).andExpect(status().isOk()).andExpect(jsonPath("$.data.defaults.period").value("Y"));
+        } finally {
+            jdbc.update("UPDATE sys_config SET config_value = 'LATEST' WHERE config_key = 'DASHBOARD_DEFAULT_PERIOD'");
+            sysConfig.evict();
+        }
+        // 17.6: vai trò xem dashboard Tập đoàn (vd Lập chiến lược, Giao KPI) được xuất kết quả đánh giá KPI (V005)
+        for (String r : java.util.List.of("LAP_CHIEN_LUOC", "GIAO_KPI", "PHOI_HOP_KPI", "DANH_GIA_KPI", "NGUOI_DUNG_DV")) {
+            Integer n = jdbc.queryForObject("""
+                    SELECT COUNT(*) FROM role_permission rp JOIN role ro ON ro.id = rp.role_id JOIN permission p ON p.id = rp.permission_id
+                    WHERE ro.code = ? AND p.code = 'DASHBOARD:EXPORT'""", Integer.class, r);
+            assertThat(n).as(r).isEqualTo(1);
+        }
+    }
+
     @Test
     void unitUserIsScoped() throws Exception {
         Cookie u = login("tinh_hni");

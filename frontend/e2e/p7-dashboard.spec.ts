@@ -531,6 +531,9 @@ test('Phân quyền – Người dùng cấp đơn vị chỉ xem dữ liệu đ
 test('Phân quyền – Lập chiến lược xem được biểu Tập đoàn và bản đồ chiến lược', async ({ page }) => {
   await openDash(page, 'lapchienluoc');
   await expect(content(page)).toHaveAttribute('data-mode', 'GROUP');
+  // 17.6 xuất kết quả: mọi vai trò xem được dashboard đều xuất được
+  const d = await download(page, page.getByRole('button', { name: 'Xuất kết quả đánh giá KPI' }));
+  expect((await sheets(d)).names.length).toBeGreaterThanOrEqual(2);
   await page.getByRole('button', { name: 'Xem bản đồ chiến lược' }).click();
   await expect(page.getByRole('dialog', { name: 'Bản đồ chiến lược' }).getByTestId('strategy-map')).toBeVisible();
 });

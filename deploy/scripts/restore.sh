@@ -13,8 +13,9 @@ START=$(date +%s)
 if [[ "$MODE" == "physical" ]]; then
   systemctl stop mariadb
   DATADIR=$(my_print_defaults --mysqld | sed -n 's/^--datadir=//p' | tail -1); DATADIR=${DATADIR:-/var/lib/mysql}
-  mv "$DATADIR" "${DATADIR}.before-restore.$(date +%s)"
-  mkdir -p "$DATADIR"
+  # chuyển NỘI DUNG datadir (datadir thường là mount point ổ riêng — không đổi tên được thư mục)
+  KEEP="${DATADIR%/}.before-restore.$(date +%s)"; mkdir -p "$KEEP"
+  find "$DATADIR" -mindepth 1 -maxdepth 1 -exec mv -t "$KEEP" {} +
   TMP=$(mktemp -d); tar -C "$TMP" -xzf "$SRC/physical.tar.gz"
   mariabackup --copy-back --target-dir="$TMP/physical" --datadir="$DATADIR"
   chown -R mysql:mysql "$DATADIR"; rm -rf "$TMP"

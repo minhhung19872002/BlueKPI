@@ -105,12 +105,12 @@ Quy trình (mục tiêu RTO ≤ 01 giờ):
 2. Trên DB_01: `/opt/kpi-bsc/scripts/restore.sh /var/backups/kpi-bsc/20261111_0130 logical`
    - script kiểm `sha256sum -c SHA256SUMS` trước;
    - `logical`: `DROP DATABASE` + `CREATE DATABASE … utf8mb4_vietnamese_ci` + nạp `logical.sql.gz` (cần `BACKUP_USER` có quyền DROP/CREATE/INSERT… — thường chạy với tài khoản quản trị, chỉnh `backup.env` tạm thời);
-   - `physical`: dừng MariaDB, đổi tên datadir cũ thành `<datadir>.before-restore.<epoch>`, `mariabackup --copy-back`, `chown mysql`, khởi động MariaDB.
+   - `physical`: dừng MariaDB, chuyển nội dung datadir cũ sang `<datadir>.before-restore.<epoch>` (cần đủ dung lượng trên phân vùng chứa thư mục này), `mariabackup --copy-back`, `chown mysql`, khởi động MariaDB.
 3. Script in thời gian thực hiện. Khởi động lại ứng dụng: `systemctl start kpi-bsc` APP_01 → chờ UP → APP_02.
 4. Kiểm tra: đăng nhập, số bản ghi chính (`SELECT COUNT(*) FROM evaluation_result;`…), `flyway_schema_history`.
 5. Replica: sau khi khôi phục master, **dựng lại DB_02** từ master (`deploy/TRIEN-KHAI.md` §3) vì GTID đã thay đổi.
 
-> **Cảnh báo chế độ `physical`:** `backup.sh` sao lưu vật lý **một phần** (`--databases=kpi_bsc`, không gồm schema hệ thống `mysql`), trong khi `restore.sh` thay **toàn bộ datadir** bằng bản đó. MariaDB không hỗ trợ khôi phục bản partial bằng `--copy-back` như bản full; kết quả có thể thiếu tài khoản/quyền hệ thống. **Chưa kiểm thử.** Cho đến khi đã diễn tập thành công, dùng chế độ `logical`; hoặc sửa `backup.sh` bỏ `--databases` để có bản full. Datadir cũ luôn được giữ lại (`*.before-restore.*`) để quay lui.
+> **Chế độ `physical` đã diễn tập thành công (12/11/2026, §8.1 lần 3):** `backup.sh` sao lưu vật lý **toàn instance** (gồm schema hệ thống `mysql`) nên `--copy-back` thay cả datadir là hợp lệ; khôi phục 685 MB trong 23 s, dữ liệu khớp 100 %. Datadir cũ luôn được giữ lại (`*.before-restore.*`) để quay lui — xóa thủ công sau khi kiểm tra.
 
 Khôi phục đến thời điểm (PITR) bằng binlog: **chưa có script**. Thủ công: khôi phục bản đêm gần nhất rồi `mariadb-binlog --start-position=<pos trong xtrabackup_binlog_info> --stop-datetime='…' mysql-bin.0000xx | mariadb`.
 
@@ -258,7 +258,8 @@ Khi liên hệ hỗ trợ: gửi `traceId` (hiển thị trong thông báo lỗi
 | Lần | Ngày | Môi trường | Kích thước DB | Chế độ | Thời gian `restore.sh` | Tổng thời gian đến khi 2 node UP | Người thực hiện | Ghi chú |
 |---|---|---|---|---|---|---|---|---|
 | 1 | 11/11/2026 | Dev: MariaDB 10.11 (Docker), 1 node ứng dụng | 20,6 MB (8.352 kết quả đánh giá) | logical (`mariadb-dump --single-transaction` + gzip → nạp lại CSDL mới) | sao lưu 1 s; khôi phục 7 s; đối chiếu số dòng `evaluation_result` khớp 8.352/8.352 | + khởi động ứng dụng 11 s (readiness UP) ⇒ **≈ 20 s** | Nhóm triển khai | Ngoại suy tuyến tính theo kích thước: ~ 6 phút/GB khôi phục logical — với CSDL > 5 GB nên dùng physical (mariabackup) để đạt RTO ≤ 1 giờ |
-| 2 | _chưa đo (staging)_ | | | logical | | | | |
-| 3 | _chưa đo (staging)_ | | | physical (sau khi xử lý cảnh báo §3.3) | | | | |
+| 2 | 12/11/2026 | Diễn tập: container `mariadb:10.11` sạch, chạy đúng `backup.sh` + `restore.sh` (systemctl thay bằng stub) | 685 MB (seed-volume: 50.112 kết quả, 2.003.812 audit, 15.014 user) | logical | `backup.sh` 84 s (cả physical + logical, 144 MB nén); `restore.sh logical` **323 s** | + 11 s khởi động ứng dụng ⇒ ≈ 5,6 phút | Nhóm triển khai | Đối chiếu số dòng 3 bảng khớp 100 % |
+| 3 | 12/11/2026 | như lần 2 | 685 MB | physical (mariabackup toàn instance) | `backup.sh` 48 s; `restore.sh physical` **23 s** | + 11 s ⇒ **≈ 35 s** | Nhóm triển khai | Khớp 100 %. Phát hiện & sửa: (1) backup partial `--databases` không khôi phục được khi thay cả datadir → sao lưu toàn instance; (2) `mv datadir` lỗi khi datadir là mount point → chuyển nội dung sang thư mục `*.before-restore.*` |
+| 4 | _chưa đo_ | Staging/production thật (DB_01/DB_02) | | physical | | | | Bắt buộc trước nghiệm thu: đo trên phần cứng và dữ liệu thật |
 
 Cách đo: ghi thời điểm bắt đầu dừng ứng dụng → dòng “Khôi phục (…) xong sau Ns” của `restore.sh` → thời điểm readiness UP cả hai node.
