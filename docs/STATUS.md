@@ -25,14 +25,19 @@ Báo cáo nghiệm thu: `docs/BAO-CAO-KIEM-THU.md` (`node scripts/gen-test-repor
 | Kiểm tra chéo PHẦN C | xong — 2 Blocker (3.9 gán vai trò, 46.4/47.4 thu hồi sau chốt) + 4 Minor đã sửa | `572a95d` |
 | P9 Bàn giao | xong — HDSD 9 phân hệ (30 ảnh), HDQT, VAN-HANH (RTO đo lần 1), TRIEN-KHAI, ATTT, KIEN-TRUC, BÁO CÁO KIỂM THỬ, gói `kpi-bsc-<version>.tar.gz` | commit P9 |
 
-## Việc còn lại / rủi ro (cần Chủ đầu tư hoặc môi trường thật)
+## CI và staging (12/11/2026)
 
-1. **Đo lại trên staging thật** (đã diễn tập tại dev): sao lưu/khôi phục bằng `backup.sh`/`restore.sh` với 685 MB — logical 323 s, physical 23 s, khớp 100 % (`docs/VAN-HANH.md` §8.1 lần 2–3); `seed-volume` 2 triệu audit — dashboard < 150 ms, k6 100 TPS đạt (`docs/perf-report.md` §5b). Còn: đo trên phần cứng DB_01/DB_02 + 2 node sau F5 (§8.1 lần 4).
-2. **Pentest bên ngoài** (PHẦN D §1.d) và chạy pipeline CI thật (Dependency-Check cần `NVD_API_KEY`; ZAP cần `STAGING_URL`).
-3. **Cấu hình theo hạ tầng thật**: dải IP F5 trong `set_real_ip_from` (`deploy/nginx/kpi.conf`), `KPI_SOURCE_ALLOWED_HOSTS`, CAS URL/thuộc tính, SMTP, Zalo OA (OPEN-QUESTIONS #6).
-4. Spring Framework 6.2.19 còn 2 CVE chỉ vá ở 7.x (không ảnh hưởng — suppression hết hạn 31/03/2027): rà soát khi có bản 6.2.x vá hoặc khi E-HSMT cho phép Spring Boot 4.
-5. Các câu hỏi mở `docs/OPEN-QUESTIONS.md` (mẫu báo cáo chính thức, khung điểm, thuật ngữ R2/BCL, ký số TGĐ…).
+- **CI GitHub Actions xanh toàn bộ** trên `main` (`9ec60a8`): backend (`mvnw verify` + SpotBugs/FindSecBugs 0 bug + SBOM/OSV-Scanner), frontend (lint, typecheck, Vitest, build, npm audit), Semgrep OWASP, **e2e Playwright đầy đủ trên runner**, package tarball, **ZAP baseline trên staging**.
+- **Staging**: https://kpi-bsc.14.225.83.93.sslip.io — VM BlueStar, profile `prod` sau Caddy dùng chung (`deploy/staging/README.md`). ZAP FAIL 0 / WARN 0 (cảnh báo đã đánh giá ở `.zap/rules.tsv`).
+- **RTO trên phần cứng staging**: `backup.sh`/`restore.sh` 685 MB — logical 163 s, physical 22 s, khớp 100 % (`docs/VAN-HANH.md` §8.1 lần 4).
 
+## Việc còn lại (ngoài phạm vi kỹ thuật của nhóm phát triển)
+
+1. **Pentest** do đơn vị bên ngoài có giấy phép (PHẦN D §1.d) — staging, tài khoản các vai trò (tạo qua “Quản lý người dùng” từ admin staging) và tài liệu API (bật `SWAGGER_ENABLED` tạm thời) đã sẵn sàng; ghi kết quả vào `docs/ATTT.md`.
+2. **Secret `NVD_API_KEY`** cho bước OWASP Dependency-Check trong CI (đang tự bỏ qua khi thiếu key; OSV-Scanner trên SBOM thay thế và đang chặn build khi có lỗ hổng).
+3. **Hạ tầng production thật** (DB_01/DB_02, 2 node sau F5): cài theo `docs/TRIEN-KHAI.md`, điền dải IP F5 (`set_real_ip_from`), CAS/SMTP/Zalo, `KPI_SOURCE_ALLOWED_HOSTS`; diễn tập khôi phục lần cuối trước vận hành (§8.1). Tên miền thật cho staging (`kpi.bluestar.com.vn`) khi có bản ghi DNS.
+4. Spring Framework 6.2.19 — 2 CVE chỉ vá ở 7.x (không ảnh hưởng; ignore/suppression hết hạn 31/03/2027).
+5. Câu hỏi mở `docs/OPEN-QUESTIONS.md` (mẫu báo cáo chính thức, khung điểm, R2/BCL, ký số TGĐ…).
 ## Ghi chú môi trường dev
 - Hạ tầng: `docker compose -f deploy/docker-compose.dev.yml up -d` (MariaDB 3307, MinIO 9100/9101, Mailpit 1026/8026, mock CAS 8091, mock nguồn KPI 8092). Mật khẩu tài khoản seed dev: `Kpi@2026` (chỉ seed-dev; production không có mật khẩu mặc định — xem `docs/HDQT.md` §2).
 - JDK 21 bắt buộc (`JAVA_HOME`); e2e mặc định BE 8089, FE 4174, DB `kpi_bsc_e2e` (cô lập bằng `E2E_DB/E2E_BE_PORT/E2E_FE_PORT/E2E_DIST/E2E_JAR`). CAS e2e cần mock CAS 8091.
