@@ -77,8 +77,9 @@ const ObjectiveNode = memo(function ObjectiveNode({ data }: NodeProps<Node<ObjDa
           </button>
         )}
         {editable && onRemove && (
-          <button type="button" aria-label={`Xóa mục tiêu ${node.code}`} title="Xóa" className="nodrag rounded p-0.5 text-red-600 hover:bg-red-50" onClick={() => onRemove(node.objectiveId)}>
-            <Trash2 className="h-4 w-4" />
+          <button type="button" aria-label={`Xóa mục tiêu ${node.code}`} title="Xóa" className="nodrag inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[11px] font-medium text-red-600 hover:bg-red-50" onClick={() => onRemove(node.objectiveId)}>
+            <Trash2 className="h-3.5 w-3.5" />
+            Xóa
           </button>
         )}
       </div>

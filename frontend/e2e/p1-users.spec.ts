@@ -145,6 +145,23 @@ test('3.9 Gán vai trò cho người dùng', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Thông tin người dùng' })).toContainText('DANH_GIA_KPI – Đánh giá KPI');
 });
 
+test('3.9 Gán vai trò cho người dùng – tích chọn nhiều vai trò rồi “Lưu”', async ({ page }) => {
+  await openUsers(page);
+  const u = uid('gan2').toLowerCase();
+  await createUser(page, `Gán nhiều vai trò ${u}`, u);
+  await searchKeyword(page, u);
+  await rowAction(page, u, 'Quản lý vai trò người dùng');
+  const dlg = page.getByRole('dialog', { name: 'Quản lý vai trò người dùng' });
+  await dlg.getByTestId('roles-available').getByText('DANH_GIA_KPI – Đánh giá KPI').click();
+  await dlg.getByTestId('roles-available').getByText('PHOI_HOP_KPI', { exact: false }).first().click();
+  await dlg.getByRole('button', { name: 'Lưu' }).click();
+  await expectToast(page, 'Cập nhật vai trò thành công');
+  await rowAction(page, u, 'Xem');
+  const info = page.getByRole('dialog', { name: 'Thông tin người dùng' });
+  await expect(info).toContainText('DANH_GIA_KPI – Đánh giá KPI');
+  await expect(info).toContainText('PHOI_HOP_KPI');
+});
+
 test('3.10 Bỏ gán vai trò của người dùng', async ({ page }) => {
   await openUsers(page);
   const u = uid('bo').toLowerCase();

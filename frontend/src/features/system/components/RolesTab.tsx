@@ -306,6 +306,7 @@ interface PermRow {
   code: string;
   name: string;
   module: string;
+  moduleName?: string;
   menuName?: string;
   description?: string;
   sortOrder: number;
@@ -329,7 +330,7 @@ export function PermissionsTab() {
         columns={[
           { key: 'code', header: 'Mã quyền', sortable: true, width: 190 },
           { key: 'name', header: 'Tên quyền', sortable: true },
-          { key: 'module', header: 'Phân hệ/Menu', sortable: true, render: (r) => `${r.module}${r.menuName ? ' / ' + r.menuName : ''}` },
+          { key: 'module', header: 'Phân hệ/Menu', sortable: true, render: (r) => `${r.moduleName ?? r.module}${r.menuName ? ' / ' + r.menuName : ''}` },
           { key: 'description', header: 'Mô tả' },
           { key: 'sortOrder', header: 'Thứ tự', sortable: true, width: 80, align: 'right' },
           {

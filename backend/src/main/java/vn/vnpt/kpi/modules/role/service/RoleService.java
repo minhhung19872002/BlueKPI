@@ -154,7 +154,9 @@ public class RoleService {
     public PageResult<Permission> searchPermissions(String keyword, String module, PageQuery q) {
         q.applySort(PSORT, "p.sort_order, p.id");
         String kw = Strs.like(keyword);
-        return PageResult.of(mapper.searchPermissions(kw, module, q), mapper.countPermissions(kw, module), q);
+        List<Permission> items = mapper.searchPermissions(kw, module, q);
+        items.forEach(p -> p.setModuleName(MODULE_NAMES.getOrDefault(p.getModule(), p.getModule())));
+        return PageResult.of(items, mapper.countPermissions(kw, module), q);
     }
 
     public Map<String, Object> getPermission(Long id) {

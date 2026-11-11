@@ -333,7 +333,8 @@ function UserRolesDialog({ user, orgNodes, onClose, onSaved }: { user: UserRow; 
   const save = async () => {
     setBusy(true);
     try {
-      await put(EP.users.roles(user.id), list);
+      // 3.9: vai trò đã tích ở cột “Vai trò có sẵn” cũng được gán khi “Lưu” (không bắt buộc bấm “Thêm →”)
+      await put(EP.users.roles(user.id), [...list, ...availSel.filter((id) => !list.some((a) => a.roleId === id)).map((id) => ({ roleId: id, orgUnitId: null }))]);
       toast.success('Cập nhật vai trò thành công');
       onSaved();
       onClose();

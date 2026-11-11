@@ -163,7 +163,13 @@ public class BscService {
         validate(p);
         Map<String, Object> closing = mapper.periodClosing(p.year(), p.period());
         if (closing != null) {
-            throw new BusinessException(ErrorCode.ERR_INVALID_STATE, "Kỳ " + Labels.of(Labels.PERIOD, p.period()) + " năm " + p.year() + " đã được chốt đánh giá KPI");
+            if ("TGD_DA_DUYET".equals(closing.get("status"))) throw new BusinessException(ErrorCode.ERR_PERIOD_LOCKED);
+            // Đã chốt trước đó: chỉ cho chốt lại khi có kết quả mới sau thu hồi (46.4/47.4 → đơn vị đánh giá lại → 48.1)
+            boolean pending = !mapper.resultIdsOfPeriod(p.year(), p.period(), List.of(EvaluationStateMachine.DA_CO_KQ, EvaluationStateMachine.DA_XU_LY)).isEmpty()
+                    || !mapper.notEligibleForClose(p.year(), p.period()).isEmpty();
+            if (!pending) {
+                throw new BusinessException(ErrorCode.ERR_INVALID_STATE, "Kỳ " + Labels.of(Labels.PERIOD, p.period()) + " năm " + p.year() + " đã được chốt đánh giá KPI");
+            }
         }
         if (mapper.countResultsOfPeriod(p.year(), p.period()) == 0) throw new BusinessException(ErrorCode.ERR_INVALID_STATE, "Kỳ đánh giá chưa có dữ liệu");
         List<Map<String, Object>> bad = mapper.notEligibleForClose(p.year(), p.period());

@@ -10,6 +10,8 @@ public class Permission extends BaseEntity {
     private String code;
     private String name;
     private String module;
+    /** Tên phân hệ tiếng Việt (RoleService.MODULE_NAMES) — không lưu DB */
+    private String moduleName;
     private String menuCode;
     private String menuName;
     private String description;

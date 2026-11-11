@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BscIT extends AbstractIT {
     @Autowired JdbcTemplate jdbc;
 
-    static final int YEAR = 2033;
+    static final int YEAR = 2035; // năm riêng: AssignmentIT dùng 2031–2033 trên cùng container
 
     long id(Cookie a, String url) throws Exception {
         return json(mvc.perform(get(url).cookie(a)).andReturn()).at("/data/items/0/id").asLong();
@@ -100,6 +100,15 @@ class BscIT extends AbstractIT {
         assertThat(jdbc.queryForObject("SELECT status FROM evaluation_result WHERE id = ?", String.class, resultHni)).isEqualTo("CHOT_DANH_GIA");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM bsc_unit_summary WHERE year = ? AND period_code = 'Q1' AND bsc_score IS NOT NULL", Integer.class, YEAR)).isGreaterThanOrEqualTo(2);
         mvc.perform(as(post("/bsc/close"), a).content(yp("Q1"))).andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("ERR_INVALID_STATE"));
+
+        // 47.4 thu hồi SAU khi chốt (chưa TGĐ duyệt) → TGĐ duyệt bị chặn → đơn vị đánh giá lại → chốt lại được (48.1) → duyệt (50.2)
+        mvc.perform(as(post("/bsc/revoke-unit"), a).content(om.writeValueAsString(Map.of("resultId", resultHni)))).andExpect(status().isOk());
+        assertThat(jdbc.queryForObject("SELECT status FROM evaluation_result WHERE id = ?", String.class, resultHni)).isEqualTo("BCL_YEU_CAU_LAM_LAI");
+        mvc.perform(as(post("/bsc/approve/check"), a).content(yp("Q1"))).andExpect(status().isOk()).andExpect(jsonPath("$.data.eligible").value(false));
+        mvc.perform(as(post("/bsc/close"), a).content(yp("Q1"))).andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("ERR_NOT_ELIGIBLE"));
+        jdbc.update("UPDATE evaluation_result SET status = 'DA_CO_KQ' WHERE id = ?", resultHni);
+        mvc.perform(as(post("/bsc/close"), a).content(yp("Q1"))).andExpect(status().isOk());
+        assertThat(jdbc.queryForObject("SELECT status FROM evaluation_result WHERE id = ?", String.class, resultHni)).isEqualTo("CHOT_DANH_GIA");
 
         // 50.2 ký duyệt
         mvc.perform(as(post("/bsc/approve/check"), a).content(yp("Q1"))).andExpect(status().isOk())
