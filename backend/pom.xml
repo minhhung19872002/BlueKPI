@@ -41,6 +41,7 @@
     <findsecbugs.version>1.14.0</findsecbugs.version>
     <dependency-check.version>12.2.2</dependency-check.version>
     <skipITs>false</skipITs>
+    <skipDependencyCheck>false</skipDependencyCheck>
   </properties>
 
   <!-- Phụ thuộc bắc cầu có lỗ hổng (minio → guava/bcprov/snappy, jxls → commons-beanutils): ép bản đã vá -->
@@ -168,6 +169,8 @@
             <artifactId>dependency-check-maven</artifactId>
             <version>${dependency-check.version}</version>
             <configuration>
+              <!-- bỏ qua khi chưa có NVD_API_KEY (tải NVD không key bị giới hạn/lỗi) — CI dùng OSV-Scanner thay thế -->
+              <skip>${skipDependencyCheck}</skip>
               <failBuildOnCVSS>7</failBuildOnCVSS>
               <suppressionFile>dependency-check-suppressions.xml</suppressionFile>
               <formats><format>HTML</format><format>JSON</format></formats>

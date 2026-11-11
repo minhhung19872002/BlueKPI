@@ -1,0 +1,10 @@
+# OSV-Scanner (CI: quét SBOM CycloneDX của backend). Mỗi mục bỏ qua phải có lý do + hạn rà soát — xem docs/ATTT.md §11.1.
+[[IgnoredVulns]]
+id = "GHSA-j9f9-w8pj-32f8"  # CVE-2026-47890 — Spring MVC SSE stream corruption
+ignoreUntil = 2027-03-31
+reason = "Không dùng SSE/SseEmitter/ResponseBodyEmitter (thông báo dùng polling). Chỉ vá ở Spring Framework 7.0.9; Spring Boot 3.5.x dùng 6.2.x."
+
+[[IgnoredVulns]]
+id = "GHSA-pc63-qcmh-9cmg"  # CVE-2026-47884 — XsltView SSRF/RCE
+ignoreUntil = 2027-03-31
+reason = "Không dùng XsltView/XsltViewResolver, không render view (REST JSON). Chỉ vá ở Spring Framework 7.0.9."
