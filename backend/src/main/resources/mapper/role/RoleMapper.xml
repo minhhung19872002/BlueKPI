@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.role.mapper.RoleMapper">
+  <sql id="cols">r.id, r.code, r.name, r.description, r.status, r.data_scope, r.is_system, r.created_by, r.created_at, r.updated_by, r.updated_at, r.version,
+    (SELECT COUNT(DISTINCT ur.user_id) FROM user_role ur JOIN app_user u ON u.id = ur.user_id AND u.deleted = 0 WHERE ur.role_id = r.id) AS user_count</sql>
+  <sql id="where">
+    WHERE r.deleted = 0
+    <if test="keyword != null">AND (r.code LIKE #{keyword} OR r.name LIKE #{keyword})</if>
+    <if test="status != null and status != ''">AND r.status = #{status}</if>
+  </sql>
+
+  <select id="search" resultType="vn.vnpt.kpi.modules.role.model.Role">
+    SELECT <include refid="cols"/> FROM role r <include refid="where"/> ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="count" resultType="long">SELECT COUNT(*) FROM role r <include refid="where"/></select>
+  <select id="findActive" resultType="vn.vnpt.kpi.modules.role.model.Role">
+    SELECT <include refid="cols"/> FROM role r WHERE r.deleted = 0 AND r.status = 'HIEU_LUC' ORDER BY r.is_system DESC, r.id
+  </select>
+  <select id="findById" resultType="vn.vnpt.kpi.modules.role.model.Role">
+    SELECT <include refid="cols"/> FROM role r WHERE r.id = #{id} AND r.deleted = 0
+  </select>
+  <select id="findByCode" resultType="vn.vnpt.kpi.modules.role.model.Role">
+    SELECT <include refid="cols"/> FROM role r WHERE r.code = #{code} AND r.deleted = 0
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO role (code, name, description, status, data_scope, is_system, created_by, updated_by)
+    VALUES (#{code}, #{name}, #{description}, #{status}, #{dataScope}, 0, #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="update">
+    UPDATE role SET name = #{name}, description = #{description}, status = #{status}, data_scope = #{dataScope},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="softDelete">
+    UPDATE role SET deleted = 1, updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+
+  <select id="findPermissionIds" resultType="long">SELECT permission_id FROM role_permission WHERE role_id = #{roleId}</select>
+  <delete id="deletePermissions">DELETE FROM role_permission WHERE role_id = #{roleId}</delete>
+  <insert id="insertPermissions">
+    INSERT INTO role_permission (role_id, permission_id) VALUES
+    <foreach collection="ids" item="p" separator=",">(#{roleId}, #{p})</foreach>
+  </insert>
+  <select id="findUserIdsOfRole" resultType="long">SELECT DISTINCT user_id FROM user_role WHERE role_id = #{roleId}</select>
+  <delete id="deleteUserRoles">DELETE FROM user_role WHERE role_id = #{roleId}</delete>
+
+  <!-- Quyền -->
+  <sql id="pcols">p.id, p.code, p.name, p.module, p.menu_code, m.name AS menu_name, p.description, p.sort_order,
+    p.created_by, p.created_at, p.updated_by, p.updated_at, p.version</sql>
+  <sql id="pwhere">
+    WHERE p.deleted = 0
+    <if test="keyword != null">AND (p.code LIKE #{keyword} OR p.name LIKE #{keyword} OR p.description LIKE #{keyword})</if>
+    <if test="module != null and module != ''">AND p.module = #{module}</if>
+  </sql>
+  <select id="searchPermissions" resultType="vn.vnpt.kpi.modules.permission.model.Permission">
+    SELECT <include refid="pcols"/> FROM permission p LEFT JOIN menu m ON m.code = p.menu_code <include refid="pwhere"/>
+    ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countPermissions" resultType="long">SELECT COUNT(*) FROM permission p <include refid="pwhere"/></select>
+  <select id="findAllPermissions" resultType="vn.vnpt.kpi.modules.permission.model.Permission">
+    SELECT <include refid="pcols"/> FROM permission p LEFT JOIN menu m ON m.code = p.menu_code WHERE p.deleted = 0 ORDER BY p.sort_order, p.id
+  </select>
+  <select id="findPermission" resultType="vn.vnpt.kpi.modules.permission.model.Permission">
+    SELECT <include refid="pcols"/> FROM permission p LEFT JOIN menu m ON m.code = p.menu_code WHERE p.id = #{id} AND p.deleted = 0
+  </select>
+  <update id="updatePermission">
+    UPDATE permission SET name = #{name}, description = #{description}, sort_order = #{sortOrder},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <select id="findRolesHavingPermission" resultType="map">
+    SELECT r.id, r.code, r.name, r.status FROM role_permission rp JOIN role r ON r.id = rp.role_id AND r.deleted = 0
+    WHERE rp.permission_id = #{permissionId} ORDER BY r.code
+  </select>
+</mapper>

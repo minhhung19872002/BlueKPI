@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.org.mapper.OrgUnitMapper">
+  <sql id="cols">
+    o.id, o.code, o.name, o.short_name, o.parent_id, p.code AS parent_code, p.name AS parent_name, o.unit_type, o.region_code,
+    o.is_kpi_assignable, o.sort_order, o.path, o.level, o.status, o.hrm_ref,
+    o.created_by, o.created_at, o.updated_by, o.updated_at, o.version
+  </sql>
+  <sql id="where">
+    WHERE o.deleted = 0
+    <if test="f.keyword != null">AND (o.code LIKE #{f.keyword} OR o.name LIKE #{f.keyword} OR o.short_name LIKE #{f.keyword})</if>
+    <if test="f.unitType != null">AND o.unit_type = #{f.unitType}</if>
+    <if test="f.regionCode != null">AND o.region_code = #{f.regionCode}</if>
+    <if test="f.parentId != null">AND o.parent_id = #{f.parentId}</if>
+    <include refid="common.scope"><property name="col" value="o.id"/></include>
+  </sql>
+
+  <select id="search" resultType="vn.vnpt.kpi.modules.org.model.OrgUnit">
+    SELECT <include refid="cols"/> FROM org_unit o LEFT JOIN org_unit p ON p.id = o.parent_id
+    <include refid="where"/>
+    ORDER BY ${q.orderBy}
+    LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+
+  <select id="count" resultType="long">
+    SELECT COUNT(*) FROM org_unit o <include refid="where"/>
+  </select>
+
+  <select id="findAllActive" resultType="vn.vnpt.kpi.modules.org.model.OrgUnit">
+    SELECT <include refid="cols"/> FROM org_unit o LEFT JOIN org_unit p ON p.id = o.parent_id
+    WHERE o.deleted = 0 <if test="assignableOnly">AND o.is_kpi_assignable = 1</if>
+    <include refid="common.scope"><property name="col" value="o.id"/></include>
+    ORDER BY o.level, o.sort_order, o.code
+  </select>
+
+  <select id="findById" resultType="vn.vnpt.kpi.modules.org.model.OrgUnit">
+    SELECT <include refid="cols"/> FROM org_unit o LEFT JOIN org_unit p ON p.id = o.parent_id WHERE o.id = #{id} AND o.deleted = 0
+  </select>
+
+  <select id="findByCode" resultType="vn.vnpt.kpi.modules.org.model.OrgUnit">
+    SELECT <include refid="cols"/> FROM org_unit o LEFT JOIN org_unit p ON p.id = o.parent_id WHERE o.code = #{code} AND o.deleted = 0
+  </select>
+
+  <select id="findByCodes" resultType="vn.vnpt.kpi.modules.org.model.OrgUnit">
+    SELECT <include refid="cols"/> FROM org_unit o LEFT JOIN org_unit p ON p.id = o.parent_id
+    WHERE o.deleted = 0 AND o.code IN <foreach collection="codes" item="c" open="(" separator="," close=")">#{c}</foreach>
+  </select>
+
+  <select id="findByIds" resultType="vn.vnpt.kpi.modules.org.model.OrgUnit">
+    SELECT <include refid="cols"/> FROM org_unit o LEFT JOIN org_unit p ON p.id = o.parent_id
+    WHERE o.deleted = 0 AND o.id IN <foreach collection="ids" item="c" open="(" separator="," close=")">#{c}</foreach>
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO org_unit (code, name, short_name, parent_id, unit_type, region_code, is_kpi_assignable, sort_order, path, level, status, hrm_ref, created_by, updated_by)
+    VALUES (#{code}, #{name}, #{shortName}, #{parentId}, #{unitType}, #{regionCode}, #{isKpiAssignable}, #{sortOrder}, '/', 1, 'HIEU_LUC', #{hrmRef}, #{createdBy}, #{updatedBy})
+  </insert>
+
+  <update id="update">
+    UPDATE org_unit SET name = #{name}, short_name = #{shortName}, parent_id = #{parentId}, unit_type = #{unitType}, region_code = #{regionCode},
+      is_kpi_assignable = #{isKpiAssignable}, sort_order = #{sortOrder}, updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+
+  <update id="updatePath">UPDATE org_unit SET path = #{path}, level = #{level} WHERE id = #{id}</update>
+
+  <update id="rebasePaths">
+    UPDATE org_unit SET path = CONCAT(#{newPrefix}, SUBSTRING(path, CHAR_LENGTH(#{oldPrefix}) + 1)), level = level + #{levelDelta}
+    WHERE path LIKE CONCAT(#{oldPrefix}, '%') AND path &lt;&gt; #{oldPrefix}
+  </update>
+
+  <update id="softDelete">
+    UPDATE org_unit SET deleted = 1, updated_by = #{by}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+
+  <select id="countReferences" resultType="map">
+    SELECT
+      (SELECT COUNT(*) FROM org_unit WHERE parent_id = #{id} AND deleted = 0) AS children,
+      (SELECT COUNT(*) FROM app_user WHERE org_unit_id = #{id} AND deleted = 0) AS users,
+      (SELECT COUNT(*) FROM kpi_assignment_detail WHERE org_unit_id = #{id} AND deleted = 0) AS assignments,
+      (SELECT COUNT(*) FROM evaluation_result WHERE org_unit_id = #{id} AND deleted = 0) AS evaluations,
+      (SELECT COUNT(*) FROM kpi WHERE deleted = 0 AND (assigning_unit_id = #{id} OR evaluating_unit_id = #{id})) AS kpis,
+      (SELECT COUNT(*) FROM strategy WHERE org_unit_id = #{id} AND deleted = 0) AS strategies
+  </select>
+</mapper>

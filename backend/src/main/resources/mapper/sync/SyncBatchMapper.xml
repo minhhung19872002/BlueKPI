@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.sync.mapper.SyncBatchMapper">
+  <sql id="cols">id, job_type, year, period_code, kpi_id, schedule_id, `trigger`, started_at, finished_at, status, total, success, failed, message, triggered_by</sql>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO sync_batch (job_type, year, period_code, kpi_id, schedule_id, `trigger`, started_at, status, triggered_by)
+    VALUES (#{jobType}, #{year}, #{periodCode}, #{kpiId}, #{scheduleId}, #{trigger}, NOW(3), 'DANG_CHAY', #{triggeredBy})
+  </insert>
+  <update id="finish">
+    UPDATE sync_batch SET status = #{status}, total = #{total}, success = #{success}, failed = #{failed}, message = #{message}, finished_at = NOW(3)
+    WHERE id = #{id}
+  </update>
+  <select id="findById" resultType="vn.vnpt.kpi.modules.sync.model.SyncBatch">SELECT <include refid="cols"/> FROM sync_batch WHERE id = #{id}</select>
+  <select id="recentBySchedule" resultType="vn.vnpt.kpi.modules.sync.model.SyncBatch">
+    SELECT <include refid="cols"/> FROM sync_batch WHERE schedule_id = #{scheduleId} ORDER BY started_at DESC, id DESC LIMIT #{limit}
+  </select>
+  <select id="recentByJobType" resultType="vn.vnpt.kpi.modules.sync.model.SyncBatch">
+    SELECT <include refid="cols"/> FROM sync_batch WHERE job_type = #{jobType} ORDER BY started_at DESC, id DESC LIMIT #{limit}
+  </select>
+  <insert id="insertItem">
+    INSERT INTO sync_batch_item (batch_id, formula_definition_id, org_unit_id, request_summary, value, error, at)
+    VALUES (#{batchId}, #{formulaId}, #{orgUnitId}, #{request}, #{value}, #{error}, NOW(3))
+  </insert>
+  <select id="errorItems" resultType="map">
+    SELECT i.id, o.code AS unitCode, o.name AS unitName, f.code AS formulaCode, i.request_summary AS request, i.error
+    FROM sync_batch_item i LEFT JOIN org_unit o ON o.id = i.org_unit_id LEFT JOIN formula_definition f ON f.id = i.formula_definition_id
+    WHERE i.batch_id = #{batchId} AND i.error IS NOT NULL ORDER BY i.id LIMIT 1000
+  </select>
+  <select id="recentItemsByFormula" resultType="map">
+    SELECT i.id, i.at, b.`trigger` AS `trigger`, b.year, b.period_code AS periodCode, o.code AS unitCode, o.name AS unitName,
+      i.value, i.error, i.request_summary AS request
+    FROM sync_batch_item i JOIN sync_batch b ON b.id = i.batch_id LEFT JOIN org_unit o ON o.id = i.org_unit_id
+    WHERE i.formula_definition_id = #{formulaId} ORDER BY i.at DESC, i.id DESC LIMIT #{limit}
+  </select>
+</mapper>

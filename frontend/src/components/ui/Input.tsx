@@ -44,7 +44,7 @@ export function Label({ children, required, htmlFor, className }: { children: Re
   return (
     <label htmlFor={htmlFor} className={cn('mb-1 block text-[13px] font-medium text-slate-700', className)}>
       {children}
-      {required && <span className="required-mark">*</span>}
+      {required && <span className="required-mark" aria-hidden="true">*</span>}
     </label>
   );
 }

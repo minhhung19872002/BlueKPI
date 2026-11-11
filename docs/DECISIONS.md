@@ -65,6 +65,8 @@ Phiên bản chính xác đã khóa trong `frontend/package-lock.json`.
 | Apache Tika (BE) | Bắt buộc theo PHẦN B §9.7 (magic bytes) |
 | Jayway json-path (BE) | Bắt buộc để đọc `response_path` (JSONPath) |
 | `cron-utils` (BE) — không dùng; tự viết `CronDescriber` tiếng Việt | Tránh thêm phụ thuộc |
+| `exceljs` (devDependency FE) | Chỉ dùng trong e2e Playwright để tạo file .xlsx nhập liệu; không đóng gói vào bản build |
+| `@fontsource/be-vietnam-pro` | Font “Be Vietnam Pro” đóng gói cục bộ (không phụ thuộc Google Fonts khi chạy mạng nội bộ) |
 
 ## 4. Quyết định kiến trúc
 

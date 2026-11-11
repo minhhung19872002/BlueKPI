@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Đoạn SQL dùng chung. ${col} là tên cột hằng trong XML (không phải dữ liệu người dùng). -->
+<mapper namespace="common">
+  <!-- Lọc theo phạm vi đơn vị (DataScopeService): <include refid="common.scope"><property name="col" value="x.org_unit_id"/></include> -->
+  <sql id="scope">
+    <if test="scope != null and !scope.all">
+      <choose>
+        <when test="scope.unitIds.isEmpty()">AND 1 = 0</when>
+        <otherwise>AND ${col} IN <foreach collection="scope.unitIds" item="_sid" open="(" separator="," close=")">#{_sid}</foreach></otherwise>
+      </choose>
+    </if>
+  </sql>
+</mapper>

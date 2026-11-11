@@ -41,3 +41,34 @@ export async function pickSearch(page: Page, triggerLabel: string, itemText: str
   await page.getByPlaceholder('Tìm kiếm').last().fill(itemText);
   await page.getByRole('option', { name: new RegExp(itemText) }).first().click();
 }
+
+/** Tạo file .xlsx (sheet 1: dòng tiêu đề + dữ liệu) để nhập */
+export async function makeXlsx(headers: string[], rows: (string | number | null)[][]): Promise<Buffer> {
+  const ExcelJS = (await import('exceljs')).default;
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Du lieu');
+  ws.addRow(headers);
+  rows.forEach((r) => ws.addRow(r));
+  return Buffer.from(await wb.xlsx.writeBuffer());
+}
+
+/** Mở dialog nhập, kiểm tra và xác nhận; trả về locator kết quả */
+export async function importFile(page: Page, buffer: Buffer, name = 'nhap.xlsx') {
+  const dlg = page.getByRole('dialog', { name: 'Nhập dữ liệu từ file' });
+  await expect(dlg.getByText('Tải file mẫu')).toBeVisible();
+  await dlg.getByTestId('import-file').setInputFiles({ name, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer });
+  await dlg.getByRole('button', { name: 'Kiểm tra' }).click();
+  await expect(dlg.getByRole('table', { name: 'Bảng xem trước' })).toBeVisible();
+  return dlg;
+}
+
+/** Bấm nút trên một dòng lưới */
+export async function rowAction(page: Page, text: string | RegExp, action: string) {
+  await row(page, text).getByRole('button', { name: action, exact: true }).click();
+}
+
+/** Tìm kiếm theo từ khóa trên thanh tìm kiếm */
+export async function searchKeyword(page: Page, kw: string) {
+  await page.getByLabel('Từ khóa tìm kiếm').fill(kw);
+  await page.getByLabel('Từ khóa tìm kiếm').press('Enter');
+}

@@ -59,6 +59,7 @@
     "@vitejs/plugin-react": "^5.0.2",
     "eslint": "^9.35.0",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "exceljs": "^4.4.0",
     "globals": "^16.3.0",
     "jsdom": "^26.1.0",
     "tailwindcss": "^4.1.13",
