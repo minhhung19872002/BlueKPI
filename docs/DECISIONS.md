@@ -80,3 +80,5 @@ Phiên bản chính xác đã khóa trong `frontend/package-lock.json`.
 8. **Báo cáo JXLS**: template mặc định tự sinh lúc khởi động (nếu bảng `report_template` chưa có file) bằng POI, lưu MinIO; admin thay file khác qua API.
 9. **Dev không có Docker cho chạy app**: backend chạy bằng `mvnw` trên máy, hạ tầng (MariaDB/MinIO/Mailpit/mock CAS/mock KPI source) chạy bằng `deploy/docker-compose.dev.yml`.
 10. **Kỳ đánh giá**: mã kỳ `Q1, Q2, H1, Q3, Q4, Y`; giai đoạn trên dashboard dùng tham số `period=GD:<id>` (id bảng `evaluation_stage`).
+
+11. **Image MinIO**: `minio/minio` không còn kéo được từ Docker Hub (`pull access denied` — 11/2026, CI và VM staging đều lỗi). Dùng bản build Chainguard `cgr.dev/chainguard/minio` **ghim digest** (dev compose, staging, Testcontainers `asCompatibleSubstituteFor("minio/minio")`, `/data` tmpfs). Image chạy user 65532: volume dữ liệu cũ tạo bởi image cũ (root) cần `chown -R 65532` hoặc tạo volume mới. Production cài MinIO bằng binary theo `docs/TRIEN-KHAI.md` — không phụ thuộc image này.

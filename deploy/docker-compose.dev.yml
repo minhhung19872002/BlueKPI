@@ -26,7 +26,8 @@ services:
       retries: 30
 
   minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    # minio/minio đã ngừng phát hành trên Docker Hub (pull access denied, 11/2026) → bản build Chainguard, ghim digest
+    image: cgr.dev/chainguard/minio@sha256:db3f583fa49121942168bd6383a773b2cde3384c9a99bf7193560b9a0f3a28fd
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: kpiminio

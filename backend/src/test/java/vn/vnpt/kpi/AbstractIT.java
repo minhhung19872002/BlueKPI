@@ -36,7 +36,11 @@ public abstract class AbstractIT {
     static final MariaDBContainer<?> MARIADB = new MariaDBContainer<>("mariadb:10.11")
             .withDatabaseName("kpi_bsc").withUsername("kpi_migrate").withPassword("kpi_migrate_it")
             .withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_vietnamese_ci", "--default-time-zone=+07:00");
-    static final MinIOContainer MINIO = new MinIOContainer("minio/minio:RELEASE.2025-04-22T22-12-26Z")
+    /** minio/minio đã ngừng phát hành trên Docker Hub → bản build Chainguard (ghim digest); /data là tmpfs (tránh lỗi rename trên overlayfs) */
+    static final MinIOContainer MINIO = new MinIOContainer(org.testcontainers.utility.DockerImageName
+            .parse("cgr.dev/chainguard/minio@sha256:db3f583fa49121942168bd6383a773b2cde3384c9a99bf7193560b9a0f3a28fd")
+            .asCompatibleSubstituteFor("minio/minio"))
+            .withTmpFs(java.util.Map.of("/data", "rw"))
             .withUserName("itminio").withPassword("itminio_secret_123");
 
     static {
