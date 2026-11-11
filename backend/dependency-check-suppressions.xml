@@ -2,7 +2,24 @@
 <!--
   OWASP Dependency-Check (profile -Psecurity, failBuildOnCVSS=7).
   Mỗi suppression phải có lý do + ngày rà soát lại; không suppress lỗ hổng chưa phân tích.
-  Hiện chưa có mục nào được chấp nhận rủi ro.
 -->
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+  <suppress until="2027-03-31Z">
+    <notes><![CDATA[
+      CVE-2026-47890 (GHSA-j9f9-w8pj-32f8): hỏng luồng Server-Sent Events khi render view fragment.
+      KHÔNG ẢNH HƯỞNG: ứng dụng không dùng SSE/SseEmitter/ResponseBodyEmitter (thông báo dùng polling 60s),
+      không render view (REST JSON). Bản vá chỉ có ở Spring Framework 7.0.9; Spring Boot 3.5.x (stack E-HSMT) dùng 6.2.x.
+      Rà soát lại khi nâng Spring Boot 4 / có bản 6.2.x vá. Đánh giá: 11/11/2026.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-webmvc@.*$</packageUrl>
+    <cve>CVE-2026-47890</cve>
+  </suppress>
+  <suppress until="2027-03-31Z">
+    <notes><![CDATA[
+      CVE-2026-47884 (GHSA-pc63-qcmh-9cmg): SSRF/RCE qua XsltView khi có mapping "/**" render view không chỉ định tên.
+      KHÔNG ẢNH HƯỞNG: không dùng XsltView/XsltViewResolver, không có view resolver (REST JSON). Đánh giá: 11/11/2026.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-webmvc@.*$</packageUrl>
+    <cve>CVE-2026-47884</cve>
+  </suppress>
 </suppressions>

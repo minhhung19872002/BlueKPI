@@ -1,0 +1,494 @@
+{
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "setup": {
+                "checks": {
+                    "đăng nhập 200": {
+                        "id": "e82ec49cb9894a5bf807310685a2fd31",
+                        "passes": 7,
+                        "fails": 0,
+                        "name": "đăng nhập 200",
+                        "path": "::setup::đăng nhập 200"
+                    }
+                },
+                "name": "setup",
+                "path": "::setup",
+                "id": "5c0f8025f7e0b6654089e5b00e950f1a",
+                "groups": {}
+            }
+        },
+        "checks": {
+            "đọc 200": {
+                "name": "đọc 200",
+                "path": "::đọc 200",
+                "id": "fc1059e049ac1d796b4b6ecbe2e529af",
+                "passes": 21093,
+                "fails": 0
+            },
+            "ghi 200": {
+                "name": "ghi 200",
+                "path": "::ghi 200",
+                "id": "c678ced1ccd11ca97a6cca118a3296dd",
+                "passes": 9015,
+                "fails": 0
+            },
+            "xóa 200": {
+                "fails": 0,
+                "name": "xóa 200",
+                "path": "::xóa 200",
+                "id": "942023b9a5beefe45acdb2220a4f8658",
+                "passes": 1289
+            }
+        },
+        "name": ""
+    },
+    "metrics": {
+        "http_req_duration": {
+            "avg": 16.41400799721166,
+            "min": 1.666339,
+            "med": 9.7817735,
+            "p(90)": 20.3567975,
+            "p(95)": 27.141801749999985,
+            "p(99)": 229.59208457999995,
+            "max": 664.664489
+        },
+        "data_sent": {
+            "rate": 50383.91754219963,
+            "count": 15556675
+        },
+        "iterations": {
+            "count": 30108,
+            "rate": 97.5117748079552
+        },
+        "http_req_duration{kind:auth}": {
+            "p(99)": 264.6762698,
+            "max": 265.13491,
+            "avg": 89.96630023809523,
+            "min": 2.621863,
+            "med": 4.587016,
+            "p(90)": 262.269318,
+            "p(95)": 262.841709,
+            "thresholds": {
+                "p(95)<2000": false
+            }
+        },
+        "http_reqs": {
+            "rate": 103.37388163678472,
+            "count": 31918
+        },
+        "http_req_duration{kind:read}": {
+            "avg": 19.53794875209572,
+            "min": 1.666339,
+            "med": 11.238075,
+            "p(90)": 22.3049088,
+            "p(95)": 31.524146599999987,
+            "p(99)": 256.6238381199966,
+            "max": 664.664489,
+            "thresholds": {
+                "p(95)<2000": false
+            }
+        },
+        "http_req_duration{expected_response:true}": {
+            "avg": 16.41400799721166,
+            "min": 1.666339,
+            "med": 9.7817735,
+            "p(90)": 20.3567975,
+            "p(95)": 27.141801749999985,
+            "p(99)": 229.59208457999995,
+            "max": 664.664489
+        },
+        "iteration_duration": {
+            "p(90)": 6623.8584447,
+            "p(95)": 6824.44432675,
+            "p(99)": 6979.77342236,
+            "max": 7721.120234,
+            "avg": 5023.03271918821,
+            "min": 3005.065681,
+            "med": 5030.0071995
+        },
+        "data_received": {
+            "count": 244129516,
+            "rate": 790670.3330731732
+        },
+        "http_req_duration{kind:write}": {
+            "med": 3.9746145,
+            "p(90)": 16.647446900000002,
+            "p(95)": 19.4028843,
+            "p(99)": 158.02034101999956,
+            "max": 471.501703,
+            "avg": 9.717593900038844,
+            "min": 1.798678,
+            "thresholds": {
+                "p(95)<2000": false
+            }
+        },
+        "vus": {
+            "value": 12,
+            "min": 0,
+            "max": 500
+        },
+        "kpi_reads": {
+            "rate": 68.31459632071872,
+            "count": 21093
+        },
+        "http_req_tls_handshaking": {
+            "med": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0,
+            "max": 0,
+            "avg": 0,
+            "min": 0
+        },
+        "checks": {
+            "passes": 31404,
+            "fails": 0,
+            "thresholds": {
+                "rate>0.999": false
+            },
+            "value": 1
+        },
+        "kpi_writes": {
+            "count": 9015,
+            "rate": 29.19717848723649
+        },
+        "kpi_login_ms": {
+            "p(90)": 263.75898939999996,
+            "p(95)": 264.4469497,
+            "p(99)": 264.99731794,
+            "max": 265.13491,
+            "avg": 260.1580931428572,
+            "min": 252.631126,
+            "med": 260.903638
+        },
+        "vus_max": {
+            "value": 500,
+            "min": 500,
+            "max": 500
+        },
+        "http_req_waiting": {
+            "min": 1.440282,
+            "med": 9.3141435,
+            "p(90)": 19.3802104,
+            "p(95)": 25.351492499999978,
+            "p(99)": 227.16821971999934,
+            "max": 664.515285,
+            "avg": 15.671960722445046
+        },
+        "http_req_blocked": {
+            "med": 0.006072,
+            "p(90)": 0.008957,
+            "p(95)": 0.01086334999999998,
+            "p(99)": 46.94868414999854,
+            "max": 221.607778,
+            "avg": 1.0277385693339114,
+            "min": 0.001853
+        },
+        "http_req_receiving": {
+            "avg": 0.6480333976752912,
+            "min": -2.583135,
+            "med": 0.1893165,
+            "p(90)": 1.7228081,
+            "p(95)": 2.498076199999997,
+            "p(99)": 4.9982014799999845,
+            "max": 81.871464
+        },
+        "http_req_sending": {
+            "min": 0.007184,
+            "med": 0.047302,
+            "p(90)": 0.06413869999999999,
+            "p(95)": 0.078835,
+            "p(99)": 0.3954492299999991,
+            "max": 46.873684,
+            "avg": 0.09401387709129702
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 31918,
+            "thresholds": {
+                "rate<0.001": false
+            },
+            "value": 0
+        },
+        "http_req_connecting": {
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 46.212331669999784,
+            "max": 216.333579,
+            "avg": 0.9998659529419134,
+            "min": 0,
+            "med": 0
+        }
+    },
+    "setup_data": {
+        "danhgia": {
+            "access": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5IiwidXNyIjoiZGFuaGdpYSIsInNpZCI6Mzg1MiwiYW0iOiJMT0NBTCIsInR5cCI6ImFjY2VzcyIsImlzcyI6ImtwaS1ic2MiLCJpYXQiOjE3OTQ0MTI2MDAsImV4cCI6MTc5NDQxMzUwMH0.Cf42cAD4R7zNU99Z0wRcSxfH_siYG53m1rTtwdjTs0A7fZbsrEgXzYjFD78DU37EWnfpuMFb_j_5Cc04Y9oDsA",
+            "perms": [
+                "ASSIGN:VIEW",
+                "BSC:VIEW",
+                "DASHBOARD:VIEW_GROUP",
+                "DASHBOARD:VIEW_PROVINCE",
+                "DASHBOARD:VIEW_UNIT",
+                "EVAL:ADJUST",
+                "EVAL:CLOSE_R2",
+                "EVAL:IMPORT",
+                "EVAL:INPUT",
+                "EVAL:SYNC",
+                "EVAL:VIEW",
+                "KPI:VIEW",
+                "MYKPI:VIEW",
+                "NOTIFY:VIEW",
+                "STRATEGY:VIEW"
+            ]
+        },
+        "giaokpi": {
+            "access": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3IiwidXNyIjoiZ2lhb2twaSIsInNpZCI6Mzg1MywiYW0iOiJMT0NBTCIsInR5cCI6ImFjY2VzcyIsImlzcyI6ImtwaS1ic2MiLCJpYXQiOjE3OTQ0MTI2MDAsImV4cCI6MTc5NDQxMzUwMH0.Y5jwMlwM2JC9kisVukcYbeF_K7bBVvznU528_nfhmdMxZwila_JrGLGN74lCSGsY4O74JnNekxjGvr2eaxU6Yg",
+            "perms": [
+                "ASSIGN:ADJUST",
+                "ASSIGN:CLOSE",
+                "ASSIGN:COPY",
+                "ASSIGN:CREATE",
+                "ASSIGN:DELETE",
+                "ASSIGN:EXPORT",
+                "ASSIGN:IMPORT",
+                "ASSIGN:UPDATE",
+                "ASSIGN:VIEW",
+                "DASHBOARD:VIEW_GROUP",
+                "DASHBOARD:VIEW_PROVINCE",
+                "DASHBOARD:VIEW_UNIT",
+                "KPI:VIEW",
+                "MYKPI:VIEW",
+                "NOTIFY:VIEW",
+                "OBJECTIVE:VIEW",
+                "PERSPECTIVE:VIEW",
+                "STRATEGY:VIEW",
+                "UOM:VIEW"
+            ]
+        },
+        "lanhdao": {
+            "access": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwidXNyIjoibGFuaGRhbyIsInNpZCI6Mzg0OCwiYW0iOiJMT0NBTCIsInR5cCI6ImFjY2VzcyIsImlzcyI6ImtwaS1ic2MiLCJpYXQiOjE3OTQ0MTI1OTksImV4cCI6MTc5NDQxMzQ5OX0.2PjcSwuZ7Q3oMCIMLKD8JLdiwu-D5yy61HvS5FIxZgWIBTgfYr44QzP1KibE-8cGNM7EgTnh8PZnykjCLba7Bw",
+            "perms": [
+                "ASSIGN:VIEW",
+                "BSC:REPORT",
+                "BSC:VIEW",
+                "DASHBOARD:EXPORT",
+                "DASHBOARD:VIEW_GROUP",
+                "DASHBOARD:VIEW_PROVINCE",
+                "DASHBOARD:VIEW_UNIT",
+                "EVAL:VIEW",
+                "FORMULA:VIEW",
+                "KPI:VIEW",
+                "MYKPI:EXPORT",
+                "MYKPI:VIEW",
+                "NOTIFY:VIEW",
+                "OBJECTIVE:VIEW",
+                "PERSPECTIVE:VIEW",
+                "STRATEGY:VIEW",
+                "UOM:VIEW"
+            ]
+        },
+        "qtgiao": {
+            "access": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwidXNyIjoicXRnaWFvIiwic2lkIjozODUwLCJhbSI6IkxPQ0FMIiwidHlwIjoiYWNjZXNzIiwiaXNzIjoia3BpLWJzYyIsImlhdCI6MTc5NDQxMjYwMCwiZXhwIjoxNzk0NDEzNTAwfQ.XpFNYqxrrAGHUDQEFJ0eoDmxCqY6GpJgQy582ILh2GgDrz9IsmUtMIGNQaAV9ClqQz5J0kZfsNqQPdeGxhvHvg",
+            "perms": [
+                "ASSIGN:ADJUST",
+                "ASSIGN:CLOSE",
+                "ASSIGN:COPY",
+                "ASSIGN:CREATE",
+                "ASSIGN:DELETE",
+                "ASSIGN:EXPORT",
+                "ASSIGN:IMPORT",
+                "ASSIGN:UPDATE",
+                "ASSIGN:VIEW",
+                "BSC:VIEW",
+                "DASHBOARD:EXPORT",
+                "DASHBOARD:VIEW_GROUP",
+                "DASHBOARD:VIEW_PROVINCE",
+                "DASHBOARD:VIEW_UNIT",
+                "EVAL:VIEW",
+                "FORMULA:CREATE",
+                "FORMULA:DELETE",
+                "FORMULA:TEST",
+                "FORMULA:UPDATE",
+                "FORMULA:VIEW",
+                "KPI:CREATE",
+                "KPI:DELETE",
+                "KPI:EXPORT",
+                "KPI:IMPORT",
+                "KPI:UPDATE",
+                "KPI:VIEW",
+                "MYKPI:VIEW",
+                "NOTIFY:VIEW",
+                "OBJECTIVE:CREATE",
+                "OBJECTIVE:DELETE",
+                "OBJECTIVE:EXPORT",
+                "OBJECTIVE:IMPORT",
+                "OBJECTIVE:UPDATE",
+                "OBJECTIVE:VIEW",
+                "PERSPECTIVE:CREATE",
+                "PERSPECTIVE:DELETE",
+                "PERSPECTIVE:EXPORT",
+                "PERSPECTIVE:IMPORT",
+                "PERSPECTIVE:UPDATE",
+                "PERSPECTIVE:VIEW",
+                "STRATEGY:VIEW",
+                "UOM:CREATE",
+                "UOM:DELETE",
+                "UOM:EXPORT",
+                "UOM:IMPORT",
+                "UOM:UPDATE",
+                "UOM:VIEW"
+            ]
+        },
+        "qtthamdinh": {
+            "access": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2IiwidXNyIjoicXR0aGFtZGluaCIsInNpZCI6Mzg1MSwiYW0iOiJMT0NBTCIsInR5cCI6ImFjY2VzcyIsImlzcyI6ImtwaS1ic2MiLCJpYXQiOjE3OTQ0MTI2MDAsImV4cCI6MTc5NDQxMzUwMH0.2Cd--S448Q1hgr_yvlCF1tBDfkOSt0TZRqmmL1voNuaBF7gmyUUUPFeShhSK-P0E6DHfcHrkw69QngtK2Oqvfw",
+            "perms": [
+                "ASSIGN:VIEW",
+                "BSC:CLOSE",
+                "BSC:RECALC",
+                "BSC:REPORT",
+                "BSC:REVOKE",
+                "BSC:VIEW",
+                "DASHBOARD:EXPORT",
+                "DASHBOARD:VIEW_GROUP",
+                "DASHBOARD:VIEW_PROVINCE",
+                "DASHBOARD:VIEW_UNIT",
+                "EVAL:ADJUST",
+                "EVAL:CLOSE_R2",
+                "EVAL:IMPORT",
+                "EVAL:INPUT",
+                "EVAL:SYNC",
+                "EVAL:VIEW",
+                "FORMULA:TEST",
+                "FORMULA:VIEW",
+                "KPI:VIEW",
+                "MYKPI:VIEW",
+                "NOTIFY:VIEW",
+                "OBJECTIVE:VIEW",
+                "PERSPECTIVE:VIEW",
+                "STRATEGY:VIEW",
+                "UOM:VIEW"
+            ]
+        },
+        "tgd": {
+            "access": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwidXNyIjoidGdkIiwic2lkIjozODQ5LCJhbSI6IkxPQ0FMIiwidHlwIjoiYWNjZXNzIiwiaXNzIjoia3BpLWJzYyIsImlhdCI6MTc5NDQxMjU5OSwiZXhwIjoxNzk0NDEzNDk5fQ.Np0Jx9YwYIOxL4LZr0DtQSTsccRL_eldlF4Y78B9zglga4bvyh8Roj2peUeLP4GxGYXxm-JSQa0Yqhzv2VgjmQ",
+            "perms": [
+                "ASSIGN:VIEW",
+                "BSC:APPROVE",
+                "BSC:REPORT",
+                "BSC:VIEW",
+                "DASHBOARD:EXPORT",
+                "DASHBOARD:VIEW_GROUP",
+                "DASHBOARD:VIEW_PROVINCE",
+                "DASHBOARD:VIEW_UNIT",
+                "EVAL:VIEW",
+                "FORMULA:VIEW",
+                "KPI:VIEW",
+                "MYKPI:EXPORT",
+                "MYKPI:VIEW",
+                "NOTIFY:VIEW",
+                "OBJECTIVE:VIEW",
+                "PERSPECTIVE:VIEW",
+                "STRATEGY:VIEW",
+                "UOM:VIEW"
+            ]
+        },
+        "admin": {
+            "access": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwidXNyIjoiYWRtaW4iLCJzaWQiOjM4NDcsImFtIjoiTE9DQUwiLCJ0eXAiOiJhY2Nlc3MiLCJpc3MiOiJrcGktYnNjIiwiaWF0IjoxNzk0NDEyNTk5LCJleHAiOjE3OTQ0MTM0OTl9.MPhpjrKobdCHPsGO7t_cR60esWPVw7aRdP8RMxGaRpk8ONFT9sWdyf-FwoTyb8X1d7exVaydyEAW_8RsUN7Ytw",
+            "perms": [
+                "ASSIGN:ADJUST",
+                "ASSIGN:CLOSE",
+                "ASSIGN:COPY",
+                "ASSIGN:CREATE",
+                "ASSIGN:DELETE",
+                "ASSIGN:EXPORT",
+                "ASSIGN:IMPORT",
+                "ASSIGN:UPDATE",
+                "ASSIGN:VIEW",
+                "AUDIT:VIEW",
+                "BSC:APPROVE",
+                "BSC:CLOSE",
+                "BSC:RECALC",
+                "BSC:REPORT",
+                "BSC:REVOKE",
+                "BSC:VIEW",
+                "DASHBOARD:EXPORT",
+                "DASHBOARD:VIEW_GROUP",
+                "DASHBOARD:VIEW_PROVINCE",
+                "DASHBOARD:VIEW_UNIT",
+                "EVAL:ADJUST",
+                "EVAL:CLOSE_R2",
+                "EVAL:IMPORT",
+                "EVAL:INPUT",
+                "EVAL:SYNC",
+                "EVAL:VIEW",
+                "FORMULA:CREATE",
+                "FORMULA:DELETE",
+                "FORMULA:TEST",
+                "FORMULA:UPDATE",
+                "FORMULA:VIEW",
+                "KPI:CREATE",
+                "KPI:DELETE",
+                "KPI:EXPORT",
+                "KPI:IMPORT",
+                "KPI:UPDATE",
+                "KPI:VIEW",
+                "MYKPI:EXPORT",
+                "MYKPI:PROPOSE_ADJUST",
+                "MYKPI:VIEW",
+                "NOTIFY:VIEW",
+                "OBJECTIVE:CREATE",
+                "OBJECTIVE:DELETE",
+                "OBJECTIVE:EXPORT",
+                "OBJECTIVE:IMPORT",
+                "OBJECTIVE:UPDATE",
+                "OBJECTIVE:VIEW",
+                "ORG:CREATE",
+                "ORG:DELETE",
+                "ORG:EXPORT",
+                "ORG:IMPORT",
+                "ORG:UPDATE",
+                "ORG:VIEW",
+                "PERMISSION:UPDATE",
+                "PERMISSION:VIEW",
+                "PERSPECTIVE:CREATE",
+                "PERSPECTIVE:DELETE",
+                "PERSPECTIVE:EXPORT",
+                "PERSPECTIVE:IMPORT",
+                "PERSPECTIVE:UPDATE",
+                "PERSPECTIVE:VIEW",
+                "ROLE:CREATE",
+                "ROLE:DELETE",
+                "ROLE:UPDATE",
+                "ROLE:VIEW",
+                "SCHEDULE:RUN",
+                "SCHEDULE:UPDATE",
+                "SCHEDULE:VIEW",
+                "STRATEGY:ASSIGN_KPI",
+                "STRATEGY:CREATE",
+                "STRATEGY:DELETE",
+                "STRATEGY:EXPORT_IMAGE",
+                "STRATEGY:UPDATE",
+                "STRATEGY:VIEW",
+                "SYSCONFIG:CREATE",
+                "SYSCONFIG:DELETE",
+                "SYSCONFIG:UPDATE",
+                "SYSCONFIG:VIEW",
+                "UOM:CREATE",
+                "UOM:DELETE",
+                "UOM:EXPORT",
+                "UOM:IMPORT",
+                "UOM:UPDATE",
+                "UOM:VIEW",
+                "USER:ASSIGN_ROLE",
+                "USER:CREATE",
+                "USER:DELETE",
+                "USER:EXPORT",
+                "USER:IMPORT",
+                "USER:UPDATE",
+                "USER:VIEW"
+            ]
+        }
+    }
+}

@@ -31,6 +31,7 @@ public class AuthService {
     private final SysConfigService config;
     private final AuditService auditService;
     private final LoginAttemptLogger attemptLogger;
+    private final org.springframework.transaction.support.TransactionTemplate tx;
 
     public record Tokens(String accessToken, String refreshToken, Long userId, String username) {}
 
@@ -42,18 +43,38 @@ public class AuthService {
         return dummyHash;
     }
 
-    @Transactional(noRollbackFor = BusinessException.class)
+    /**
+     * bcrypt (cost 12, ~250ms CPU) chạy NGOÀI transaction để không giữ kết nối DB (HikariCP 30/node) trong lúc băm —
+     * nếu không, 100 TPS + nhiều phiên đăng nhập đồng thời làm cạn pool. Phần ghi (đếm sai, khóa, phiên, audit) chạy trong
+     * một transaction; lỗi nghiệp vụ được trả về rồi mới ném ra ngoài transaction để vẫn commit việc ghi nhận đăng nhập sai.
+     */
     public Tokens login(String username, String password, String ip, String userAgent) {
         Map<String, Object> u = securityMapper.findLoginUser(username);
+        boolean pwOk;
         if (u == null) {
             passwordEncoder.matches(password, dummyHash());
+            pwOk = false;
+        } else {
+            String hash = (String) u.get("passwordHash");
+            pwOk = hash != null && !"CAS".equals(u.get("authSource")) && passwordEncoder.matches(password, hash);
+        }
+        Object r = tx.execute(st -> {
+            try {
+                return loginTx(u, username, pwOk, ip, userAgent);
+            } catch (BusinessException e) {
+                return e;
+            }
+        });
+        if (r instanceof BusinessException e) throw e;
+        return (Tokens) r;
+    }
+
+    private Tokens loginTx(Map<String, Object> u, String username, boolean pwOk, String ip, String userAgent) {
+        if (u == null) {
             attemptLogger.log(username, "SAI_THONG_TIN", "LOCAL", ip, userAgent);
             throw new BusinessException(ErrorCode.ERR_LOGIN_FAILED);
         }
         Long id = ((Number) u.get("id")).longValue();
-        String hash = (String) u.get("passwordHash");
-        String authSource = (String) u.get("authSource");
-        boolean pwOk = hash != null && !"CAS".equals(authSource) && passwordEncoder.matches(password, hash);
         LocalDateTime lockedUntil = toLdt(u.get("lockedUntil"));
         int failed = u.get("failedLoginCount") == null ? 0 : ((Number) u.get("failedLoginCount")).intValue();
 

@@ -155,10 +155,25 @@
 | Semgrep 1.95.0 | `--config p/owasp-top-ten --config p/java --config p/typescript --error --severity ERROR` (loại `frontend/e2e`, `perf`) |
 | ZAP baseline | `zaproxy/action-baseline@v0.14.0` trên `vars.STAGING_URL` (mặc định `https://kpi-staging.vnpt.vn`), chỉ nhánh `main`, `fail_action: true`, quy tắc `.zap/rules.tsv`: 10049 IGNORE (API no-store), 10096 IGNORE (timestamp trong JSON), 10015 WARN (cache tài nguyên hash) |
 
-**Vấn đề đã phát hiện (chưa chạy thử pipeline):**
-- `backend/spotbugs-exclude.xml` và `backend/dependency-check-suppressions.xml` được pom tham chiếu nhưng **không tồn tại** → bước `-Psecurity` có khả năng lỗi cấu hình.
-- Job `zap-baseline` không có bước `actions/checkout` → `.zap/rules.tsv` không có trong workspace.
-- Chưa có báo cáo kết quả quét/pentest lưu trong repo.
+Đã sửa (P8): thêm `backend/spotbugs-exclude.xml`, `backend/dependency-check-suppressions.xml`; job `zap-baseline` có `actions/checkout`; mọi GitHub Action được **ghim theo commit SHA** (Semgrep `github-actions-mutable-action-tag`).
+
+### 11.1 Kết quả quét thực tế (11/11/2026)
+
+| Công cụ | Phạm vi | Kết quả | Bằng chứng |
+|---|---|---|---|
+| ZAP baseline (stable) | Nginx dùng đúng `deploy/nginx/*.conf` + TLS tự ký → backend | **FAIL 0**, PASS 63, WARN 4 (đã đánh giá, xem dưới) | [`docs/security/zap-baseline.html`](security/zap-baseline.html) |
+| Semgrep 1.95.0 `p/owasp-top-ten` | toàn repo (404 tệp) | **0 ERROR**; 23 WARNING → đã xử lý: ghim SHA action CI, Nginx bỏ `$host` (Host header injection); còn `unencrypted-socket` (clamd TCP nội bộ 127.0.0.1, chấp nhận) | [`docs/security/semgrep.json`](security/semgrep.json) |
+| OSV-Scanner 1.9.2 (thay Dependency-Check khi chạy cục bộ — NVD cần API key) | SBOM CycloneDX backend (phụ thuộc đã resolve) + `package-lock.json` | Ban đầu 40+ lỗ hổng (Tomcat 9.8, Bouncy Castle 9.3, MinIO 8.7, Guava 8.2, BeanUtils 8.8, Jackson 7.5, Snappy 7.5…) → **đã nâng bản vá**; còn 2 CVE Spring Framework 6.2.19 **không ảnh hưởng** (suppression có lý do) | [`docs/security/sbom-backend.cdx.json`](security/sbom-backend.cdx.json), `backend/dependency-check-suppressions.xml` |
+| npm audit | frontend | `--omit=dev`: **0**; toàn bộ: 0 critical/high (đã nâng `vitest` 5.1.0), 9 moderate chỉ ở công cụ dev (typescript-eslint/minimatch, exceljs/uuid) — không đóng gói | — |
+
+**Bản vá thư viện (P8)** — ghi đè trong `backend/pom.xml`, giữ Spring Boot 3.5.16 (stack E-HSMT): Tomcat 10.1.61, Jackson 2.21.8, MariaDB Connector/J 3.5.11, Log4j API 2.25.5, commons-lang3 3.21.0, MinIO 8.6.0 (+ `okhttp-jvm` 5.1.0, Kotlin stdlib 2.2.0), Guava 33.8.0-jre, Bouncy Castle 1.87, snappy-java 1.1.10.12, commons-beanutils 1.11.0.
+
+**CVE còn lại — không ảnh hưởng** (chỉ có bản vá ở Spring Framework 7.0.9):
+- CVE-2026-47890 (SSE stream corruption): ứng dụng không dùng SSE/`SseEmitter` (thông báo dùng polling).
+- CVE-2026-47884 (`XsltView` SSRF/RCE): không dùng `XsltView`/view resolver (REST JSON).
+Rà soát lại trước 31/03/2027 hoặc khi nâng Spring Boot 4.
+
+**ZAP WARN còn lại (chấp nhận):** `CSP: style-src unsafe-inline` (React/ECharts/XYFlow đặt style inline; `script-src` không có `unsafe-inline`), `Cross-Origin-Embedder-Policy` (bật sẽ chặn tệp minh chứng mở bằng URL ký trước MinIO), `Re-examine Cache-control`, `Modern Web Application` (thông tin).
 
 ---
 

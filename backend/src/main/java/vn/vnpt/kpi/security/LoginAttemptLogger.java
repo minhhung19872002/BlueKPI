@@ -13,7 +13,9 @@ import vn.vnpt.kpi.security.mapper.SecurityMapper;
 public class LoginAttemptLogger {
     private final SecurityMapper securityMapper;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // REQUIRED (không REQUIRES_NEW): tham gia transaction đăng nhập — REQUIRES_NEW cần kết nối thứ 2 khi đang giữ 1,
+    // gây deadlock pool HikariCP dưới tải (k6). Các nơi gọi (AuthService) commit cả khi đăng nhập thất bại.
+    @Transactional(propagation = Propagation.REQUIRED)
     public void log(String username, String result, String method, String ip, String userAgent) {
         securityMapper.insertLoginLog(RequestInfo.truncate(username, 100), result, method, ip, userAgent);
     }

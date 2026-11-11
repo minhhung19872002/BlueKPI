@@ -26,3 +26,6 @@ frontend/dist-*/
 frontend/test-results-*/
 backend/e2e-jars/
 dist-package/
+
+# Vitest 5 cache
+frontend/.vitest/

@@ -25,7 +25,8 @@
     INSERT INTO unit_of_measure (code, name, description, status, created_by, updated_by)
     VALUES (CONCAT('TMP-', UUID_SHORT()), #{name}, #{description}, #{status}, #{createdBy}, #{updatedBy})
   </insert>
-  <update id="setUomCode">UPDATE unit_of_measure SET code = CONCAT('DVD', LPAD(id, 3, '0')) WHERE id = #{id}</update>
+  <!-- DVD001…DVD999, từ 1000 giữ nguyên id (LPAD cắt chuỗi khi id có > 3 chữ số → trùng mã) -->
+  <update id="setUomCode">UPDATE unit_of_measure SET code = CONCAT('DVD', IF(id &lt; 1000, LPAD(id, 3, '0'), id)) WHERE id = #{id}</update>
   <update id="updateUom">
     UPDATE unit_of_measure SET name = #{name}, description = #{description}, status = #{status}, updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
     WHERE id = #{id} AND version = #{version} AND deleted = 0

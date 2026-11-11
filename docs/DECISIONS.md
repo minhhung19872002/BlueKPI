@@ -8,12 +8,12 @@
 |---|---|---|
 | JDK | Temurin 21.0.13+9 | Java 21 LTS theo E-HSMT; Temurin tarball chạy được trên Ubuntu 20.04 |
 | Maven | 3.9.11 (qua `mvnw`) | Wrapper cố định phiên bản build |
-| Spring Boot | 3.5.16 | E-HSMT yêu cầu 3.5.x — bản patch mới nhất của dòng 3.5 (không lên 4.x) |
+| Spring Boot | 3.5.16 | E-HSMT yêu cầu 3.5.x — bản patch mới nhất của dòng 3.5 (không lên 4.x). P8: ghi đè bản vá thư viện do Boot quản lý — `tomcat.version` 10.1.61, `jackson-bom.version` 2.21.8, `mariadb.version` 3.5.11, `log4j2.version` 2.25.5, `commons-lang3.version` 3.21.0; `dependencyManagement` ép Guava 33.8.0-jre, Bouncy Castle 1.87, snappy-java 1.1.10.12, commons-beanutils 1.11.0 (xem `docs/ATTT.md` §11.1) |
 | mybatis-spring-boot-starter | 3.0.5 | Dòng 3.0.x tương thích Spring Boot 3 (4.x dành cho Boot 4) |
 | mariadb-java-client | 3.5.x (Boot BOM quản lý) | Driver chính thức MariaDB 10.11 |
 | Flyway (core + flyway-mysql) | Boot BOM quản lý (11.x) | Migration; module `flyway-mysql` hỗ trợ MariaDB |
 | jjwt-api/impl/jackson | 0.12.7 | E-HSMT yêu cầu jjwt 0.12 |
-| MinIO Java SDK | 8.5.17 | E-HSMT yêu cầu SDK 8.x; không dùng 8.6.0 vì phụ thuộc okhttp 5 chỉ phát hành metadata Gradle (Maven không resolve được lớp) |
+| MinIO Java SDK | 8.6.0 | E-HSMT yêu cầu SDK 8.x. P8 nâng từ 8.5.17 vì GHSA-h7rh-xfpj-hpcm (CVSS 8.7, sửa ở 8.6.0). OkHttp 5 phát hành kiểu đa nền tảng (Maven không resolve lớp JVM) → khai báo thêm `com.squareup.okhttp3:okhttp-jvm:5.1.0` và `kotlin.version=2.2.0` |
 | Quartz | Boot BOM (spring-boot-starter-quartz) | JDBC JobStore, clustered |
 | springdoc-openapi-starter-webmvc-ui | 2.8.x (bản 2.x tương thích Boot 3.5) | E-HSMT yêu cầu Springdoc OpenAPI 2 |
 | Apache POI (poi-ooxml) | 5.5.1 | Đọc/ghi Excel |
@@ -49,7 +49,7 @@
 | dayjs | 1.11.x | Ngày dd/MM/yyyy |
 | html-to-image | 1.11.13 | Xuất ảnh bản đồ |
 | lucide-react | latest | Icon (bổ sung — xem §3) |
-| Vitest + @testing-library/react + jsdom | 3.2.x / 16.x | Unit FE |
+| Vitest + @testing-library/react + jsdom | 5.1.0 / 16.x | Unit FE. P8 nâng Vitest 3.2 → 5.1.0 (GHSA-82fw-gwwq-j7x9, tinypool prototype pollution — critical, chỉ công cụ dev); 15/15 test vẫn xanh |
 | @playwright/test | 1.5x+ | E2E |
 | ESLint 9 + typescript-eslint 8 | 9.39.x / 8.x | Lint |
 
