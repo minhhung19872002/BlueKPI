@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.security.mapper.SecurityMapper">
+
+  <select id="findUserCore" resultType="map">
+    SELECT u.id, u.username, u.full_name AS fullName, u.email, u.org_unit_id AS orgUnitId, u.status,
+           o.name AS orgUnitName, o.path AS orgUnitPath
+    FROM app_user u JOIN org_unit o ON o.id = u.org_unit_id
+    WHERE u.id = #{id} AND u.deleted = 0
+  </select>
+
+  <select id="findLoginUser" resultType="map">
+    SELECT id, username, status, auth_source AS authSource, password_hash AS passwordHash,
+           failed_login_count AS failedLoginCount, locked_until AS lockedUntil, last_login_ip AS lastLoginIp
+    FROM app_user WHERE username = #{username} AND deleted = 0
+  </select>
+
+  <select id="findUserForSso" resultType="map">
+    SELECT id, username, status, auth_source AS authSource
+    FROM app_user
+    WHERE deleted = 0 AND (username = #{username} <if test="email != null">OR email = #{email}</if>)
+    ORDER BY CASE WHEN username = #{username} THEN 0 ELSE 1 END
+    LIMIT 1
+  </select>
+
+  <select id="findGrants" resultType="map">
+    SELECT r.id AS roleId, r.code, r.name, r.data_scope AS dataScope, ur.org_unit_id AS orgUnitId
+    FROM user_role ur JOIN role r ON r.id = ur.role_id
+    WHERE ur.user_id = #{userId} AND r.deleted = 0 AND r.status = 'HIEU_LUC'
+  </select>
+
+  <select id="findPermissionsOfUser" resultType="map">
+    SELECT DISTINCT rp.role_id AS roleId, p.code
+    FROM user_role ur
+    JOIN role r ON r.id = ur.role_id AND r.deleted = 0 AND r.status = 'HIEU_LUC'
+    JOIN role_permission rp ON rp.role_id = r.id
+    JOIN permission p ON p.id = rp.permission_id AND p.deleted = 0
+    WHERE ur.user_id = #{userId}
+  </select>
+
+  <select id="findSubtreeIds" resultType="long">
+    SELECT c.id FROM org_unit c
+    JOIN org_unit p ON p.id = #{unitId}
+    WHERE c.deleted = 0 AND c.path LIKE CONCAT(p.path, '%')
+  </select>
+
+  <update id="recordLoginFailure">
+    UPDATE app_user SET failed_login_count = #{count}, locked_until = #{lockedUntil} WHERE id = #{id}
+  </update>
+
+  <update id="recordLoginSuccess">
+    UPDATE app_user SET failed_login_count = 0, locked_until = NULL, last_login_at = NOW(3), last_login_ip = #{ip} WHERE id = #{id}
+  </update>
+
+  <insert id="insertLoginLog">
+    INSERT INTO login_log (username, result, auth_method, ip, user_agent, at)
+    VALUES (#{username}, #{result}, #{authMethod}, #{ip}, #{userAgent}, NOW(3))
+  </insert>
+
+  <insert id="insertSession" parameterType="map" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO user_session (user_id, refresh_token_hash, expires_at, last_seen_at, revoked, auth_method, ip, user_agent, created_at)
+    VALUES (#{userId}, #{hash}, #{expiresAt}, NOW(3), 0, #{authMethod}, #{ip}, #{userAgent}, NOW(3))
+  </insert>
+
+  <select id="findSessionByHash" resultType="map">
+    SELECT id, user_id AS userId, expires_at AS expiresAt, last_seen_at AS lastSeenAt, revoked, auth_method AS authMethod
+    FROM user_session WHERE refresh_token_hash = #{hash}
+  </select>
+
+  <update id="rotateSession">
+    UPDATE user_session SET refresh_token_hash = #{newHash}, expires_at = #{expiresAt}, last_seen_at = NOW(3) WHERE id = #{id}
+  </update>
+
+  <update id="revokeSession">UPDATE user_session SET revoked = 1 WHERE id = #{id}</update>
+  <update id="revokeSessionByHash">UPDATE user_session SET revoked = 1 WHERE refresh_token_hash = #{hash}</update>
+  <update id="revokeUserSessions">UPDATE user_session SET revoked = 1 WHERE user_id = #{userId} AND revoked = 0</update>
+
+  <select id="findMenus" resultType="map">
+    SELECT id, code, name, route, parent_id AS parentId, icon, sort_order AS sortOrder, permission_code AS permissionCode
+    FROM menu WHERE deleted = 0 ORDER BY sort_order, id
+  </select>
+</mapper>

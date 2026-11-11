@@ -13,7 +13,7 @@
 | mariadb-java-client | 3.5.x (Boot BOM quản lý) | Driver chính thức MariaDB 10.11 |
 | Flyway (core + flyway-mysql) | Boot BOM quản lý (11.x) | Migration; module `flyway-mysql` hỗ trợ MariaDB |
 | jjwt-api/impl/jackson | 0.12.7 | E-HSMT yêu cầu jjwt 0.12 |
-| MinIO Java SDK | 8.6.0 | E-HSMT yêu cầu SDK 8.x |
+| MinIO Java SDK | 8.5.17 | E-HSMT yêu cầu SDK 8.x; không dùng 8.6.0 vì phụ thuộc okhttp 5 chỉ phát hành metadata Gradle (Maven không resolve được lớp) |
 | Quartz | Boot BOM (spring-boot-starter-quartz) | JDBC JobStore, clustered |
 | springdoc-openapi-starter-webmvc-ui | 2.8.x (bản 2.x tương thích Boot 3.5) | E-HSMT yêu cầu Springdoc OpenAPI 2 |
 | Apache POI (poi-ooxml) | 5.5.1 | Đọc/ghi Excel |

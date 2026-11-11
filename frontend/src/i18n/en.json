@@ -1,0 +1,12 @@
+{
+  "app": { "title": "BSC KPI Management System" },
+  "common": {
+    "search": "Search", "reset": "Reset", "view": "View", "edit": "Edit", "delete": "Delete", "save": "Save", "close": "Close",
+    "cancel": "Cancel", "confirm": "Confirm", "import": "Import", "export": "Export", "stt": "No.", "actions": "Actions",
+    "status": "Status", "createdBy": "Created by", "createdAt": "Created at", "updatedBy": "Updated by", "updatedAt": "Updated at",
+    "created": "Created successfully", "updated": "Updated successfully", "deleted": "Deleted successfully", "confirmDelete": "Confirm delete",
+    "noData": "No data", "active": "Active", "inactive": "Inactive"
+  },
+  "auth": { "username": "Username", "password": "Password", "login": "Sign in", "loginSso": "Sign in with VNPT SSO", "logout": "Sign out", "profile": "Account" },
+  "error": { "forbidden": "You do not have permission to access this function" }
+}

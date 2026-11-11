@@ -1,0 +1,27 @@
+# Profile dev — giá trị mặc định CHỈ DÙNG CHO MÁY DEV (StartupSecurityCheck chặn ở prod)
+spring:
+  datasource:
+    password: ${DB_PASSWORD:kpi_app_dev}
+  flyway:
+    password: ${DB_MIGRATE_PASSWORD:kpi_migrate_dev}
+    locations: classpath:db/migration,classpath:db/seed-dev
+
+kpi:
+  security:
+    jwt-secret: ${KPI_JWT_SECRET:dev-secret-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef-dev_only}
+    cookie-secure: ${KPI_COOKIE_SECURE:false}
+    cors-allowed-origins: ${KPI_CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173}
+    pii-encryption-key: ${KPI_PII_KEY:dev-pii-key-0123456789abcdef-dev_only}
+    login-rate-limit-per-minute: ${KPI_LOGIN_RATE_LIMIT:200}
+  cas:
+    server-url: ${CAS_SERVER_URL:http://localhost:8091/cas}
+    service-url: ${CAS_SERVICE_URL:http://localhost:5173/api/auth/sso/callback}
+    frontend-url: ${KPI_FRONTEND_URL:http://localhost:5173/}
+  minio:
+    access-key: ${MINIO_ACCESS_KEY:kpiminio}
+    secret-key: ${MINIO_SECRET_KEY:kpiminio_dev_only}
+  demo-seed: ${KPI_DEMO_SEED:true}
+
+logging:
+  level:
+    vn.vnpt.kpi: INFO

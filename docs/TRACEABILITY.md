@@ -2,15 +2,15 @@
 
 > File sinh tự động bởi `node scripts/gen-traceability.mjs` từ `docs/traceability-data.txt`. Cột “Test e2e” dò tự động trong `frontend/e2e/**/*.spec.ts` (tên test bắt đầu bằng mã STT). ☑ = đã đủ DoD (CLAUDE.md §6) và có e2e.
 
-**Tiến độ chức năng: 0/173 STT ☑**
+**Tiến độ chức năng: 3/173 STT ☑**
 
 ## 1. Chức năng (PHẦN C)
 
 | STT | Tên | Route FE | Endpoint BE | Quyền | Test e2e | Trạng thái |
 |---|---|---|---|---|---|---|
-| 1.1 | Đăng nhập hệ thống | `/login` | `POST /api/auth/login` | `(public)` | — | ☐ |
-| 1.2 | Đăng nhập – Thông tin không hợp lệ | `/login` | `POST /api/auth/login` | `(public)` | — | ☐ |
-| 2.1 | Đăng xuất hệ thống | `(Header)` | `POST /api/auth/logout` | `(authenticated)` | — | ☐ |
+| 1.1 | Đăng nhập hệ thống | `/login` | `POST /api/auth/login` | `(public)` | `p0-auth.spec.ts` | ☑ |
+| 1.2 | Đăng nhập – Thông tin không hợp lệ | `/login` | `POST /api/auth/login` | `(public)` | `p0-auth.spec.ts` | ☑ |
+| 2.1 | Đăng xuất hệ thống | `(Header)` | `POST /api/auth/logout` | `(authenticated)` | `p0-auth.spec.ts` | ☑ |
 | 3.1 | Lấy danh sách – Người dùng | `/system/users` | `GET /api/users` | `USER:VIEW` | — | ☐ |
 | 3.2 | Tìm kiếm – Người dùng | `/system/users` | `GET /api/users?keyword&status&orgUnitId` | `USER:VIEW` | — | ☐ |
 | 3.3 | Xem chi tiết – Người dùng | `/system/users` | `GET /api/users/{id}` | `USER:VIEW` | — | ☐ |

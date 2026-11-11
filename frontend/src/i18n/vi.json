@@ -1,0 +1,12 @@
+{
+  "app": { "title": "Hệ thống quản trị KPI theo BSC" },
+  "common": {
+    "search": "Tìm kiếm", "reset": "Làm mới", "view": "Xem", "edit": "Sửa", "delete": "Xóa", "save": "Lưu", "close": "Đóng",
+    "cancel": "Hủy", "confirm": "Xác nhận", "import": "Nhập dữ liệu", "export": "Xuất dữ liệu", "stt": "STT", "actions": "Thao tác",
+    "status": "Trạng thái", "createdBy": "Người tạo", "createdAt": "Ngày tạo", "updatedBy": "Người cập nhật", "updatedAt": "Ngày cập nhật",
+    "created": "Thêm mới thành công", "updated": "Cập nhật thành công", "deleted": "Xóa thành công", "confirmDelete": "Xác nhận xóa",
+    "noData": "Không có dữ liệu", "active": "Hiệu lực", "inactive": "Không hiệu lực"
+  },
+  "auth": { "username": "Tên đăng nhập", "password": "Mật khẩu", "login": "Đăng nhập", "loginSso": "Đăng nhập bằng VNPT SSO", "logout": "Đăng xuất", "profile": "Thông tin tài khoản" },
+  "error": { "forbidden": "Bạn không có quyền truy cập chức năng này" }
+}

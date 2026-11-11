@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.common.audit.AuditMapper">
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO audit_log (user_id, username, action, entity, entity_id, before_json, after_json, ip, user_agent, trace_id, at)
+    VALUES (#{userId}, #{username}, #{action}, #{entity}, #{entityId}, #{beforeJson}, #{afterJson}, #{ip}, #{userAgent}, #{traceId}, NOW(3))
+  </insert>
+
+  <sql id="where">
+    <where>
+      <if test="username != null and username != ''">AND username = #{username}</if>
+      <if test="action != null and action != ''">AND action = #{action}</if>
+      <if test="entity != null and entity != ''">AND entity = #{entity}</if>
+      <if test="from != null">AND at &gt;= #{from}</if>
+      <if test="to != null">AND at &lt; #{to}</if>
+    </where>
+  </sql>
+
+  <select id="search" resultType="vn.vnpt.kpi.common.audit.AuditLog">
+    SELECT id, user_id, username, action, entity, entity_id, before_json, after_json, ip, user_agent, trace_id, at
+    FROM audit_log
+    <include refid="where"/>
+    ORDER BY ${q.orderBy}
+    LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+
+  <select id="count" resultType="long">
+    SELECT COUNT(*) FROM audit_log <include refid="where"/>
+  </select>
+</mapper>

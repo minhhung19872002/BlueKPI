@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+@import '@fontsource/be-vietnam-pro/400.css';
+@import '@fontsource/be-vietnam-pro/500.css';
+@import '@fontsource/be-vietnam-pro/600.css';
+@import '@fontsource/be-vietnam-pro/700.css';
+@import '@xyflow/react/dist/style.css';
+
+/* Design tokens (PHẦN D §1.g — thân thiện, thống nhất) */
+@theme {
+  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --color-primary: #0b5cab;
+  --color-primary-hover: #094c8e;
+  --color-primary-soft: #e8f1fb;
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-surface: #ffffff;
+  --color-canvas: #f4f6fa;
+  --color-rating-pass: #16a34a;
+  --color-rating-fail: #dc2626;
+  --color-rating-track: #94a3b8;
+}
+
+html, body, #root { height: 100%; }
+body {
+  @apply bg-canvas text-slate-800 antialiased;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  min-width: 1024px;
+}
+
+.field-error { @apply mt-1 text-xs text-danger; }
+.required-mark { @apply text-danger ml-0.5; }
+.page-title { @apply text-lg font-semibold text-slate-800; }
+.card { @apply rounded-lg border border-border bg-surface shadow-sm; }

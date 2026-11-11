@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.notification.mapper.NotificationMapper">
+
+  <insert id="insertBatch" useGeneratedKeys="true" keyProperty="list.id" keyColumn="id">
+    INSERT INTO notification (user_id, event_type, title, content, link_route, link_params, is_read, email_status, zalo_status, created_at)
+    VALUES
+    <foreach collection="list" item="n" separator=",">
+      (#{n.userId}, #{n.eventType}, #{n.title}, #{n.content}, #{n.linkRoute}, #{n.linkParams}, 0, #{n.emailStatus}, #{n.zaloStatus}, NOW(3))
+    </foreach>
+  </insert>
+
+  <select id="findByUser" resultType="vn.vnpt.kpi.modules.notification.model.Notification">
+    SELECT id, user_id, event_type, title, content, link_route, link_params, is_read, read_at, email_status, zalo_status, created_at
+    FROM notification WHERE user_id = #{userId} <if test="unreadOnly">AND is_read = 0</if>
+    ORDER BY created_at DESC, id DESC LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+
+  <select id="countByUser" resultType="long">
+    SELECT COUNT(*) FROM notification WHERE user_id = #{userId} <if test="unreadOnly">AND is_read = 0</if>
+  </select>
+
+  <update id="markRead">UPDATE notification SET is_read = 1, read_at = NOW(3) WHERE id = #{id} AND user_id = #{userId} AND is_read = 0</update>
+  <update id="markAllRead">UPDATE notification SET is_read = 1, read_at = NOW(3) WHERE user_id = #{userId} AND is_read = 0</update>
+  <update id="updateChannelStatus">UPDATE notification SET email_status = #{emailStatus}, zalo_status = #{zaloStatus} WHERE id = #{id}</update>
+
+  <sql id="userCols">u.id, u.username, u.full_name AS fullName, u.email, u.phone</sql>
+
+  <select id="findUsersWithPermissionInUnits" resultType="map">
+    SELECT DISTINCT <include refid="userCols"/>
+    FROM app_user u
+    JOIN user_role ur ON ur.user_id = u.id
+    JOIN role r ON r.id = ur.role_id AND r.deleted = 0 AND r.status = 'HIEU_LUC'
+    JOIN role_permission rp ON rp.role_id = r.id
+    JOIN permission p ON p.id = rp.permission_id AND p.code = #{perm}
+    WHERE u.deleted = 0 AND u.status = 'HOAT_DONG' AND u.org_unit_id IN
+    <foreach collection="unitIds" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+
+  <select id="findUsersWithPermission" resultType="map">
+    SELECT DISTINCT <include refid="userCols"/>
+    FROM app_user u
+    JOIN user_role ur ON ur.user_id = u.id
+    JOIN role r ON r.id = ur.role_id AND r.deleted = 0 AND r.status = 'HIEU_LUC'
+    JOIN role_permission rp ON rp.role_id = r.id
+    JOIN permission p ON p.id = rp.permission_id AND p.code LIKE CONCAT(#{permPrefix}, '%')
+    WHERE u.deleted = 0 AND u.status = 'HOAT_DONG'
+  </select>
+
+  <select id="findUsersWithRole" resultType="map">
+    SELECT DISTINCT <include refid="userCols"/>
+    FROM app_user u JOIN user_role ur ON ur.user_id = u.id JOIN role r ON r.id = ur.role_id AND r.code = #{roleCode}
+    WHERE u.deleted = 0 AND u.status = 'HOAT_DONG'
+  </select>
+
+  <select id="findUsersByIds" resultType="map">
+    SELECT <include refid="userCols"/> FROM app_user u
+    WHERE u.deleted = 0 AND u.status = 'HOAT_DONG' AND u.id IN
+    <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+</mapper>

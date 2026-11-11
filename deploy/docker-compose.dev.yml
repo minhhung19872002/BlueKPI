@@ -1,0 +1,59 @@
+# Hạ tầng dev: MariaDB 10.11, MinIO, Mailpit, mock CAS, mock nguồn KPI
+# docker compose -f deploy/docker-compose.dev.yml up -d
+name: kpi-bsc-dev
+services:
+  mariadb:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: root_dev_only
+      MARIADB_DATABASE: kpi_bsc
+      MARIADB_USER: kpi_migrate
+      MARIADB_PASSWORD: kpi_migrate_dev
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_vietnamese_ci
+      - --default-time-zone=+07:00
+      - --max-connections=300
+      - --innodb-buffer-pool-size=512M
+    ports: ["127.0.0.1:3307:3306"]
+    volumes:
+      - kpi-mariadb:/var/lib/mysql
+      - ./mariadb/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: kpiminio
+      MINIO_ROOT_PASSWORD: kpiminio_dev_only
+    ports: ["127.0.0.1:9100:9000", "127.0.0.1:9101:9001"]
+    volumes: [kpi-minio:/data]
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports: ["127.0.0.1:1026:1025", "127.0.0.1:8026:8025"]
+
+  mock-cas:
+    image: node:22-alpine
+    working_dir: /app
+    command: node mock-cas.mjs
+    environment: { PORT: "8091" }
+    volumes: [./mocks:/app:ro]
+    ports: ["127.0.0.1:8091:8091"]
+
+  mock-kpi-source:
+    image: node:22-alpine
+    working_dir: /app
+    command: node mock-kpi-source.mjs
+    environment: { PORT: "8092" }
+    volumes: [./mocks:/app:ro]
+    ports: ["127.0.0.1:8092:8092"]
+
+volumes:
+  kpi-mariadb:
+  kpi-minio:

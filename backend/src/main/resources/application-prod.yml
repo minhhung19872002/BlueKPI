@@ -1,0 +1,23 @@
+# Profile production — mọi secret bắt buộc từ /etc/kpi/secrets.env (quyền 600)
+spring:
+  datasource:
+    url: ${DB_URL}
+    hikari:
+      data-source-properties:
+        sslMode: ${DB_SSL_MODE:verify-full}
+  flyway:
+    locations: classpath:db/migration
+
+kpi:
+  security:
+    cookie-secure: true
+    bypass-sso: ${BYPASS_SSO:false}
+
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
+
+logging:
+  level:
+    root: INFO
+    vn.vnpt.kpi: INFO

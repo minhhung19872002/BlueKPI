@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.file.mapper.FileMapper">
+  <sql id="cols">id, bucket, object_key, original_name, content_type, size, sha256, scan_status, owner_type, owner_id,
+    uploaded_by, uploaded_at, retention_until</sql>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO file_object (bucket, object_key, original_name, content_type, size, sha256, scan_status, owner_type, owner_id,
+      uploaded_by, uploaded_at, retention_until, created_by, updated_by)
+    VALUES (#{bucket}, #{objectKey}, #{originalName}, #{contentType}, #{size}, #{sha256}, #{scanStatus}, #{ownerType}, #{ownerId},
+      #{uploadedBy}, NOW(3), #{retentionUntil}, #{uploadedBy}, #{uploadedBy})
+  </insert>
+
+  <select id="findById" resultType="vn.vnpt.kpi.modules.file.model.FileObject">
+    SELECT <include refid="cols"/> FROM file_object WHERE id = #{id} AND deleted = 0
+  </select>
+
+  <select id="findByOwner" resultType="vn.vnpt.kpi.modules.file.model.FileObject">
+    SELECT <include refid="cols"/> FROM file_object WHERE owner_type = #{ownerType} AND owner_id = #{ownerId} AND deleted = 0 ORDER BY id
+  </select>
+
+  <update id="attach">
+    UPDATE file_object SET owner_type = #{ownerType}, owner_id = #{ownerId}, updated_at = NOW(3)
+    WHERE deleted = 0 AND owner_id IS NULL AND id IN
+    <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </update>
+
+  <select id="findExpired" resultType="vn.vnpt.kpi.modules.file.model.FileObject">
+    SELECT <include refid="cols"/> FROM file_object WHERE deleted = 0 AND retention_until IS NOT NULL AND retention_until &lt; #{today} LIMIT 1000
+  </select>
+
+  <update id="markDeleted">UPDATE file_object SET deleted = 1, updated_at = NOW(3) WHERE id = #{id}</update>
+</mapper>
