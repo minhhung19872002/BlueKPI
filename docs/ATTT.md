@@ -162,6 +162,8 @@
 | Công cụ | Phạm vi | Kết quả | Bằng chứng |
 |---|---|---|---|
 | ZAP baseline (stable) | Nginx dùng đúng `deploy/nginx/*.conf` + TLS tự ký → backend | **FAIL 0**, PASS 63, WARN 4 (đã đánh giá, xem dưới) | [`docs/security/zap-baseline.html`](security/zap-baseline.html) |
+| ZAP baseline trên **staging thật** (12/11/2026) | `https://kpi-bsc.14.225.83.93.sslip.io` (Caddy TLS → nginx → app profile prod) | **FAIL 0**, PASS 63, WARN 4 (giống trên) | [`docs/security/zap-staging.html`](security/zap-staging.html) |
+| SpotBugs 4.9.8 + FindSecBugs 1.14 (profile `security`, threshold High) | backend | **0 bug** | CI bước “SpotBugs + FindSecBugs” |
 | Semgrep 1.95.0 `p/owasp-top-ten` | toàn repo (404 tệp) | **0 ERROR**; 23 WARNING → đã xử lý: ghim SHA action CI, Nginx bỏ `$host` (Host header injection); còn `unencrypted-socket` (clamd TCP nội bộ 127.0.0.1, chấp nhận) | [`docs/security/semgrep.json`](security/semgrep.json) |
 | OSV-Scanner 1.9.2 (thay Dependency-Check khi chạy cục bộ — NVD cần API key) | SBOM CycloneDX backend (phụ thuộc đã resolve) + `package-lock.json` | Ban đầu 40+ lỗ hổng (Tomcat 9.8, Bouncy Castle 9.3, MinIO 8.7, Guava 8.2, BeanUtils 8.8, Jackson 7.5, Snappy 7.5…) → **đã nâng bản vá**; còn 2 CVE Spring Framework 6.2.19 **không ảnh hưởng** (suppression có lý do) | [`docs/security/sbom-backend.cdx.json`](security/sbom-backend.cdx.json), `backend/dependency-check-suppressions.xml` |
 | npm audit | frontend | `--omit=dev`: **0**; toàn bộ: 0 critical/high (đã nâng `vitest` 5.1.0), 9 moderate chỉ ở công cụ dev (typescript-eslint/minimatch, exceljs/uuid) — không đóng gói | — |
