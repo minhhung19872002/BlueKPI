@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.catalog.mapper.FormulaMapper">
+  <sql id="cols">id, code, name, definition_type, data_type, expression, source_definition, api_path, http_method, response_path,
+    business_description, status, created_by, created_at, updated_by, updated_at, version</sql>
+  <sql id="where">WHERE deleted = 0
+    <if test="keyword != null">AND (code LIKE #{keyword} OR name LIKE #{keyword})</if>
+    <if test="status != null and status != ''">AND status = #{status}</if>
+    <if test="type != null and type != ''">AND definition_type = #{type}</if></sql>
+
+  <select id="search" resultType="vn.vnpt.kpi.modules.catalog.model.FormulaDefinition">
+    SELECT <include refid="cols"/> FROM formula_definition <include refid="where"/> ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="count" resultType="long">SELECT COUNT(*) FROM formula_definition <include refid="where"/></select>
+  <select id="findAllActive" resultType="vn.vnpt.kpi.modules.catalog.model.FormulaDefinition">
+    SELECT <include refid="cols"/> FROM formula_definition WHERE deleted = 0 AND status = 'HIEU_LUC' ORDER BY code
+  </select>
+  <select id="findById" resultType="vn.vnpt.kpi.modules.catalog.model.FormulaDefinition">
+    SELECT <include refid="cols"/> FROM formula_definition WHERE id = #{id} AND deleted = 0
+  </select>
+  <select id="findByCode" resultType="vn.vnpt.kpi.modules.catalog.model.FormulaDefinition">
+    SELECT <include refid="cols"/> FROM formula_definition WHERE code = #{code} AND deleted = 0
+  </select>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO formula_definition (code, name, definition_type, data_type, expression, source_definition, api_path, http_method, response_path,
+      business_description, status, created_by, updated_by)
+    VALUES (#{code}, #{name}, #{definitionType}, #{dataType}, #{expression}, #{sourceDefinition}, #{apiPath}, #{httpMethod}, #{responsePath},
+      #{businessDescription}, #{status}, #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="update">
+    UPDATE formula_definition SET name = #{name}, definition_type = #{definitionType}, data_type = #{dataType}, expression = #{expression},
+      source_definition = #{sourceDefinition}, api_path = #{apiPath}, http_method = #{httpMethod}, response_path = #{responsePath},
+      business_description = #{businessDescription}, status = #{status}, updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="softDelete">
+    UPDATE formula_definition SET deleted = 1, updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <select id="countComponentUsage" resultType="long">
+    SELECT COUNT(*) FROM kpi_component c JOIN kpi k ON k.id = c.kpi_id AND k.deleted = 0 WHERE c.formula_definition_id = #{id} AND c.deleted = 0
+  </select>
+  <select id="findCodesUsingInExpression" resultType="string">
+    SELECT code FROM formula_definition WHERE deleted = 0 AND definition_type = 'CONG_THUC_TONG_HOP' AND expression REGEXP CONCAT('(^|[^A-Za-z0-9_])', #{code}, '([^A-Za-z0-9_]|$)')
+  </select>
+</mapper>

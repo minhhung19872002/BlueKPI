@@ -42,9 +42,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 
 export function Label({ children, required, htmlFor, className }: { children: React.ReactNode; required?: boolean; htmlFor?: string; className?: string }) {
   return (
-    <label htmlFor={htmlFor} className={cn('mb-1 block text-[13px] font-medium text-slate-700', className)}>
+    <label htmlFor={htmlFor} className={cn('mb-1 block text-[13px] font-medium text-slate-700', required && "after:ml-0.5 after:text-danger after:content-['*']", className)}>
       {children}
-      {required && <span className="required-mark" aria-hidden="true">*</span>}
     </label>
   );
 }

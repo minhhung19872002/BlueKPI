@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.assignment.mapper.AssignmentMapper">
+
+  <!-- ===================== Header (theo đơn vị) ===================== -->
+  <sql id="hCols">
+    h.id, h.org_unit_id, o.code AS org_unit_code, o.name AS org_unit_name, o.unit_type, h.year, h.status,
+    h.created_by, h.created_at, h.updated_by, h.updated_at, h.version,
+    (SELECT COUNT(*) FROM kpi_assignment_detail d WHERE d.assignment_id = h.id AND d.deleted = 0) AS kpi_count,
+    (SELECT COALESCE(SUM(d.weight), 0) FROM kpi_assignment_detail d JOIN kpi k ON k.id = d.kpi_id
+       WHERE d.assignment_id = h.id AND d.deleted = 0 AND k.parent_id IS NULL) AS total_weight
+  </sql>
+  <sql id="hWhere">
+    WHERE h.deleted = 0
+    <if test="f.keyword != null">AND (o.code LIKE #{f.keyword} OR o.name LIKE #{f.keyword} OR o.short_name LIKE #{f.keyword})</if>
+    <if test="f.year != null">AND h.year = #{f.year}</if>
+    <if test="f.status != null">AND h.status = #{f.status}</if>
+    <include refid="common.scope"><property name="col" value="h.org_unit_id"/></include>
+  </sql>
+  <select id="searchHeaders" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Header">
+    SELECT <include refid="hCols"/> FROM kpi_assignment h JOIN org_unit o ON o.id = h.org_unit_id
+    <include refid="hWhere"/> ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countHeaders" resultType="long">
+    SELECT COUNT(*) FROM kpi_assignment h JOIN org_unit o ON o.id = h.org_unit_id <include refid="hWhere"/>
+  </select>
+  <select id="findHeader" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Header">
+    SELECT <include refid="hCols"/> FROM kpi_assignment h JOIN org_unit o ON o.id = h.org_unit_id WHERE h.id = #{id} AND h.deleted = 0
+  </select>
+  <select id="findHeaderByUnitYear" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Header">
+    SELECT <include refid="hCols"/> FROM kpi_assignment h JOIN org_unit o ON o.id = h.org_unit_id
+    WHERE h.org_unit_id = #{orgUnitId} AND h.year = #{year} AND h.deleted = 0
+  </select>
+  <select id="findHeadersByIds" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Header">
+    SELECT <include refid="hCols"/> FROM kpi_assignment h JOIN org_unit o ON o.id = h.org_unit_id
+    WHERE h.deleted = 0 AND h.id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+  <insert id="insertHeader" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO kpi_assignment (org_unit_id, year, status, created_by, updated_by) VALUES (#{orgUnitId}, #{year}, 'DANG_SOAN', #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="touchHeader">UPDATE kpi_assignment SET updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id}</update>
+  <!-- Trạng thái header suy từ detail: còn DANG_SOAN → Đang soạn; có DA_DIEU_CHINH → Đã điều chỉnh; còn lại Đã giao -->
+  <update id="refreshHeaderStatus">
+    UPDATE kpi_assignment h SET h.status = (
+      SELECT CASE
+        WHEN SUM(d.status = 'DANG_SOAN') > 0 OR COUNT(d.id) = 0 THEN 'DANG_SOAN'
+        WHEN SUM(d.status = 'DA_DIEU_CHINH') > 0 THEN 'DA_DIEU_CHINH'
+        ELSE 'DA_GIAO' END
+      FROM kpi_assignment_detail d WHERE d.assignment_id = h.id AND d.deleted = 0)
+    WHERE h.id = #{id}
+  </update>
+  <delete id="deleteHeader">DELETE FROM kpi_assignment WHERE id = #{id}</delete>
+
+  <!-- ===================== Detail ===================== -->
+  <sql id="dCols">
+    d.id, d.assignment_id, d.kpi_id, k.code AS kpi_code, k.name AS kpi_name, k.parent_id AS parent_kpi_id, pk.code AS parent_kpi_code,
+    pe.name AS perspective_name, pe.color AS perspective_color, pe.sort_order AS perspective_sort, uom.name AS unit_of_measure_name,
+    d.org_unit_id, o.code AS org_unit_code, o.name AS org_unit_name, o.unit_type, d.year, d.weight,
+    d.target_q1, d.target_q2, d.target_h1, d.target_q3, d.target_q4, d.target_year,
+    d.adj_q1, d.adj_q2, d.adj_h1, d.adj_q3, d.adj_q4, d.status, d.note, d.updated_at, d.version
+  </sql>
+  <sql id="dJoins">
+    JOIN kpi k ON k.id = d.kpi_id LEFT JOIN kpi pk ON pk.id = k.parent_id
+    JOIN perspective pe ON pe.id = k.perspective_id JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id
+    JOIN org_unit o ON o.id = d.org_unit_id
+  </sql>
+  <select id="findDetailsOfHeader" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Detail">
+    SELECT <include refid="dCols"/> FROM kpi_assignment_detail d <include refid="dJoins"/>
+    WHERE d.assignment_id = #{assignmentId} AND d.deleted = 0
+    ORDER BY pe.sort_order, COALESCE(pk.code, k.code), k.parent_id IS NOT NULL, k.code
+  </select>
+  <select id="findDetailsOfKpiYear" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Detail">
+    SELECT <include refid="dCols"/> FROM kpi_assignment_detail d <include refid="dJoins"/>
+    WHERE d.kpi_id = #{kpiId} AND d.year = #{year} AND d.deleted = 0
+    <include refid="common.scope"><property name="col" value="d.org_unit_id"/></include>
+    ORDER BY o.level, o.sort_order, o.code
+  </select>
+  <select id="findDetailsOfKpiYears" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Detail">
+    SELECT <include refid="dCols"/> FROM kpi_assignment_detail d <include refid="dJoins"/>
+    WHERE d.deleted = 0 AND (
+      <foreach collection="keys" item="k" separator=" OR ">(d.kpi_id = #{k.kpiId} AND d.year = #{k.year})</foreach>
+    )
+  </select>
+  <select id="findDetail" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Detail">
+    SELECT <include refid="dCols"/> FROM kpi_assignment_detail d <include refid="dJoins"/> WHERE d.id = #{id} AND d.deleted = 0
+  </select>
+  <select id="findDetailByKey" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Detail">
+    SELECT <include refid="dCols"/> FROM kpi_assignment_detail d <include refid="dJoins"/>
+    WHERE d.kpi_id = #{kpiId} AND d.org_unit_id = #{orgUnitId} AND d.year = #{year} AND d.deleted = 0
+  </select>
+  <select id="findDetailsByIds" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Detail">
+    SELECT <include refid="dCols"/> FROM kpi_assignment_detail d <include refid="dJoins"/>
+    WHERE d.deleted = 0 AND d.id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+  <insert id="insertDetail" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO kpi_assignment_detail (assignment_id, kpi_id, org_unit_id, year, weight, target_q1, target_q2, target_h1, target_q3, target_q4,
+      target_year, status, note, created_by, updated_by)
+    VALUES (#{assignmentId}, #{kpiId}, #{orgUnitId}, #{year}, #{weight}, #{targetQ1}, #{targetQ2}, #{targetH1}, #{targetQ3}, #{targetQ4},
+      #{targetYear}, 'DANG_SOAN', #{note}, #{updatedBy}, #{updatedBy})
+  </insert>
+  <update id="updateDetail">
+    UPDATE kpi_assignment_detail SET weight = #{weight}, target_q1 = #{targetQ1}, target_q2 = #{targetQ2}, target_h1 = #{targetH1},
+      target_q3 = #{targetQ3}, target_q4 = #{targetQ4}, target_year = #{targetYear}, note = #{note},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND status = 'DANG_SOAN' AND deleted = 0
+  </update>
+  <delete id="deleteDetail">DELETE FROM kpi_assignment_detail WHERE id = #{id} AND status = 'DANG_SOAN'</delete>
+  <update id="setDetailStatus">
+    UPDATE kpi_assignment_detail SET status = #{status}, updated_by = #{by}, updated_at = NOW(3), version = version + 1
+    WHERE id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </update>
+  <!-- ${col} là tên cột hằng trong service (whitelist adj_q1..adj_q4/adj_h1) -->
+  <update id="applyAdjustment">
+    UPDATE kpi_assignment_detail SET ${col} = #{value}, status = 'DA_DIEU_CHINH', updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id}
+  </update>
+  <select id="headerIdsOfDetails" resultType="long">
+    SELECT DISTINCT assignment_id FROM kpi_assignment_detail WHERE id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+
+  <!-- ===================== Theo chỉ tiêu ===================== -->
+  <sql id="kSelect">
+    SELECT d.kpi_id, k.code AS kpi_code, k.name AS kpi_name, k.parent_id AS parent_kpi_id, pe.name AS perspective_name, pe.color AS perspective_color,
+      uom.name AS unit_of_measure_name, au.name AS assigning_unit_name, d.year,
+      COUNT(*) AS unit_count, SUM(d.status = 'DANG_SOAN') AS draft_count, SUM(d.status = 'DA_GIAO') AS assigned_count,
+      SUM(d.status = 'DA_DIEU_CHINH') AS adjusted_count, MAX(d.updated_at) AS updated_at,
+      CASE WHEN SUM(d.status = 'DANG_SOAN') > 0 THEN 'DANG_SOAN' WHEN SUM(d.status = 'DA_DIEU_CHINH') > 0 THEN 'DA_DIEU_CHINH' ELSE 'DA_GIAO' END AS status
+    FROM kpi_assignment_detail d JOIN kpi k ON k.id = d.kpi_id JOIN perspective pe ON pe.id = k.perspective_id
+    JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id JOIN org_unit au ON au.id = k.assigning_unit_id
+  </sql>
+  <sql id="kWhere">
+    WHERE d.deleted = 0 AND k.parent_id IS NULL
+    <if test="f.keyword != null">AND (k.code LIKE #{f.keyword} OR k.name LIKE #{f.keyword})</if>
+    <if test="f.year != null">AND d.year = #{f.year}</if>
+    <if test="f.perspectiveId != null">AND k.perspective_id = #{f.perspectiveId}</if>
+    <include refid="common.scope"><property name="col" value="d.org_unit_id"/></include>
+    GROUP BY d.kpi_id, d.year
+    <if test="f.status != null">
+      HAVING (CASE WHEN SUM(d.status = 'DANG_SOAN') > 0 THEN 'DANG_SOAN' WHEN SUM(d.status = 'DA_DIEU_CHINH') > 0 THEN 'DA_DIEU_CHINH' ELSE 'DA_GIAO' END) = #{f.status}
+    </if>
+  </sql>
+  <select id="searchByKpi" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$ByKpiRow">
+    <include refid="kSelect"/> <include refid="kWhere"/>
+    ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countByKpi" resultType="long">
+    SELECT COUNT(*) FROM (SELECT d.kpi_id FROM kpi_assignment_detail d JOIN kpi k ON k.id = d.kpi_id <include refid="kWhere"/>) t
+  </select>
+  <select id="byKpiChildren" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$ByKpiRow">
+    <include refid="kSelect"/>
+    WHERE d.deleted = 0 AND k.parent_id IN <foreach collection="parentIds" item="i" open="(" separator="," close=")">#{i}</foreach>
+    AND d.year IN <foreach collection="years" item="y" open="(" separator="," close=")">#{y}</foreach>
+    <include refid="common.scope"><property name="col" value="d.org_unit_id"/></include>
+    GROUP BY d.kpi_id, d.year ORDER BY k.code
+  </select>
+
+  <!-- ===================== Lịch sử / điều chỉnh ===================== -->
+  <insert id="insertHistory">
+    INSERT INTO kpi_assignment_history (detail_id, action, decision_no, decision_date, reason, snapshot, at, `by`)
+    VALUES (#{detailId}, #{action}, #{decisionNo}, #{decisionDate}, #{reason}, #{snapshot}, NOW(3), #{by})
+  </insert>
+  <select id="findDraftAdjustment" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$Adjustment">
+    SELECT id, kpi_id, year, decision_no, decision_date, reason, status, created_by, created_at, updated_by, updated_at
+    FROM kpi_assignment_adjustment WHERE kpi_id = #{kpiId} AND year = #{year} AND status = 'NHAP' AND deleted = 0 ORDER BY id DESC LIMIT 1
+  </select>
+  <select id="findAdjustmentLines" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$AdjustmentLine">
+    SELECT id, adjustment_id, detail_id, period_code, old_value, new_value FROM kpi_assignment_adjustment_line WHERE adjustment_id = #{adjustmentId}
+  </select>
+  <insert id="insertAdjustment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO kpi_assignment_adjustment (kpi_id, year, decision_no, decision_date, reason, status, created_by, updated_by)
+    VALUES (#{kpiId}, #{year}, #{decisionNo}, #{decisionDate}, #{reason}, #{status}, #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="updateAdjustment">
+    UPDATE kpi_assignment_adjustment SET decision_no = #{decisionNo}, decision_date = #{decisionDate}, reason = #{reason}, status = #{status},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1 WHERE id = #{id}
+  </update>
+  <delete id="deleteAdjustmentLines">DELETE FROM kpi_assignment_adjustment_line WHERE adjustment_id = #{adjustmentId}</delete>
+  <insert id="insertAdjustmentLine">
+    INSERT INTO kpi_assignment_adjustment_line (adjustment_id, detail_id, period_code, old_value, new_value, created_by, updated_by)
+    VALUES (#{adjustmentId}, #{detailId}, #{periodCode}, #{oldValue}, #{newValue}, 'system', 'system')
+  </insert>
+  <select id="adjustmentHistory" resultType="vn.vnpt.kpi.modules.assignment.model.AssignmentModels$HistoryRow">
+    SELECT a.id AS adjustment_id,
+      DENSE_RANK() OVER (ORDER BY a.updated_at, a.id) AS lan,
+      a.decision_no, a.decision_date, a.reason, l.period_code, l.old_value, l.new_value, a.updated_by AS `by`, a.updated_at AS at
+    FROM kpi_assignment_adjustment_line l JOIN kpi_assignment_adjustment a ON a.id = l.adjustment_id AND a.status = 'DA_CHOT'
+    WHERE l.detail_id = #{detailId}
+    ORDER BY a.updated_at, a.id, FIELD(l.period_code, 'Q1','Q2','H1','Q3','Q4')
+  </select>
+  <select id="closedPeriods" resultType="string">SELECT period_code FROM period_closing WHERE year = #{year}</select>
+
+  <select id="unitAssignStatus" resultType="map">
+    SELECT h.org_unit_id AS orgUnitId, h.status FROM kpi_assignment h WHERE h.year = #{year} AND h.deleted = 0
+    <if test="kpiId != null">AND EXISTS (SELECT 1 FROM kpi_assignment_detail d WHERE d.assignment_id = h.id AND d.kpi_id = #{kpiId} AND d.deleted = 0)</if>
+  </select>
+</mapper>

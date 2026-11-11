@@ -2,7 +2,7 @@
 
 > File sinh tự động bởi `node scripts/gen-traceability.mjs` từ `docs/traceability-data.txt`. Cột “Test e2e” dò tự động trong `frontend/e2e/**/*.spec.ts` (tên test bắt đầu bằng mã STT). ☑ = đã đủ DoD (CLAUDE.md §6) và có e2e.
 
-**Tiến độ chức năng: 38/173 STT ☑**
+**Tiến độ chức năng: 77/173 STT ☑**
 
 ## 1. Chức năng (PHẦN C)
 
@@ -63,31 +63,31 @@
 | 20.1 | KPI đơn vị của tôi – Theo dõi kết quả thẩm định và phản hồi | `/my-kpi?view=review` | `GET /api/my-kpi/review` | `MYKPI:VIEW` | — | ☐ |
 | 21.1 | Đề nghị điều chỉnh kết quả KPI | `/my-kpi?view=review` | `POST /api/my-kpi/results/{id}/adjust-request` | `MYKPI:PROPOSE_ADJUST` | — | ☐ |
 | 22.1 | Xuất kết quả đánh giá KPI theo mẫu | `/my-kpi?view=period` | `GET /api/my-kpi/export` | `MYKPI:EXPORT` | — | ☐ |
-| 23.1 | Lấy danh sách – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/tree` | `KPI:VIEW` | — | ☐ |
-| 23.2 | Tìm kiếm – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/tree?keyword&perspectiveId&objectiveId` | `KPI:VIEW` | — | ☐ |
-| 23.3 | Xem chi tiết – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/{id}` | `KPI:VIEW` | — | ☐ |
-| 23.4 | Ghi lại – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `PUT /api/kpis/{id}` | `KPI:UPDATE` | — | ☐ |
-| 23.5 | Xóa – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `DELETE /api/kpis/{id}` | `KPI:DELETE` | — | ☐ |
-| 23.6 | Nhập dữ liệu – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `POST /api/kpis/import/validate, /commit` | `KPI:IMPORT` | — | ☐ |
-| 23.7 | Xuất dữ liệu – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/export` | `KPI:EXPORT` | — | ☐ |
-| 24.1 | Thêm mới tiêu chí đánh giá KPI – KPI đơn lẻ | `/kpi-admin/catalog?tab=kpi` | `POST /api/kpis, GET /api/kpis/next-code` | `KPI:CREATE` | — | ☐ |
-| 25.1 | Thêm mới tiêu chí đánh giá KPI – KPI cha – con | `/kpi-admin/catalog?tab=kpi` | `POST /api/kpis (children[])` | `KPI:CREATE` | — | ☐ |
-| 26.1 | Lấy danh sách – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms` | `UOM:VIEW` | — | ☐ |
-| 26.2 | Tìm kiếm – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms?keyword&status` | `UOM:VIEW` | — | ☐ |
-| 26.3 | Xem chi tiết – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms/{id}` | `UOM:VIEW` | — | ☐ |
-| 26.4 | Thêm mới – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `POST /api/uoms` | `UOM:CREATE` | — | ☐ |
-| 26.5 | Ghi lại – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `PUT /api/uoms/{id}` | `UOM:UPDATE` | — | ☐ |
-| 26.6 | Xóa – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `DELETE /api/uoms/{id}` | `UOM:DELETE` | — | ☐ |
-| 26.7 | Nhập dữ liệu – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `POST /api/uoms/import/validate, /commit` | `UOM:IMPORT` | — | ☐ |
-| 26.8 | Xuất dữ liệu – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms/export` | `UOM:EXPORT` | — | ☐ |
-| 26.9 | Lấy danh sách – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives` | `PERSPECTIVE:VIEW` | — | ☐ |
-| 26.10 | Tìm kiếm – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives?keyword&status` | `PERSPECTIVE:VIEW` | — | ☐ |
-| 26.11 | Xem chi tiết – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives/{id}` | `PERSPECTIVE:VIEW` | — | ☐ |
-| 26.12 | Thêm mới – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `POST /api/perspectives` | `PERSPECTIVE:CREATE` | — | ☐ |
-| 26.13 | Ghi lại – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `PUT /api/perspectives/{id}` | `PERSPECTIVE:UPDATE` | — | ☐ |
-| 26.14 | Xóa – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `DELETE /api/perspectives/{id}` | `PERSPECTIVE:DELETE` | — | ☐ |
-| 26.15 | Nhập dữ liệu – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `POST /api/perspectives/import/validate, /commit` | `PERSPECTIVE:IMPORT` | — | ☐ |
-| 26.16 | Xuất dữ liệu – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives/export` | `PERSPECTIVE:EXPORT` | — | ☐ |
+| 23.1 | Lấy danh sách – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/tree` | `KPI:VIEW` | `p2-kpi.spec.ts` | ☑ |
+| 23.2 | Tìm kiếm – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/tree?keyword&perspectiveId&objectiveId` | `KPI:VIEW` | `p2-kpi.spec.ts` | ☑ |
+| 23.3 | Xem chi tiết – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/{id}` | `KPI:VIEW` | `p2-kpi.spec.ts` | ☑ |
+| 23.4 | Ghi lại – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `PUT /api/kpis/{id}` | `KPI:UPDATE` | `p2-kpi.spec.ts` | ☑ |
+| 23.5 | Xóa – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `DELETE /api/kpis/{id}` | `KPI:DELETE` | `p2-kpi.spec.ts` | ☑ |
+| 23.6 | Nhập dữ liệu – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `POST /api/kpis/import/validate, /commit` | `KPI:IMPORT` | `p2-kpi.spec.ts` | ☑ |
+| 23.7 | Xuất dữ liệu – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/export` | `KPI:EXPORT` | `p2-kpi.spec.ts` | ☑ |
+| 24.1 | Thêm mới tiêu chí đánh giá KPI – KPI đơn lẻ | `/kpi-admin/catalog?tab=kpi` | `POST /api/kpis, GET /api/kpis/next-code` | `KPI:CREATE` | `p2-kpi.spec.ts` | ☑ |
+| 25.1 | Thêm mới tiêu chí đánh giá KPI – KPI cha – con | `/kpi-admin/catalog?tab=kpi` | `POST /api/kpis (children[])` | `KPI:CREATE` | `p2-kpi.spec.ts` | ☑ |
+| 26.1 | Lấy danh sách – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms` | `UOM:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 26.2 | Tìm kiếm – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms?keyword&status` | `UOM:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 26.3 | Xem chi tiết – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms/{id}` | `UOM:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 26.4 | Thêm mới – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `POST /api/uoms` | `UOM:CREATE` | `p2-catalog.spec.ts` | ☑ |
+| 26.5 | Ghi lại – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `PUT /api/uoms/{id}` | `UOM:UPDATE` | `p2-catalog.spec.ts` | ☑ |
+| 26.6 | Xóa – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `DELETE /api/uoms/{id}` | `UOM:DELETE` | `p2-catalog.spec.ts` | ☑ |
+| 26.7 | Nhập dữ liệu – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `POST /api/uoms/import/validate, /commit` | `UOM:IMPORT` | `p2-catalog.spec.ts` | ☑ |
+| 26.8 | Xuất dữ liệu – Đơn vị đo | `/kpi-admin/catalog?tab=uom` | `GET /api/uoms/export` | `UOM:EXPORT` | `p2-catalog.spec.ts` | ☑ |
+| 26.9 | Lấy danh sách – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives` | `PERSPECTIVE:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 26.10 | Tìm kiếm – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives?keyword&status` | `PERSPECTIVE:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 26.11 | Xem chi tiết – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives/{id}` | `PERSPECTIVE:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 26.12 | Thêm mới – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `POST /api/perspectives` | `PERSPECTIVE:CREATE` | `p2-catalog.spec.ts` | ☑ |
+| 26.13 | Ghi lại – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `PUT /api/perspectives/{id}` | `PERSPECTIVE:UPDATE` | `p2-catalog.spec.ts` | ☑ |
+| 26.14 | Xóa – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `DELETE /api/perspectives/{id}` | `PERSPECTIVE:DELETE` | `p2-catalog.spec.ts` | ☑ |
+| 26.15 | Nhập dữ liệu – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `POST /api/perspectives/import/validate, /commit` | `PERSPECTIVE:IMPORT` | `p2-catalog.spec.ts` | ☑ |
+| 26.16 | Xuất dữ liệu – Viễn cảnh | `/kpi-admin/catalog?tab=perspective` | `GET /api/perspectives/export` | `PERSPECTIVE:EXPORT` | `p2-catalog.spec.ts` | ☑ |
 | 26.17 | Lấy danh sách – Lịch đồng bộ | `/system/schedules` | `GET /api/schedules` | `SCHEDULE:VIEW` | `p1-config.spec.ts` | ☑ |
 | 26.18 | Xem chi tiết – Lịch đồng bộ | `/system/schedules` | `GET /api/schedules/{id}` | `SCHEDULE:VIEW` | `p1-config.spec.ts` | ☑ |
 | 26.19 | Ghi lại – Lịch đồng bộ | `/system/schedules` | `PUT /api/schedules/{id}, POST /api/schedules/{id}/run` | `SCHEDULE:UPDATE, SCHEDULE:RUN` | `p1-config.spec.ts` | ☑ |
@@ -96,20 +96,20 @@
 | 26.22 | Thêm mới – Tham số hệ thống | `/system/sys-configs` | `POST /api/sys-configs` | `SYSCONFIG:CREATE` | `p1-config.spec.ts` | ☑ |
 | 26.23 | Ghi lại – Tham số hệ thống | `/system/sys-configs` | `PUT /api/sys-configs/{id}` | `SYSCONFIG:UPDATE` | `p1-config.spec.ts` | ☑ |
 | 26.24 | Xóa – Tham số hệ thống | `/system/sys-configs` | `DELETE /api/sys-configs/{id}` | `SYSCONFIG:DELETE` | `p1-config.spec.ts` | ☑ |
-| 27.1 | Lấy danh sách – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions` | `FORMULA:VIEW` | — | ☐ |
-| 27.2 | Tìm kiếm – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions?keyword&status` | `FORMULA:VIEW` | — | ☐ |
-| 27.3 | Xem chi tiết – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions/{id}` | `FORMULA:VIEW` | — | ☐ |
-| 27.4 | Thêm mới – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `POST /api/formula-definitions, POST /{id}/test, POST /validate-expression` | `FORMULA:CREATE, FORMULA:TEST` | — | ☐ |
-| 27.5 | Ghi lại – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `PUT /api/formula-definitions/{id}` | `FORMULA:UPDATE` | — | ☐ |
-| 27.6 | Xóa – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `DELETE /api/formula-definitions/{id}` | `FORMULA:DELETE` | — | ☐ |
-| 28.1 | Lấy danh sách – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives` | `OBJECTIVE:VIEW` | — | ☐ |
-| 28.2 | Tìm kiếm – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives?keyword&perspectiveId` | `OBJECTIVE:VIEW` | — | ☐ |
-| 28.3 | Xem chi tiết – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives/{id}` | `OBJECTIVE:VIEW` | — | ☐ |
-| 28.4 | Thêm mới – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `POST /api/objectives` | `OBJECTIVE:CREATE` | — | ☐ |
-| 28.5 | Ghi lại – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `PUT /api/objectives/{id}` | `OBJECTIVE:UPDATE` | — | ☐ |
-| 28.6 | Xóa – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `DELETE /api/objectives/{id}` | `OBJECTIVE:DELETE` | — | ☐ |
-| 28.7 | Nhập dữ liệu – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `POST /api/objectives/import/validate, /commit` | `OBJECTIVE:IMPORT` | — | ☐ |
-| 28.8 | Xuất dữ liệu – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives/export` | `OBJECTIVE:EXPORT` | — | ☐ |
+| 27.1 | Lấy danh sách – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions` | `FORMULA:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 27.2 | Tìm kiếm – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions?keyword&status` | `FORMULA:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 27.3 | Xem chi tiết – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `GET /api/formula-definitions/{id}` | `FORMULA:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 27.4 | Thêm mới – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `POST /api/formula-definitions, POST /{id}/test, POST /validate-expression` | `FORMULA:CREATE, FORMULA:TEST` | `p2-catalog.spec.ts` | ☑ |
+| 27.5 | Ghi lại – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `PUT /api/formula-definitions/{id}` | `FORMULA:UPDATE` | `p2-catalog.spec.ts` | ☑ |
+| 27.6 | Xóa – Định nghĩa KPI công thức | `/kpi-admin/catalog?tab=formula` | `DELETE /api/formula-definitions/{id}` | `FORMULA:DELETE` | `p2-catalog.spec.ts` | ☑ |
+| 28.1 | Lấy danh sách – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives` | `OBJECTIVE:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 28.2 | Tìm kiếm – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives?keyword&perspectiveId` | `OBJECTIVE:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 28.3 | Xem chi tiết – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives/{id}` | `OBJECTIVE:VIEW` | `p2-catalog.spec.ts` | ☑ |
+| 28.4 | Thêm mới – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `POST /api/objectives` | `OBJECTIVE:CREATE` | `p2-catalog.spec.ts` | ☑ |
+| 28.5 | Ghi lại – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `PUT /api/objectives/{id}` | `OBJECTIVE:UPDATE` | `p2-catalog.spec.ts` | ☑ |
+| 28.6 | Xóa – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `DELETE /api/objectives/{id}` | `OBJECTIVE:DELETE` | `p2-catalog.spec.ts` | ☑ |
+| 28.7 | Nhập dữ liệu – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `POST /api/objectives/import/validate, /commit` | `OBJECTIVE:IMPORT` | `p2-catalog.spec.ts` | ☑ |
+| 28.8 | Xuất dữ liệu – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives/export` | `OBJECTIVE:EXPORT` | `p2-catalog.spec.ts` | ☑ |
 | 29.1 | Lấy danh sách – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit` | `ASSIGN:VIEW` | — | ☐ |
 | 29.2 | Tìm kiếm – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit?keyword&year&status` | `ASSIGN:VIEW` | — | ☐ |
 | 29.3 | Xem chi tiết – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit/{id}` | `ASSIGN:VIEW` | — | ☐ |

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.catalog.mapper.CatalogMapper">
+  <sql id="audit">created_by, created_at, updated_by, updated_at, version</sql>
+
+  <!-- ================= Đơn vị đo ================= -->
+  <sql id="uomWhere">WHERE deleted = 0
+    <if test="keyword != null">AND (code LIKE #{keyword} OR name LIKE #{keyword})</if>
+    <if test="status != null and status != ''">AND status = #{status}</if></sql>
+  <select id="searchUom" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Uom">
+    SELECT id, code, name, description, status, <include refid="audit"/> FROM unit_of_measure <include refid="uomWhere"/>
+    ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countUom" resultType="long">SELECT COUNT(*) FROM unit_of_measure <include refid="uomWhere"/></select>
+  <select id="findUom" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Uom">
+    SELECT id, code, name, description, status, <include refid="audit"/> FROM unit_of_measure WHERE id = #{id} AND deleted = 0
+  </select>
+  <select id="findUomByName" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Uom">
+    SELECT id, code, name, description, status, <include refid="audit"/> FROM unit_of_measure WHERE name = #{name} AND deleted = 0
+  </select>
+  <select id="findUomByCodeOrName" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Uom">
+    SELECT id, code, name, description, status, <include refid="audit"/> FROM unit_of_measure WHERE (code = #{v} OR name = #{v}) AND deleted = 0 LIMIT 1
+  </select>
+  <insert id="insertUom" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO unit_of_measure (code, name, description, status, created_by, updated_by)
+    VALUES (CONCAT('TMP-', UUID_SHORT()), #{name}, #{description}, #{status}, #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="setUomCode">UPDATE unit_of_measure SET code = CONCAT('DVD', LPAD(id, 3, '0')) WHERE id = #{id}</update>
+  <update id="updateUom">
+    UPDATE unit_of_measure SET name = #{name}, description = #{description}, status = #{status}, updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="deleteUom">UPDATE unit_of_measure SET deleted = 1, updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id} AND version = #{version} AND deleted = 0</update>
+  <select id="countUomUsage" resultType="long">SELECT COUNT(*) FROM kpi WHERE unit_of_measure_id = #{id} AND deleted = 0</select>
+
+  <!-- ================= Viễn cảnh ================= -->
+  <sql id="perCols">p.id, p.code, p.name, p.sort_order, p.description, p.color, p.status, p.created_by, p.created_at, p.updated_by, p.updated_at, p.version,
+    (SELECT COUNT(*) FROM kpi k WHERE k.perspective_id = p.id AND k.deleted = 0) AS kpi_count</sql>
+  <sql id="perWhere">WHERE p.deleted = 0
+    <if test="keyword != null">AND (p.code LIKE #{keyword} OR p.name LIKE #{keyword})</if>
+    <if test="status != null and status != ''">AND p.status = #{status}</if></sql>
+  <select id="searchPerspective" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Perspective">
+    SELECT <include refid="perCols"/> FROM perspective p <include refid="perWhere"/> ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countPerspective" resultType="long">SELECT COUNT(*) FROM perspective p <include refid="perWhere"/></select>
+  <select id="allPerspectives" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Perspective">
+    SELECT <include refid="perCols"/> FROM perspective p WHERE p.deleted = 0 ORDER BY p.sort_order, p.id
+  </select>
+  <select id="findPerspective" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Perspective">
+    SELECT <include refid="perCols"/> FROM perspective p WHERE p.id = #{id} AND p.deleted = 0
+  </select>
+  <select id="findPerspectiveByCode" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Perspective">
+    SELECT <include refid="perCols"/> FROM perspective p WHERE p.code = #{code} AND p.deleted = 0
+  </select>
+  <insert id="insertPerspective" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO perspective (code, name, sort_order, description, color, status, created_by, updated_by)
+    VALUES (#{code}, #{name}, #{sortOrder}, #{description}, #{color}, #{status}, #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="updatePerspective">
+    UPDATE perspective SET code = #{code}, name = #{name}, sort_order = #{sortOrder}, description = #{description}, color = #{color}, status = #{status},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="deletePerspective">UPDATE perspective SET deleted = 1, updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id} AND version = #{version} AND deleted = 0</update>
+  <select id="countPerspectiveKpi" resultType="long">SELECT COUNT(*) FROM kpi WHERE perspective_id = #{id} AND deleted = 0</select>
+  <select id="countPerspectiveObjective" resultType="long">SELECT COUNT(*) FROM strategic_objective WHERE perspective_id = #{id} AND deleted = 0</select>
+
+  <!-- ================= Mục tiêu trọng tâm ================= -->
+  <sql id="objCols">o.id, o.code, o.name, o.perspective_id, p.code AS perspective_code, p.name AS perspective_name, p.color AS perspective_color,
+    p.sort_order AS perspective_sort, o.description, o.status, o.created_by, o.created_at, o.updated_by, o.updated_at, o.version</sql>
+  <sql id="objWhere">WHERE o.deleted = 0
+    <if test="keyword != null">AND (o.code LIKE #{keyword} OR o.name LIKE #{keyword})</if>
+    <if test="perspectiveId != null">AND o.perspective_id = #{perspectiveId}</if>
+    <if test="status != null and status != ''">AND o.status = #{status}</if></sql>
+  <select id="searchObjective" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Objective">
+    SELECT <include refid="objCols"/>
+      <if test="strategyId != null">, EXISTS(SELECT 1 FROM strategy_objective so WHERE so.strategy_id = #{strategyId} AND so.objective_id = o.id) AS on_map</if>
+    FROM strategic_objective o JOIN perspective p ON p.id = o.perspective_id
+    <include refid="objWhere"/> ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countObjective" resultType="long">SELECT COUNT(*) FROM strategic_objective o <include refid="objWhere"/></select>
+  <select id="findObjective" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Objective">
+    SELECT <include refid="objCols"/> FROM strategic_objective o JOIN perspective p ON p.id = o.perspective_id WHERE o.id = #{id} AND o.deleted = 0
+  </select>
+  <select id="findObjectiveByCode" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Objective">
+    SELECT <include refid="objCols"/> FROM strategic_objective o JOIN perspective p ON p.id = o.perspective_id WHERE o.code = #{code} AND o.deleted = 0
+  </select>
+  <insert id="insertObjective" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO strategic_objective (code, name, perspective_id, description, status, created_by, updated_by)
+    VALUES (#{code}, #{name}, #{perspectiveId}, #{description}, 'HIEU_LUC', #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="updateObjective">
+    UPDATE strategic_objective SET name = #{name}, perspective_id = #{perspectiveId}, description = #{description},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="deleteObjective">UPDATE strategic_objective SET deleted = 1, updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id} AND version = #{version} AND deleted = 0</update>
+  <select id="countObjectiveKpi" resultType="long">SELECT COUNT(*) FROM kpi WHERE objective_id = #{id} AND deleted = 0</select>
+  <select id="countObjectiveStrategy" resultType="long">
+    SELECT COUNT(*) FROM strategy_objective so JOIN strategy s ON s.id = so.strategy_id AND s.deleted = 0 WHERE so.objective_id = #{id}
+  </select>
+
+  <!-- ================= Phương pháp tính điểm / Giai đoạn ================= -->
+  <select id="allScoringMethods" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$ScoringMethod">
+    SELECT id, code, name, type, config FROM scoring_method WHERE deleted = 0 ORDER BY id
+  </select>
+  <select id="findScoringMethod" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$ScoringMethod">
+    SELECT id, code, name, type, config FROM scoring_method WHERE id = #{id}
+  </select>
+  <select id="findScoringMethodByCode" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$ScoringMethod">
+    SELECT id, code, name, type, config FROM scoring_method WHERE code = #{code} AND deleted = 0
+  </select>
+  <select id="allStages" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Stage">
+    SELECT id, code, name, from_year, to_year, <include refid="audit"/> FROM evaluation_stage WHERE deleted = 0 ORDER BY from_year
+  </select>
+  <select id="findStage" resultType="vn.vnpt.kpi.modules.catalog.model.CatalogModels$Stage">
+    SELECT id, code, name, from_year, to_year, <include refid="audit"/> FROM evaluation_stage WHERE id = #{id} AND deleted = 0
+  </select>
+  <insert id="insertStage" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO evaluation_stage (code, name, from_year, to_year, created_by, updated_by) VALUES (#{code}, #{name}, #{fromYear}, #{toYear}, #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="updateStage">
+    UPDATE evaluation_stage SET name = #{name}, from_year = #{fromYear}, to_year = #{toYear}, updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND deleted = 0
+  </update>
+  <update id="deleteStage">UPDATE evaluation_stage SET deleted = 1, updated_by = #{by}, updated_at = NOW(3) WHERE id = #{id}</update>
+  <select id="countStageUsage" resultType="long">SELECT COUNT(*) FROM strategy WHERE stage_id = #{id} AND deleted = 0</select>
+</mapper>

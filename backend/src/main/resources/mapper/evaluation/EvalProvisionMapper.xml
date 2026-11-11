@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.evaluation.mapper.EvalProvisionMapper">
+  <sql id="ids"><foreach collection="detailIds" item="i" open="(" separator="," close=")">#{i}</foreach></sql>
+
+  <insert id="upsertEvaluationKpis">
+    INSERT INTO evaluation_kpi (kpi_id, year, period_code, status, result_type, created_by, updated_by)
+    SELECT DISTINCT d.kpi_id, d.year, p.code, 'CHUA_CHAM', COALESCE(k.data_source, 'NHAP_TAY'), #{by}, #{by}
+    FROM kpi_assignment_detail d JOIN kpi k ON k.id = d.kpi_id
+    CROSS JOIN (SELECT 'Q1' AS code UNION ALL SELECT 'Q2' UNION ALL SELECT 'H1' UNION ALL SELECT 'Q3' UNION ALL SELECT 'Q4' UNION ALL SELECT 'Y') p
+    WHERE d.id IN <include refid="ids"/>
+    ON DUPLICATE KEY UPDATE deleted = 0
+  </insert>
+
+  <!-- KH giao kỳ: adj_<kỳ> nếu khác NULL, ngược lại target_<kỳ>; kỳ Y lấy target_year (PHẦN B §6.1).
+       Không thay đổi KH của kết quả đã chốt / TGĐ đã duyệt. -->
+  <insert id="upsertEvaluationResults">
+    INSERT INTO evaluation_result (evaluation_kpi_id, org_unit_id, assignment_detail_id, plan_value, year_plan_value, status, rating, created_by, updated_by)
+    SELECT ek.id, d.org_unit_id, d.id,
+      CASE ek.period_code
+        WHEN 'Q1' THEN COALESCE(d.adj_q1, d.target_q1)
+        WHEN 'Q2' THEN COALESCE(d.adj_q2, d.target_q2)
+        WHEN 'H1' THEN COALESCE(d.adj_h1, d.target_h1)
+        WHEN 'Q3' THEN COALESCE(d.adj_q3, d.target_q3)
+        WHEN 'Q4' THEN COALESCE(d.adj_q4, d.target_q4)
+        ELSE d.target_year END,
+      d.target_year, 'CHUA_CO_KQ', 'DANG_THEO_DOI', #{by}, #{by}
+    FROM kpi_assignment_detail d JOIN evaluation_kpi ek ON ek.kpi_id = d.kpi_id AND ek.year = d.year
+    WHERE d.id IN <include refid="ids"/>
+    ON DUPLICATE KEY UPDATE
+      assignment_detail_id = VALUES(assignment_detail_id),
+      plan_value = IF(status IN ('CHOT_DANH_GIA','TGD_DA_DUYET'), plan_value, VALUES(plan_value)),
+      year_plan_value = IF(status IN ('CHOT_DANH_GIA','TGD_DA_DUYET'), year_plan_value, VALUES(year_plan_value)),
+      deleted = 0
+  </insert>
+
+  <select id="resultIdsOfDetails" resultType="long">
+    SELECT id FROM evaluation_result WHERE deleted = 0 AND assignment_detail_id IN <include refid="ids"/>
+  </select>
+</mapper>

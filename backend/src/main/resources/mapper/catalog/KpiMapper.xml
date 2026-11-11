@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.catalog.mapper.KpiMapper">
+  <sql id="cols">
+    k.id, k.code, k.name, k.structure, k.parent_id, pk.code AS parent_code, k.group_aggregation, k.group_expression,
+    k.perspective_id, pe.code AS perspective_code, pe.name AS perspective_name, pe.color AS perspective_color,
+    k.group_kpi_id, gk.code AS group_kpi_code, gk.name AS group_kpi_name, k.target_data_type, k.completion_formula, k.completion_expression,
+    k.scoring_method_id, sm.name AS scoring_method_name, sm.type AS scoring_method_type, k.score_by_result,
+    k.objective_id, ob.code AS objective_code, ob.name AS objective_name, k.weight,
+    k.unit_of_measure_id, uom.name AS unit_of_measure_name,
+    k.assigning_unit_id, au.name AS assigning_unit_name, k.assigning_officer_id, ao.full_name AS assigning_officer_name,
+    k.evaluating_unit_id, eu.name AS evaluating_unit_name, k.evaluating_officer_id, eo.full_name AS evaluating_officer_name,
+    k.data_source, k.result_expression, k.is_focus, k.sort_order, k.status,
+    k.created_by, k.created_at, k.updated_by, k.updated_at, k.version,
+    (SELECT COUNT(*) FROM kpi c WHERE c.parent_id = k.id AND c.deleted = 0) AS child_count,
+    EXISTS(SELECT 1 FROM kpi_assignment_detail d WHERE d.kpi_id = k.id AND d.deleted = 0) AS assigned
+  </sql>
+  <sql id="joins">
+    LEFT JOIN kpi pk ON pk.id = k.parent_id
+    JOIN perspective pe ON pe.id = k.perspective_id
+    LEFT JOIN kpi gk ON gk.id = k.group_kpi_id
+    JOIN scoring_method sm ON sm.id = k.scoring_method_id
+    JOIN strategic_objective ob ON ob.id = k.objective_id
+    JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id
+    JOIN org_unit au ON au.id = k.assigning_unit_id
+    JOIN app_user ao ON ao.id = k.assigning_officer_id
+    JOIN org_unit eu ON eu.id = k.evaluating_unit_id
+    JOIN app_user eo ON eo.id = k.evaluating_officer_id
+  </sql>
+  <!-- điều kiện khớp trên bảng alias ${a} -->
+  <sql id="match">
+    ${a}.deleted = 0
+    <if test="f.keyword != null">AND (${a}.code LIKE #{f.keyword} OR ${a}.name LIKE #{f.keyword})</if>
+    <if test="f.perspectiveId != null">AND ${a}.perspective_id = #{f.perspectiveId}</if>
+    <if test="f.objectiveId != null">AND ${a}.objective_id = #{f.objectiveId}</if>
+    <if test="f.isFocus != null">AND ${a}.is_focus = #{f.isFocus}</if>
+  </sql>
+  <sql id="rootWhere">
+    WHERE k.parent_id IS NULL AND k.deleted = 0
+    AND ( (<include refid="match"><property name="a" value="k"/></include>)
+       OR EXISTS (SELECT 1 FROM kpi c WHERE c.parent_id = k.id AND <include refid="match"><property name="a" value="c"/></include>) )
+  </sql>
+
+  <select id="searchRoots" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi">
+    SELECT <include refid="cols"/>,
+      (<include refid="match"><property name="a" value="k"/></include>) AS matched
+    FROM kpi k <include refid="joins"/>
+    <include refid="rootWhere"/>
+    ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countRoots" resultType="long">SELECT COUNT(*) FROM kpi k <include refid="rootWhere"/></select>
+
+  <select id="findChildrenOf" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi">
+    SELECT <include refid="cols"/>, (<include refid="match"><property name="a" value="k"/></include>) AS matched
+    FROM kpi k <include refid="joins"/>
+    WHERE k.deleted = 0 AND k.parent_id IN <foreach collection="parentIds" item="i" open="(" separator="," close=")">#{i}</foreach>
+    ORDER BY k.sort_order, k.code
+  </select>
+
+  <select id="options" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi">
+    SELECT <include refid="cols"/> FROM kpi k <include refid="joins"/>
+    WHERE <include refid="match"><property name="a" value="k"/></include>
+    <if test="f.rootOnly != null">AND k.parent_id IS NULL</if>
+    <if test="f.excludeId != null">AND k.id &lt;&gt; #{f.excludeId}</if>
+    ORDER BY pe.sort_order, k.code LIMIT #{limit}
+  </select>
+
+  <select id="findById" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi">
+    SELECT <include refid="cols"/> FROM kpi k <include refid="joins"/> WHERE k.id = #{id} AND k.deleted = 0
+  </select>
+  <select id="findByCode" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi">
+    SELECT <include refid="cols"/> FROM kpi k <include refid="joins"/> WHERE k.code = #{code} AND k.deleted = 0
+  </select>
+  <select id="findByIds" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi">
+    SELECT <include refid="cols"/> FROM kpi k <include refid="joins"/>
+    WHERE k.deleted = 0 AND k.id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+
+  <sql id="compCols">c.id, c.kpi_id, c.code, c.name, c.formula_definition_id, f.code AS formula_code, f.name AS formula_name, c.source, c.sort_order</sql>
+  <select id="findComponents" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi$KpiComponent">
+    SELECT <include refid="compCols"/> FROM kpi_component c LEFT JOIN formula_definition f ON f.id = c.formula_definition_id
+    WHERE c.kpi_id = #{kpiId} AND c.deleted = 0 ORDER BY c.sort_order, c.id
+  </select>
+  <select id="findComponentsOf" resultType="vn.vnpt.kpi.modules.catalog.model.Kpi$KpiComponent">
+    SELECT <include refid="compCols"/> FROM kpi_component c LEFT JOIN formula_definition f ON f.id = c.formula_definition_id
+    WHERE c.deleted = 0 AND c.kpi_id IN <foreach collection="kpiIds" item="i" open="(" separator="," close=")">#{i}</foreach>
+    ORDER BY c.kpi_id, c.sort_order, c.id
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO kpi (code, name, structure, parent_id, group_aggregation, group_expression, perspective_id, group_kpi_id, target_data_type,
+      completion_formula, completion_expression, scoring_method_id, score_by_result, objective_id, weight, unit_of_measure_id,
+      assigning_unit_id, assigning_officer_id, evaluating_unit_id, evaluating_officer_id, data_source, result_expression, is_focus, sort_order,
+      status, created_by, updated_by)
+    VALUES (#{code}, #{name}, #{structure}, #{parentId}, #{groupAggregation}, #{groupExpression}, #{perspectiveId}, #{groupKpiId}, #{targetDataType},
+      #{completionFormula}, #{completionExpression}, #{scoringMethodId}, #{scoreByResult}, #{objectiveId}, #{weight}, #{unitOfMeasureId},
+      #{assigningUnitId}, #{assigningOfficerId}, #{evaluatingUnitId}, #{evaluatingOfficerId}, #{dataSource}, #{resultExpression}, #{isFocus}, #{sortOrder},
+      'HIEU_LUC', #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="update">
+    UPDATE kpi SET name = #{name}, structure = #{structure}, group_aggregation = #{groupAggregation}, group_expression = #{groupExpression},
+      perspective_id = #{perspectiveId}, group_kpi_id = #{groupKpiId}, target_data_type = #{targetDataType}, completion_formula = #{completionFormula},
+      completion_expression = #{completionExpression}, scoring_method_id = #{scoringMethodId}, score_by_result = #{scoreByResult},
+      objective_id = #{objectiveId}, weight = #{weight}, unit_of_measure_id = #{unitOfMeasureId}, assigning_unit_id = #{assigningUnitId},
+      assigning_officer_id = #{assigningOfficerId}, evaluating_unit_id = #{evaluatingUnitId}, evaluating_officer_id = #{evaluatingOfficerId},
+      data_source = #{dataSource}, result_expression = #{resultExpression}, is_focus = #{isFocus}, sort_order = #{sortOrder},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="softDelete">UPDATE kpi SET deleted = 1, updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id} AND deleted = 0</update>
+
+  <select id="lockSequence" resultType="integer">SELECT last_no FROM kpi_code_sequence WHERE perspective_id = #{perspectiveId} FOR UPDATE</select>
+  <insert id="insertSequence">INSERT INTO kpi_code_sequence (perspective_id, last_no) VALUES (#{perspectiveId}, #{lastNo})</insert>
+  <update id="updateSequence">UPDATE kpi_code_sequence SET last_no = #{lastNo} WHERE perspective_id = #{perspectiveId}</update>
+  <select id="maxRootNumber" resultType="integer">
+    SELECT MAX(CAST(SUBSTRING(code, CHAR_LENGTH(#{prefix}) + 2) AS UNSIGNED)) FROM kpi
+    WHERE code LIKE CONCAT(#{prefix}, '-%') AND code NOT LIKE '%.%'
+  </select>
+  <select id="maxChildNumber" resultType="integer">
+    SELECT MAX(CAST(SUBSTRING(code, CHAR_LENGTH(#{parentCode}) + 2) AS UNSIGNED)) FROM kpi WHERE code LIKE CONCAT(#{parentCode}, '.%')
+  </select>
+
+  <insert id="insertComponent" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO kpi_component (kpi_id, code, name, formula_definition_id, source, sort_order, created_by, updated_by)
+    VALUES (#{kpiId}, #{code}, #{name}, #{formulaDefinitionId}, #{source}, #{sortOrder}, 'system', 'system')
+  </insert>
+  <update id="updateComponent">
+    UPDATE kpi_component SET code = #{code}, name = #{name}, formula_definition_id = #{formulaDefinitionId}, source = #{source}, sort_order = #{sortOrder},
+      updated_at = NOW(3), version = version + 1 WHERE id = #{id}
+  </update>
+  <update id="deleteComponent">UPDATE kpi_component SET deleted = 1, updated_at = NOW(3) WHERE id = #{id}</update>
+  <select id="countComponentValues" resultType="long">SELECT COUNT(*) FROM evaluation_component_value WHERE component_id = #{componentId}</select>
+
+  <select id="countAssigned" resultType="long">
+    SELECT COUNT(*) FROM kpi_assignment_detail d JOIN kpi k ON k.id = d.kpi_id WHERE d.deleted = 0 AND (k.id = #{kpiId} OR k.parent_id = #{kpiId})
+  </select>
+  <select id="countInStrategy" resultType="long">
+    SELECT COUNT(*) FROM strategy_kpi sk JOIN strategy s ON s.id = sk.strategy_id AND s.deleted = 0 JOIN kpi k ON k.id = sk.kpi_id
+    WHERE k.id = #{kpiId} OR k.parent_id = #{kpiId}
+  </select>
+  <delete id="deleteOfficerMap">DELETE FROM kpi_officer_map WHERE kpi_id = #{kpiId} AND role IN ('GIAO','DANH_GIA')</delete>
+  <insert id="insertOfficerMap">
+    INSERT IGNORE INTO kpi_officer_map (kpi_id, org_unit_id, user_id, role, created_by, updated_by) VALUES (#{kpiId}, #{orgUnitId}, #{userId}, #{role}, #{by}, #{by})
+  </insert>
+  <select id="countChildren" resultType="int">SELECT COUNT(*) FROM kpi WHERE parent_id = #{parentId} AND deleted = 0</select>
+</mapper>

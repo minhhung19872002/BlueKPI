@@ -91,10 +91,10 @@ test('26.22 Thêm mới – Tham số hệ thống', async ({ page }) => {
   const dlg = page.getByRole('dialog', { name: 'Thêm tham số' });
   await dlg.getByLabel('Mã tham số').fill(key);
   await dlg.getByLabel('Kiểu dữ liệu').selectOption({ label: 'Số' });
-  await dlg.getByRole('textbox', { name: 'Giá trị', exact: true }).fill('abc');
+  await dlg.getByLabel('Giá trị', { exact: true }).fill('abc');
   await dlg.getByRole('button', { name: 'Lưu' }).click();
   await expect(dlg.getByText('Giá trị phải là số')).toBeVisible();
-  await dlg.getByRole('textbox', { name: 'Giá trị', exact: true }).fill('42');
+  await dlg.getByLabel('Giá trị', { exact: true }).fill('42');
   await dlg.getByLabel('Nhóm').fill('TEST');
   await dlg.getByRole('button', { name: 'Lưu' }).click();
   await expectToast(page, 'Thêm mới thành công');
@@ -107,12 +107,12 @@ test('26.23 Ghi lại – Tham số hệ thống', async ({ page }) => {
   await searchKeyword(page, 'REMIND_DAYS_BEFORE_DEADLINE');
   await rowAction(page, 'REMIND_DAYS_BEFORE_DEADLINE', 'Sửa');
   const dlg = page.getByRole('dialog', { name: 'Sửa tham số' });
-  await dlg.getByRole('textbox', { name: 'Giá trị', exact: true }).fill('6');
+  await dlg.getByLabel('Giá trị', { exact: true }).fill('6');
   await dlg.getByRole('button', { name: 'Lưu' }).click();
   await expectToast(page, 'Cập nhật thành công');
   await expect(row(page, 'REMIND_DAYS_BEFORE_DEADLINE')).toContainText('6');
   await rowAction(page, 'REMIND_DAYS_BEFORE_DEADLINE', 'Sửa');
-  await dlg.getByRole('textbox', { name: 'Giá trị', exact: true }).fill('5');
+  await dlg.getByLabel('Giá trị', { exact: true }).fill('5');
   await dlg.getByRole('button', { name: 'Lưu' }).click();
   await expectToast(page, 'Cập nhật thành công');
 });
@@ -123,7 +123,7 @@ test('26.24 Xóa – Tham số hệ thống', async ({ page }) => {
   await page.getByRole('button', { name: 'Thêm tham số' }).click();
   const dlg = page.getByRole('dialog', { name: 'Thêm tham số' });
   await dlg.getByLabel('Mã tham số').fill(key);
-  await dlg.getByRole('textbox', { name: 'Giá trị', exact: true }).fill('tam');
+  await dlg.getByLabel('Giá trị', { exact: true }).fill('tam');
   await dlg.getByRole('button', { name: 'Lưu' }).click();
   await expectToast(page, 'Thêm mới thành công');
   await searchKeyword(page, key);
