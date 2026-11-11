@@ -15,7 +15,8 @@ cp "$ROOT"/deploy/scripts/{install.sh,backup.sh,restore.sh,minio-mirror.sh,seed-
 cp "$ROOT"/deploy/nginx/*.conf "$STAGE/nginx/"
 cp "$ROOT"/deploy/systemd/*.service "$STAGE/systemd/"
 cp "$ROOT/deploy/env.example" "$STAGE/env.example"
-cp "$ROOT"/docs/{TRIEN-KHAI.md,VAN-HANH.md,HDQT.md} "$STAGE/docs/" 2>/dev/null || true
+cp "$ROOT"/docs/{TRIEN-KHAI.md,VAN-HANH.md,HDQT.md,ATTT.md,KIEN-TRUC.md,BAO-CAO-KIEM-THU.md,perf-report.md} "$STAGE/docs/" 2>/dev/null || true
+cp -r "$ROOT/docs/HDSD" "$STAGE/docs/HDSD"
 mv "$STAGE/scripts/install.sh" "$STAGE/install.sh"
 ( cd "$STAGE" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS )
 tar -C "$OUT" -czf "$OUT/kpi-bsc-$VERSION.tar.gz" "kpi-bsc-$VERSION"

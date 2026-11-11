@@ -2,7 +2,7 @@
 
 > File sinh tự động bởi `node scripts/gen-traceability.mjs` từ `docs/traceability-data.txt`. Cột “Test e2e” dò tự động trong `frontend/e2e/**/*.spec.ts` (tên test bắt đầu bằng mã STT). ☑ = đã đủ DoD (CLAUDE.md §6) và có e2e.
 
-**Tiến độ chức năng: 77/173 STT ☑**
+**Tiến độ chức năng: 173/173 STT ☑**
 
 ## 1. Chức năng (PHẦN C)
 
@@ -38,31 +38,31 @@
 | 5.6 | Xóa – Đơn vị | `/system/org-units` | `DELETE /api/org-units/{id}` | `ORG:DELETE` | `p1-org.spec.ts` | ☑ |
 | 5.7 | Nhập dữ liệu – Đơn vị | `/system/org-units` | `POST /api/org-units/import/validate, /commit` | `ORG:IMPORT` | `p1-org.spec.ts` | ☑ |
 | 5.8 | Xuất dữ liệu – Đơn vị | `/system/org-units` | `GET /api/org-units/export` | `ORG:EXPORT` | `p1-org.spec.ts` | ☑ |
-| 6.1 | Xem biểu tổng hợp Tập đoàn – Năm | `/dashboard?unit=GROUP&period=Y` | `GET /api/dashboard/overview, /ranking-provinces, /corporations` | `DASHBOARD:VIEW_GROUP` | — | ☐ |
-| 7.1 | Xem biểu tổng hợp Tập đoàn – Quý | `/dashboard?unit=GROUP&period=Q1..Q4` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | — | ☐ |
-| 8.1 | Xem biểu tổng hợp Tập đoàn – Giai đoạn | `/dashboard?unit=GROUP&period=STAGE_x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | — | ☐ |
-| 9.1 | Xem biểu tổng hợp Đơn vị – Năm | `/dashboard?unit={id}&period=Y` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 10.1 | Xem biểu tổng hợp Đơn vị – Quý | `/dashboard?unit={id}&period=Qn` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 11.1 | Xem biểu tổng hợp Đơn vị – Giai đoạn | `/dashboard?unit={id}&period=STAGE_x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 12.1 | Xem biểu tổng hợp Tỉnh – Năm (tất cả các tỉnh) | `/dashboard?unit=PROVINCES&period=Y` | `GET /api/dashboard/ranking-provinces` | `DASHBOARD:VIEW_PROVINCE` | — | ☐ |
-| 13.1 | Xem biểu tổng hợp Tỉnh – Quý (tất cả các tỉnh) | `/dashboard?unit=PROVINCES&period=Qn` | `GET /api/dashboard/ranking-provinces` | `DASHBOARD:VIEW_PROVINCE` | — | ☐ |
-| 14.1 | Xem biểu tổng hợp giai đoạn của 1 tỉnh | `/dashboard?unit={id}&period=STAGE_x` | `GET /api/dashboard/province-stage` | `DASHBOARD:VIEW_PROVINCE` | — | ☐ |
-| 15.1 | Xem bản đồ chiến lược | `/dashboard (dialog)` | `GET /api/dashboard/strategy-map` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 16.1 | Xem Dashboard đơn vị từ bảng xếp hạng | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | — | ☐ |
-| 16.2 | Quay lại Dashboard Tập đoàn | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | — | ☐ |
-| 17.1 | Xem tổng quan – Dashboard TGĐ BSC | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 17.2 | Lọc dữ liệu – Dashboard TGĐ BSC | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 17.3 | Xem danh sách KPI theo thẻ chỉ số | `/dashboard (dialog)` | `GET /api/dashboard/kpi-list?card=` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 17.4 | Xem danh sách chi tiết các KPI | `/dashboard (dialog)` | `GET /api/dashboard/kpi-list` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 17.5 | Xem chi tiết KPI trọng tâm | `/dashboard (dialog)` | `GET /api/dashboard/focus-kpis/{kpiId}/breakdown` | `DASHBOARD:VIEW_UNIT` | — | ☐ |
-| 17.6 | Xuất kết quả đánh giá KPI | `/dashboard` | `GET /api/dashboard/export-results` | `DASHBOARD:EXPORT` | — | ☐ |
-| 17.7 | Xem bảng tổng hợp kết quả KPI giao cho Tổng công ty/Công ty | `/dashboard (dialog)` | `GET /api/dashboard/corporations/{unitId}/table` | `DASHBOARD:VIEW_GROUP` | — | ☐ |
-| 17.8 | Xuất bảng tổng hợp kết quả KPI giao cho Tổng công ty/Công ty | `/dashboard (dialog)` | `GET /api/dashboard/corporations/{unitId}/table/export` | `DASHBOARD:EXPORT` | — | ☐ |
-| 18.1 | KPI đơn vị của tôi – Xem theo kỳ đánh giá | `/my-kpi?view=period` | `GET /api/my-kpi/by-period` | `MYKPI:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 19.1 | KPI đơn vị của tôi – Xem theo chỉ tiêu KPI | `/my-kpi?view=kpi` | `GET /api/my-kpi/by-kpi` | `MYKPI:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 20.1 | KPI đơn vị của tôi – Theo dõi kết quả thẩm định và phản hồi | `/my-kpi?view=review` | `GET /api/my-kpi/review` | `MYKPI:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 21.1 | Đề nghị điều chỉnh kết quả KPI | `/my-kpi?view=review` | `POST /api/my-kpi/results/{id}/adjust-request` | `MYKPI:PROPOSE_ADJUST` | `p4-eval.spec.ts` | ☐ |
-| 22.1 | Xuất kết quả đánh giá KPI theo mẫu | `/my-kpi?view=period` | `GET /api/my-kpi/export` | `MYKPI:EXPORT` | `p4-eval.spec.ts` | ☐ |
+| 6.1 | Xem biểu tổng hợp Tập đoàn – Năm | `/dashboard?unit=GROUP&period=Y` | `GET /api/dashboard/overview, /ranking-provinces, /corporations` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
+| 7.1 | Xem biểu tổng hợp Tập đoàn – Quý | `/dashboard?unit=GROUP&period=Q1..Q4` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
+| 8.1 | Xem biểu tổng hợp Tập đoàn – Giai đoạn | `/dashboard?unit=GROUP&period=STAGE_x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
+| 9.1 | Xem biểu tổng hợp Đơn vị – Năm | `/dashboard?unit={id}&period=Y` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 10.1 | Xem biểu tổng hợp Đơn vị – Quý | `/dashboard?unit={id}&period=Qn` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 11.1 | Xem biểu tổng hợp Đơn vị – Giai đoạn | `/dashboard?unit={id}&period=STAGE_x` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 12.1 | Xem biểu tổng hợp Tỉnh – Năm (tất cả các tỉnh) | `/dashboard?unit=PROVINCES&period=Y` | `GET /api/dashboard/ranking-provinces` | `DASHBOARD:VIEW_PROVINCE` | `p7-dashboard.spec.ts` | ☑ |
+| 13.1 | Xem biểu tổng hợp Tỉnh – Quý (tất cả các tỉnh) | `/dashboard?unit=PROVINCES&period=Qn` | `GET /api/dashboard/ranking-provinces` | `DASHBOARD:VIEW_PROVINCE` | `p7-dashboard.spec.ts` | ☑ |
+| 14.1 | Xem biểu tổng hợp giai đoạn của 1 tỉnh | `/dashboard?unit={id}&period=STAGE_x` | `GET /api/dashboard/province-stage` | `DASHBOARD:VIEW_PROVINCE` | `p7-dashboard.spec.ts` | ☑ |
+| 15.1 | Xem bản đồ chiến lược | `/dashboard (dialog)` | `GET /api/dashboard/strategy-map` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 16.1 | Xem Dashboard đơn vị từ bảng xếp hạng | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
+| 16.2 | Quay lại Dashboard Tập đoàn | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
+| 17.1 | Xem tổng quan – Dashboard TGĐ BSC | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 17.2 | Lọc dữ liệu – Dashboard TGĐ BSC | `/dashboard` | `GET /api/dashboard/overview` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 17.3 | Xem danh sách KPI theo thẻ chỉ số | `/dashboard (dialog)` | `GET /api/dashboard/kpi-list?card=` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 17.4 | Xem danh sách chi tiết các KPI | `/dashboard (dialog)` | `GET /api/dashboard/kpi-list` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 17.5 | Xem chi tiết KPI trọng tâm | `/dashboard (dialog)` | `GET /api/dashboard/focus-kpis/{kpiId}/breakdown` | `DASHBOARD:VIEW_UNIT` | `p7-dashboard.spec.ts` | ☑ |
+| 17.6 | Xuất kết quả đánh giá KPI | `/dashboard` | `GET /api/dashboard/export-results` | `DASHBOARD:EXPORT` | `p7-dashboard.spec.ts` | ☑ |
+| 17.7 | Xem bảng tổng hợp kết quả KPI giao cho Tổng công ty/Công ty | `/dashboard (dialog)` | `GET /api/dashboard/corporations/{unitId}/table` | `DASHBOARD:VIEW_GROUP` | `p7-dashboard.spec.ts` | ☑ |
+| 17.8 | Xuất bảng tổng hợp kết quả KPI giao cho Tổng công ty/Công ty | `/dashboard (dialog)` | `GET /api/dashboard/corporations/{unitId}/table/export` | `DASHBOARD:EXPORT` | `p7-dashboard.spec.ts` | ☑ |
+| 18.1 | KPI đơn vị của tôi – Xem theo kỳ đánh giá | `/my-kpi?view=period` | `GET /api/my-kpi/by-period` | `MYKPI:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 19.1 | KPI đơn vị của tôi – Xem theo chỉ tiêu KPI | `/my-kpi?view=kpi` | `GET /api/my-kpi/by-kpi` | `MYKPI:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 20.1 | KPI đơn vị của tôi – Theo dõi kết quả thẩm định và phản hồi | `/my-kpi?view=review` | `GET /api/my-kpi/review` | `MYKPI:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 21.1 | Đề nghị điều chỉnh kết quả KPI | `/my-kpi?view=review` | `POST /api/my-kpi/results/{id}/adjust-request` | `MYKPI:PROPOSE_ADJUST` | `p4-eval.spec.ts` | ☑ |
+| 22.1 | Xuất kết quả đánh giá KPI theo mẫu | `/my-kpi?view=period` | `GET /api/my-kpi/export` | `MYKPI:EXPORT` | `p4-eval.spec.ts` | ☑ |
 | 23.1 | Lấy danh sách – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/tree` | `KPI:VIEW` | `p2-kpi.spec.ts` | ☑ |
 | 23.2 | Tìm kiếm – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/tree?keyword&perspectiveId&objectiveId` | `KPI:VIEW` | `p2-kpi.spec.ts` | ☑ |
 | 23.3 | Xem chi tiết – Danh sách KPI | `/kpi-admin/catalog?tab=kpi` | `GET /api/kpis/{id}` | `KPI:VIEW` | `p2-kpi.spec.ts` | ☑ |
@@ -110,103 +110,103 @@
 | 28.6 | Xóa – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `DELETE /api/objectives/{id}` | `OBJECTIVE:DELETE` | `p2-catalog.spec.ts` | ☑ |
 | 28.7 | Nhập dữ liệu – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `POST /api/objectives/import/validate, /commit` | `OBJECTIVE:IMPORT` | `p2-catalog.spec.ts` | ☑ |
 | 28.8 | Xuất dữ liệu – Mục tiêu trọng tâm | `/kpi-admin/objectives` | `GET /api/objectives/export` | `OBJECTIVE:EXPORT` | `p2-catalog.spec.ts` | ☑ |
-| 29.1 | Lấy danh sách – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☐ |
-| 29.2 | Tìm kiếm – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit?keyword&year&status` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☐ |
-| 29.3 | Xem chi tiết – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit/{id}` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☐ |
-| 29.4 | Xóa – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `DELETE /api/assignments/by-unit/{id}` | `ASSIGN:DELETE` | `p3-assign.spec.ts` | ☐ |
-| 29.5 | Sao chép giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `POST /api/assignments/by-unit/{id}/copy` | `ASSIGN:COPY` | `p3-assign.spec.ts` | ☐ |
-| 30.1 | Thêm mới – Giao KPI theo đơn vị | `/kpi-admin/assignments/unit/new` | `POST /api/assignments/by-unit` | `ASSIGN:CREATE` | `p3-assign.spec.ts` | ☐ |
-| 30.2 | Ghi lại – Giao KPI theo đơn vị | `/kpi-admin/assignments/unit/$id` | `PUT /api/assignments/by-unit/{id}` | `ASSIGN:UPDATE` | `p3-assign.spec.ts` | ☐ |
-| 31.1 | Chốt số liệu giao KPI – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `POST /api/assignments/by-unit/close` | `ASSIGN:CLOSE` | `p3-assign.spec.ts` | ☐ |
-| 31.2 | Chốt số liệu giao KPI – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `POST /api/assignments/by-kpi/close` | `ASSIGN:CLOSE` | `p3-assign.spec.ts` | ☐ |
-| 32.1 | Lấy danh sách – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☐ |
-| 32.2 | Tìm kiếm – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi?keyword&year&perspectiveId&status` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☐ |
-| 32.3 | Xem chi tiết – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi/{kpiId}/{year}` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☐ |
-| 32.4 | Sao chép giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `POST /api/assignments/by-kpi/copy` | `ASSIGN:COPY` | `p3-assign.spec.ts` | ☐ |
-| 33.1 | Thêm mới – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments/kpi/new` | `POST /api/assignments/by-kpi` | `ASSIGN:CREATE` | `p3-assign.spec.ts` | ☐ |
-| 33.2 | Ghi lại – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments/kpi/$kpiId/$year` | `PUT /api/assignments/by-kpi/{kpiId}/{year}` | `ASSIGN:UPDATE` | `p3-assign.spec.ts` | ☐ |
-| 34.1 | Điều chỉnh – Lưu nháp | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `POST /api/assignments/by-kpi/{kpiId}/{year}/adjustment/draft` | `ASSIGN:ADJUST` | `p3-assign.spec.ts` | ☐ |
-| 34.2 | Điều chỉnh – Lưu chốt | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `POST /api/assignments/by-kpi/{kpiId}/{year}/adjustment/commit` | `ASSIGN:ADJUST` | `p3-assign.spec.ts` | ☐ |
-| 34.3 | Điều chỉnh – Xem lịch sử điều chỉnh | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `GET /api/assignments/details/{detailId}/history` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☐ |
-| 35.1 | Giao KPI – Nhập dữ liệu | `/kpi-admin/assignments/unit/new, /kpi/new` | `POST /api/assignments/import/parse` | `ASSIGN:IMPORT` | `p3-assign.spec.ts` | ☐ |
-| 35.2 | Xuất dữ liệu – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit/export` | `ASSIGN:EXPORT` | `p3-assign.spec.ts` | ☐ |
-| 36.1 | Lấy danh sách – Bản đồ chiến lược | `/kpi-admin/strategies` | `GET /api/strategies` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☐ |
-| 36.2 | Tìm kiếm – Bản đồ chiến lược | `/kpi-admin/strategies` | `GET /api/strategies?keyword&ownerId&fromYear&toYear&status&orgUnitId` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☐ |
-| 36.3 | Xem chi tiết – Bản đồ chiến lược | `/kpi-admin/strategies/$id?mode=view` | `GET /api/strategies/{id}, GET /api/strategies/{id}/map` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☐ |
-| 36.4 | Thêm mới – Bản đồ chiến lược | `/kpi-admin/strategies` | `POST /api/strategies` | `STRATEGY:CREATE` | `p6-strategy.spec.ts` | ☐ |
-| 36.5 | Ghi lại – Bản đồ chiến lược | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☐ |
-| 36.6 | Xóa – Bản đồ chiến lược | `/kpi-admin/strategies` | `DELETE /api/strategies/{id}` | `STRATEGY:DELETE` | `p6-strategy.spec.ts` | ☐ |
-| 37.1 | Cập nhật mục tiêu trọng tâm trên bản đồ chiến lược | `/kpi-admin/strategies/$id` | `GET /api/objectives/search-for-strategy, PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☐ |
-| 37.2 | Vẽ liên kết giữa các mục tiêu trọng tâm | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☐ |
-| 37.3 | Xóa mục tiêu trọng tâm khỏi bản đồ | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☐ |
-| 37.4 | Xem KPI của mục tiêu trọng tâm trên bản đồ | `/kpi-admin/strategies/$id` | `GET /api/strategies/{id}/objectives/{objId}/kpis` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☐ |
-| 37.5 | Tải ảnh bản đồ chiến lược | `/kpi-admin/strategies/$id` | `(client html-to-image)` | `STRATEGY:EXPORT_IMAGE` | `p6-strategy.spec.ts` | ☐ |
-| 37.6 | Xóa liên kết giữa các mục tiêu trọng tâm | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☐ |
-| 38.1 | Gán khung KPI vào chiến lược | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:ASSIGN_KPI` | `p6-strategy.spec.ts` | ☐ |
-| 39.1 | Lấy danh sách – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations?tab=kpi` | `GET /api/evaluations/by-kpi` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 39.2 | Tìm kiếm – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations?tab=kpi` | `GET /api/evaluations/by-kpi?keyword&year&period&perspectiveId&status&resultType` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 39.3 | Xem chi tiết – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations/$evalKpiId?mode=view` | `GET /api/evaluations/by-kpi/{evalKpiId}, /results` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 40.1 | Lấy danh sách – Theo dõi kết quả thẩm định và phản hồi | `/kpi-admin/evaluations?tab=review` | `GET /api/evaluations/review` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 40.2 | Tìm kiếm – Theo dõi kết quả thẩm định và phản hồi | `/kpi-admin/evaluations?tab=review` | `GET /api/evaluations/review?keyword&year&period&status` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 40.3 | Xem chi tiết – Theo dõi kết quả thẩm định và phản hồi | `/kpi-admin/evaluations?tab=review` | `GET /api/evaluations/results/{id}` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☐ |
-| 41.1 | Điều chỉnh kết quả KPI cho đơn vị | `/kpi-admin/evaluations?tab=review` | `PUT /api/evaluations/results/{id}/adjust` | `EVAL:ADJUST` | `p4-eval.spec.ts` | ☐ |
-| 42.1 | Cập nhật kết quả đánh giá KPI (SL nhập tay) cho đơn vị | `/kpi-admin/evaluations?tab=review` | `PUT /api/evaluations/results/{id}/manual` | `EVAL:INPUT` | `p4-eval.spec.ts` | ☐ |
-| 43.1 | Đánh giá – Đồng bộ lại | `/kpi-admin/evaluations/$evalKpiId` | `POST /api/evaluations/{evalKpiId}/sync` | `EVAL:SYNC` | `p4-eval.spec.ts` | ☐ |
-| 44.1 | Đánh giá – Tổng hợp BSC theo chỉ tiêu KPI (nhập tay) | `/kpi-admin/evaluations/$evalKpiId` | `PUT /api/evaluations/{evalKpiId}/results, POST /calculate-preview` | `EVAL:INPUT` | `p4-eval.spec.ts` | ☐ |
-| 44.2 | Đánh giá – Nhập dữ liệu | `/kpi-admin/evaluations/$evalKpiId` | `GET /api/evaluations/{evalKpiId}/manual-template, POST /manual-import` | `EVAL:IMPORT` | `p4-eval.spec.ts` | ☐ |
-| 45.1 | Xem chi tiết – Xuất biểu giao KPI | `/kpi-admin/bsc?tab=summary` | `GET /api/reports/assignment-sheet` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 45.2 | Xem chi tiết – Xuất biểu kết quả KPI | `/kpi-admin/bsc?tab=summary` | `GET /api/reports/result-sheet` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 46.1 | Lấy danh sách – Tổng hợp kết quả BSC | `/kpi-admin/bsc?tab=summary` | `GET /api/bsc/summary` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☐ |
-| 46.2 | Tìm kiếm – Tổng hợp kết quả BSC | `/kpi-admin/bsc?tab=summary` | `GET /api/bsc/summary?keyword&year&period&perspectiveId&status&dataType` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☐ |
-| 46.3 | Xem chi tiết – Tổng hợp kết quả BSC | `/kpi-admin/bsc?tab=summary` | `GET /api/bsc/summary/by-unit, /by-kpi` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☐ |
-| 46.4 | Thu hồi kết quả đánh giá | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/revoke` | `BSC:REVOKE` | `p5-bsc.spec.ts` | ☐ |
-| 46.5 | Tính lại điểm đánh giá | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/recalculate` | `BSC:RECALC` | `p5-bsc.spec.ts` | ☐ |
-| 47.1 | Lấy danh sách – Theo dõi kết quả thẩm định và phản hồi (Tổng hợp BSC) | `/kpi-admin/bsc?tab=review` | `GET /api/bsc/review` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☐ |
-| 47.2 | Tìm kiếm – Theo dõi kết quả thẩm định và phản hồi (Tổng hợp BSC) | `/kpi-admin/bsc?tab=review` | `GET /api/bsc/review?keyword&year&period&status` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☐ |
-| 47.3 | Xem chi tiết – Theo dõi kết quả thẩm định và phản hồi (Tổng hợp BSC) | `/kpi-admin/bsc?tab=review` | `GET /api/evaluations/results/{id}` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☐ |
-| 47.4 | Thu hồi kết quả đánh giá theo đơn vị | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/revoke-unit` | `BSC:REVOKE` | `p5-bsc.spec.ts` | ☐ |
-| 48.1 | Chốt đánh giá KPI – Đủ điều kiện | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/close` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☐ |
-| 48.2 | Chốt đánh giá KPI – Cảnh báo không đủ điều kiện | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/close → 409` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☐ |
-| 48.3 | Chốt đánh giá KPI – Đủ điều kiện (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/close` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☐ |
-| 48.4 | Chốt đánh giá KPI – Cảnh báo không đủ điều kiện (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/close → 409` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☐ |
-| 49.1 | Chốt kết quả R2 – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations?tab=kpi` | `POST /api/evaluations/{evalKpiId}/close-r2` | `EVAL:CLOSE_R2` | `p4-eval.spec.ts` | ☐ |
-| 50.1 | Tổng giám đốc duyệt – Cảnh báo không đủ điều kiện | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/approve/check` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☐ |
-| 50.2 | Tổng giám đốc duyệt – Ký duyệt | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/approve` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☐ |
-| 50.3 | Tổng giám đốc duyệt – Cảnh báo không đủ điều kiện (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/approve/check` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☐ |
-| 50.4 | Tổng giám đốc duyệt – Ký duyệt (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/approve` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☐ |
-| 51.1 | Xuất báo cáo TTr94 tổng hợp BSC | `/kpi-admin/bsc?tab=summary` | `POST /api/reports/TTR94_TONG_HOP` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 51.2 | Xuất báo cáo TTr94 tổng hợp BSC (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/TTR94_TONG_HOP` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 52.1 | Xuất báo cáo TTr94 chi tiết KPI | `/kpi-admin/bsc?tab=summary` | `POST /api/reports/TTR94_CHI_TIET` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 52.2 | Xuất báo cáo TTr94 chi tiết KPI (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/TTR94_CHI_TIET` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 53.1 | Xuất báo cáo KPI từng tỉnh | `/kpi-admin/bsc?tab=summary` | `POST /api/reports/KPI_TUNG_TINH` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 53.2 | Xuất báo cáo KPI từng tỉnh (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/KPI_TUNG_TINH` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☐ |
-| 54.1 | Thông báo (notify) trên hệ thống | `(Header – chuông), /notifications` | `GET /api/notifications, /unread-count, POST /{id}/read, /read-all` | `NOTIFY:VIEW` | `p3-assign.spec.ts` | ☐ |
+| 29.1 | Lấy danh sách – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 29.2 | Tìm kiếm – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit?keyword&year&status` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 29.3 | Xem chi tiết – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit/{id}` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 29.4 | Xóa – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `DELETE /api/assignments/by-unit/{id}` | `ASSIGN:DELETE` | `p3-assign.spec.ts` | ☑ |
+| 29.5 | Sao chép giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `POST /api/assignments/by-unit/{id}/copy` | `ASSIGN:COPY` | `p3-assign.spec.ts` | ☑ |
+| 30.1 | Thêm mới – Giao KPI theo đơn vị | `/kpi-admin/assignments/unit/new` | `POST /api/assignments/by-unit` | `ASSIGN:CREATE` | `p3-assign.spec.ts` | ☑ |
+| 30.2 | Ghi lại – Giao KPI theo đơn vị | `/kpi-admin/assignments/unit/$id` | `PUT /api/assignments/by-unit/{id}` | `ASSIGN:UPDATE` | `p3-assign.spec.ts` | ☑ |
+| 31.1 | Chốt số liệu giao KPI – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `POST /api/assignments/by-unit/close` | `ASSIGN:CLOSE` | `p3-assign.spec.ts` | ☑ |
+| 31.2 | Chốt số liệu giao KPI – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `POST /api/assignments/by-kpi/close` | `ASSIGN:CLOSE` | `p3-assign.spec.ts` | ☑ |
+| 32.1 | Lấy danh sách – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 32.2 | Tìm kiếm – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi?keyword&year&perspectiveId&status` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 32.3 | Xem chi tiết – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `GET /api/assignments/by-kpi/{kpiId}/{year}` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 32.4 | Sao chép giao KPI theo chỉ tiêu | `/kpi-admin/assignments?tab=kpi` | `POST /api/assignments/by-kpi/copy` | `ASSIGN:COPY` | `p3-assign.spec.ts` | ☑ |
+| 33.1 | Thêm mới – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments/kpi/new` | `POST /api/assignments/by-kpi` | `ASSIGN:CREATE` | `p3-assign.spec.ts` | ☑ |
+| 33.2 | Ghi lại – Giao KPI theo chỉ tiêu | `/kpi-admin/assignments/kpi/$kpiId/$year` | `PUT /api/assignments/by-kpi/{kpiId}/{year}` | `ASSIGN:UPDATE` | `p3-assign.spec.ts` | ☑ |
+| 34.1 | Điều chỉnh – Lưu nháp | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `POST /api/assignments/by-kpi/{kpiId}/{year}/adjustment/draft` | `ASSIGN:ADJUST` | `p3-assign.spec.ts` | ☑ |
+| 34.2 | Điều chỉnh – Lưu chốt | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `POST /api/assignments/by-kpi/{kpiId}/{year}/adjustment/commit` | `ASSIGN:ADJUST` | `p3-assign.spec.ts` | ☑ |
+| 34.3 | Điều chỉnh – Xem lịch sử điều chỉnh | `/kpi-admin/assignments/kpi/$kpiId/$year/adjust` | `GET /api/assignments/details/{detailId}/history` | `ASSIGN:VIEW` | `p3-assign.spec.ts` | ☑ |
+| 35.1 | Giao KPI – Nhập dữ liệu | `/kpi-admin/assignments/unit/new, /kpi/new` | `POST /api/assignments/import/parse` | `ASSIGN:IMPORT` | `p3-assign.spec.ts` | ☑ |
+| 35.2 | Xuất dữ liệu – Giao KPI theo đơn vị | `/kpi-admin/assignments?tab=unit` | `GET /api/assignments/by-unit/export` | `ASSIGN:EXPORT` | `p3-assign.spec.ts` | ☑ |
+| 36.1 | Lấy danh sách – Bản đồ chiến lược | `/kpi-admin/strategies` | `GET /api/strategies` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☑ |
+| 36.2 | Tìm kiếm – Bản đồ chiến lược | `/kpi-admin/strategies` | `GET /api/strategies?keyword&ownerId&fromYear&toYear&status&orgUnitId` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☑ |
+| 36.3 | Xem chi tiết – Bản đồ chiến lược | `/kpi-admin/strategies/$id?mode=view` | `GET /api/strategies/{id}, GET /api/strategies/{id}/map` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☑ |
+| 36.4 | Thêm mới – Bản đồ chiến lược | `/kpi-admin/strategies` | `POST /api/strategies` | `STRATEGY:CREATE` | `p6-strategy.spec.ts` | ☑ |
+| 36.5 | Ghi lại – Bản đồ chiến lược | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☑ |
+| 36.6 | Xóa – Bản đồ chiến lược | `/kpi-admin/strategies` | `DELETE /api/strategies/{id}` | `STRATEGY:DELETE` | `p6-strategy.spec.ts` | ☑ |
+| 37.1 | Cập nhật mục tiêu trọng tâm trên bản đồ chiến lược | `/kpi-admin/strategies/$id` | `GET /api/objectives/search-for-strategy, PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☑ |
+| 37.2 | Vẽ liên kết giữa các mục tiêu trọng tâm | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☑ |
+| 37.3 | Xóa mục tiêu trọng tâm khỏi bản đồ | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☑ |
+| 37.4 | Xem KPI của mục tiêu trọng tâm trên bản đồ | `/kpi-admin/strategies/$id` | `GET /api/strategies/{id}/objectives/{objId}/kpis` | `STRATEGY:VIEW` | `p6-strategy.spec.ts` | ☑ |
+| 37.5 | Tải ảnh bản đồ chiến lược | `/kpi-admin/strategies/$id` | `(client html-to-image)` | `STRATEGY:EXPORT_IMAGE` | `p6-strategy.spec.ts` | ☑ |
+| 37.6 | Xóa liên kết giữa các mục tiêu trọng tâm | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:UPDATE` | `p6-strategy.spec.ts` | ☑ |
+| 38.1 | Gán khung KPI vào chiến lược | `/kpi-admin/strategies/$id` | `PUT /api/strategies/{id}/map` | `STRATEGY:ASSIGN_KPI` | `p6-strategy.spec.ts` | ☑ |
+| 39.1 | Lấy danh sách – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations?tab=kpi` | `GET /api/evaluations/by-kpi` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 39.2 | Tìm kiếm – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations?tab=kpi` | `GET /api/evaluations/by-kpi?keyword&year&period&perspectiveId&status&resultType` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 39.3 | Xem chi tiết – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations/$evalKpiId?mode=view` | `GET /api/evaluations/by-kpi/{evalKpiId}, /results` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 40.1 | Lấy danh sách – Theo dõi kết quả thẩm định và phản hồi | `/kpi-admin/evaluations?tab=review` | `GET /api/evaluations/review` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 40.2 | Tìm kiếm – Theo dõi kết quả thẩm định và phản hồi | `/kpi-admin/evaluations?tab=review` | `GET /api/evaluations/review?keyword&year&period&status` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 40.3 | Xem chi tiết – Theo dõi kết quả thẩm định và phản hồi | `/kpi-admin/evaluations?tab=review` | `GET /api/evaluations/results/{id}` | `EVAL:VIEW` | `p4-eval.spec.ts` | ☑ |
+| 41.1 | Điều chỉnh kết quả KPI cho đơn vị | `/kpi-admin/evaluations?tab=review` | `PUT /api/evaluations/results/{id}/adjust` | `EVAL:ADJUST` | `p4-eval.spec.ts` | ☑ |
+| 42.1 | Cập nhật kết quả đánh giá KPI (SL nhập tay) cho đơn vị | `/kpi-admin/evaluations?tab=review` | `PUT /api/evaluations/results/{id}/manual` | `EVAL:INPUT` | `p4-eval.spec.ts` | ☑ |
+| 43.1 | Đánh giá – Đồng bộ lại | `/kpi-admin/evaluations/$evalKpiId` | `POST /api/evaluations/{evalKpiId}/sync` | `EVAL:SYNC` | `p4-eval.spec.ts` | ☑ |
+| 44.1 | Đánh giá – Tổng hợp BSC theo chỉ tiêu KPI (nhập tay) | `/kpi-admin/evaluations/$evalKpiId` | `PUT /api/evaluations/{evalKpiId}/results, POST /calculate-preview` | `EVAL:INPUT` | `p4-eval.spec.ts` | ☑ |
+| 44.2 | Đánh giá – Nhập dữ liệu | `/kpi-admin/evaluations/$evalKpiId` | `GET /api/evaluations/{evalKpiId}/manual-template, POST /manual-import` | `EVAL:IMPORT` | `p4-eval.spec.ts` | ☑ |
+| 45.1 | Xem chi tiết – Xuất biểu giao KPI | `/kpi-admin/bsc?tab=summary` | `GET /api/reports/assignment-sheet` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 45.2 | Xem chi tiết – Xuất biểu kết quả KPI | `/kpi-admin/bsc?tab=summary` | `GET /api/reports/result-sheet` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 46.1 | Lấy danh sách – Tổng hợp kết quả BSC | `/kpi-admin/bsc?tab=summary` | `GET /api/bsc/summary` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☑ |
+| 46.2 | Tìm kiếm – Tổng hợp kết quả BSC | `/kpi-admin/bsc?tab=summary` | `GET /api/bsc/summary?keyword&year&period&perspectiveId&status&dataType` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☑ |
+| 46.3 | Xem chi tiết – Tổng hợp kết quả BSC | `/kpi-admin/bsc?tab=summary` | `GET /api/bsc/summary/by-unit, /by-kpi` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☑ |
+| 46.4 | Thu hồi kết quả đánh giá | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/revoke` | `BSC:REVOKE` | `p5-bsc.spec.ts` | ☑ |
+| 46.5 | Tính lại điểm đánh giá | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/recalculate` | `BSC:RECALC` | `p5-bsc.spec.ts` | ☑ |
+| 47.1 | Lấy danh sách – Theo dõi kết quả thẩm định và phản hồi (Tổng hợp BSC) | `/kpi-admin/bsc?tab=review` | `GET /api/bsc/review` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☑ |
+| 47.2 | Tìm kiếm – Theo dõi kết quả thẩm định và phản hồi (Tổng hợp BSC) | `/kpi-admin/bsc?tab=review` | `GET /api/bsc/review?keyword&year&period&status` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☑ |
+| 47.3 | Xem chi tiết – Theo dõi kết quả thẩm định và phản hồi (Tổng hợp BSC) | `/kpi-admin/bsc?tab=review` | `GET /api/evaluations/results/{id}` | `BSC:VIEW` | `p5-bsc.spec.ts` | ☑ |
+| 47.4 | Thu hồi kết quả đánh giá theo đơn vị | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/revoke-unit` | `BSC:REVOKE` | `p5-bsc.spec.ts` | ☑ |
+| 48.1 | Chốt đánh giá KPI – Đủ điều kiện | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/close` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☑ |
+| 48.2 | Chốt đánh giá KPI – Cảnh báo không đủ điều kiện | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/close → 409` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☑ |
+| 48.3 | Chốt đánh giá KPI – Đủ điều kiện (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/close` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☑ |
+| 48.4 | Chốt đánh giá KPI – Cảnh báo không đủ điều kiện (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/close → 409` | `BSC:CLOSE` | `p5-bsc.spec.ts` | ☑ |
+| 49.1 | Chốt kết quả R2 – Tổng hợp BSC theo chỉ tiêu KPI | `/kpi-admin/evaluations?tab=kpi` | `POST /api/evaluations/{evalKpiId}/close-r2` | `EVAL:CLOSE_R2` | `p4-eval.spec.ts` | ☑ |
+| 50.1 | Tổng giám đốc duyệt – Cảnh báo không đủ điều kiện | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/approve/check` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☑ |
+| 50.2 | Tổng giám đốc duyệt – Ký duyệt | `/kpi-admin/bsc?tab=summary` | `POST /api/bsc/approve` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☑ |
+| 50.3 | Tổng giám đốc duyệt – Cảnh báo không đủ điều kiện (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/approve/check` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☑ |
+| 50.4 | Tổng giám đốc duyệt – Ký duyệt (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/bsc/approve` | `BSC:APPROVE` | `p5-bsc.spec.ts` | ☑ |
+| 51.1 | Xuất báo cáo TTr94 tổng hợp BSC | `/kpi-admin/bsc?tab=summary` | `POST /api/reports/TTR94_TONG_HOP` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 51.2 | Xuất báo cáo TTr94 tổng hợp BSC (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/TTR94_TONG_HOP` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 52.1 | Xuất báo cáo TTr94 chi tiết KPI | `/kpi-admin/bsc?tab=summary` | `POST /api/reports/TTR94_CHI_TIET` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 52.2 | Xuất báo cáo TTr94 chi tiết KPI (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/TTR94_CHI_TIET` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 53.1 | Xuất báo cáo KPI từng tỉnh | `/kpi-admin/bsc?tab=summary` | `POST /api/reports/KPI_TUNG_TINH` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 53.2 | Xuất báo cáo KPI từng tỉnh (tab Theo dõi) | `/kpi-admin/bsc?tab=review` | `POST /api/reports/KPI_TUNG_TINH` | `BSC:REPORT` | `p5-bsc.spec.ts` | ☑ |
+| 54.1 | Thông báo (notify) trên hệ thống | `(Header – chuông), /notifications` | `GET /api/notifications, /unread-count, POST /{id}/read, /read-all` | `NOTIFY:VIEW` | `p3-assign.spec.ts` | ☑ |
 
 ## 2. Kiến trúc (Phần 2 E-HSMT — 7 mục, PHẦN B)
 
 | Mục | Nội dung | Bằng chứng | Trạng thái |
 |---|---|---|---|
-| A1 | Tổng quan giải pháp (§1) | `docs/KIEN-TRUC.md` §1; vai trò seed `R__seed_01_identity.sql` | ☐ |
-| A2 (b) | Kiến trúc tổng thể (§2) | `docs/KIEN-TRUC.md` §2; `deploy/nginx/kpi.conf`; `backend/.../config/*` | ☐ |
-| A3 (c) | Kiến trúc chức năng F01–F07 (§3.1) | `backend/src/main/java/vn/vnpt/kpi/modules/*` | ☐ |
-| A4 (d) | Kiến trúc ứng dụng FE/BE (§3.2–3.3) | `frontend/src/api/http.ts`, `routes/index.tsx`, `authGuards.ts`, `stores/*`; BE `SecurityConfig`, `JwtAuthenticationFilter`, `VnptSsoController` | ☐ |
-| A5 (e) | Kiến trúc dữ liệu (§4) | `backend/src/main/resources/db/migration/V001__init.sql` … | ☐ |
-| A6 (f) | Kiến trúc tích hợp (§8) | `integration/cas`, `integration/kpisource`, `integration/hrm`, `integration/mail`, `integration/zalo` | ☐ |
-| A7 (g,h) | Bảo mật (§9) & hạ tầng (§10) | `config/SecurityConfig`, `StartupSecurityCheck`, `docs/ATTT.md`, `docs/TRIEN-KHAI.md`, `deploy/*` | ☐ |
+| A1 | Tổng quan giải pháp (§1) | `docs/KIEN-TRUC.md` §1; vai trò seed `V003__seed_identity.sql` | ☑ |
+| A2 (b) | Kiến trúc tổng thể (§2) | `docs/KIEN-TRUC.md` §2; `deploy/nginx/kpi.conf`; `backend/.../config/*` | ☑ |
+| A3 (c) | Kiến trúc chức năng F01–F07 (§3.1) | `backend/src/main/java/vn/vnpt/kpi/modules/*` | ☑ |
+| A4 (d) | Kiến trúc ứng dụng FE/BE (§3.2–3.3) | `frontend/src/api/http.ts`, `routes/index.tsx`, `authGuards.ts`, `stores/*`; BE `SecurityConfig`, `JwtAuthenticationFilter`, `VnptSsoController` | ☑ |
+| A5 (e) | Kiến trúc dữ liệu (§4) | `backend/src/main/resources/db/migration/V001__init.sql` … | ☑ |
+| A6 (f) | Kiến trúc tích hợp (§8) | `integration/cas`, `integration/kpisource`, `integration/hrm`, `integration/mail`, `integration/zalo` | ☑ |
+| A7 (g,h) | Bảo mật (§9) & hạ tầng (§10) | `config/SecurityConfig`, `StartupSecurityCheck`, `docs/ATTT.md`, `docs/TRIEN-KHAI.md`, `deploy/*` | ☑ |
 
 ## 3. Phi chức năng (Phần 3 E-HSMT — 11 mục, PHẦN D §1)
 
 | Mục | Nội dung | Bằng chứng | Trạng thái |
 |---|---|---|---|
-| NF-a | Hệ quản trị CSDL (mô hình, mã hóa, RBAC, giám sát, injection, sao lưu, phiên, hiệu suất, tuân thủ) | migrations; `EncryptedStringTypeHandler`; `audit_log`; màn hình “Nhật ký hệ thống”; `deploy/scripts/backup-db.sh`; `docs/VAN-HANH.md` | ☐ |
-| NF-b | Tích hợp hệ thống | `VnptSsoController`, `HrmClient`, `KpiSourceClient` | ☐ |
-| NF-c | Hiệu năng (500 user, 100 TPS) | `perf/k6-mix.js`, `docs/perf-report.md` | ☐ |
-| NF-d | An toàn thông tin | SpotBugs/FindSecBugs, Dependency-Check, `npm audit`, Semgrep, ZAP; `docs/ATTT.md` | ☐ |
-| NF-e | Tùy chỉnh chức năng & cấu hình | Vai trò theo đơn vị, `sys_config`, `sync_schedule`, `scoring_method`, `report_template` | ☐ |
-| NF-f | Hạ tầng | `docs/TRIEN-KHAI.md`, `deploy/systemd`, `deploy/nginx`, hardening | ☐ |
-| NF-g | Giao diện & trải nghiệm | Tailwind tokens, font Be Vietnam Pro, 1024×768 e2e, toast/validate | ☐ |
-| NF-h | Ổn định | 2 node, graceful shutdown, readiness/liveness | ☐ |
-| NF-i | Khả dụng | Tìm kiếm đa tiêu chí mọi danh sách | ☐ |
-| NF-j | Đào tạo | `docs/HDSD/*.md`, `docs/HDQT.md` | ☐ |
-| NF-k | Bảo hành | `/api/actuator/info`, log JSON `traceId`, `docs/VAN-HANH.md` | ☐ |
+| NF-a | Hệ quản trị CSDL (mô hình, mã hóa, RBAC, giám sát, injection, sao lưu, phiên, hiệu suất, tuân thủ) | migrations; `EncryptedStringTypeHandler`; `audit_log`; màn hình “Nhật ký hệ thống”; `deploy/scripts/backup.sh`; `docs/VAN-HANH.md` | ☑ |
+| NF-b | Tích hợp hệ thống | `VnptSsoController`, `HrmClient`, `KpiSourceClient` | ☑ |
+| NF-c | Hiệu năng (500 user, 100 TPS) | `perf/k6-mix.js`, `docs/perf-report.md` (100 TPS × 10 phút: p95 đọc 68 ms; 500 user đồng thời: 0 lỗi) | ☑ |
+| NF-d | An toàn thông tin | SpotBugs/FindSecBugs, Dependency-Check, `npm audit`, Semgrep, ZAP; `docs/ATTT.md` §11.1 (ZAP FAIL 0, Semgrep 0 ERROR, OSV đã vá), `docs/security/*` | ☑ |
+| NF-e | Tùy chỉnh chức năng & cấu hình | Vai trò theo đơn vị, `sys_config`, `sync_schedule`, `scoring_method`, `report_template` | ☑ |
+| NF-f | Hạ tầng | `docs/TRIEN-KHAI.md`, `deploy/systemd`, `deploy/nginx`, hardening | ☑ |
+| NF-g | Giao diện & trải nghiệm | Tailwind tokens, font Be Vietnam Pro, 1024×768 e2e, toast/validate | ☑ |
+| NF-h | Ổn định | 2 node, graceful shutdown, readiness/liveness | ☑ |
+| NF-i | Khả dụng | Tìm kiếm đa tiêu chí mọi danh sách | ☑ |
+| NF-j | Đào tạo | `docs/HDSD/*.md` (9 phân hệ, 30 ảnh Playwright), `docs/HDQT.md`, `docs/BAO-CAO-KIEM-THU.md` | ☑ |
+| NF-k | Bảo hành | `/api/actuator/info`, log JSON `traceId`, `docs/VAN-HANH.md` | ☑ |
 

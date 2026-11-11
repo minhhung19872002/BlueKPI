@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /** Seed demo giao KPI: năm trước + năm hiện tại đã giao (sinh dữ liệu đánh giá); năm sau “Đang soạn” cho 2 tỉnh */
 @Component
@@ -52,7 +53,11 @@ public class DemoAssignmentStep implements DemoDataSeeder.DemoStep {
             List<Long> depts = jdbc.queryForList("SELECT id FROM org_unit WHERE deleted = 0 AND level = 3 AND (code LIKE 'VNPT\\_HNI\\_%' OR code LIKE 'VNPT\\_HCM\\_%' OR code LIKE '%\\_TT1')", Long.class);
             for (int year : List.of(cur - 1, cur)) {
                 List<Long> headers = new ArrayList<>();
-                for (Long u : units) headers.add(service.createByUnit(new ByUnitRequest(u, year, details(u, year, SET), null)).header().getId());
+                Long root = units.get(0);
+                List<Long> children = units.subList(1, units.size());
+                // Công ty mẹ: chỉ tiêu = tổng hợp chỉ tiêu các đơn vị cấp 2 theo “Cách tính kết quả KPI Tập đoàn” → % TH/KH Tập đoàn hợp lý
+                headers.add(service.createByUnit(new ByUnitRequest(root, year, groupDetails(root, children, year), null)).header().getId());
+                for (Long u : children) headers.add(service.createByUnit(new ByUnitRequest(u, year, details(u, year, SET), null)).header().getId());
                 for (Long u : depts) headers.add(service.createByUnit(new ByUnitRequest(u, year, details(u, year, DEPT_SET), null)).header().getId());
                 service.closeByUnit(headers);
             }
@@ -72,6 +77,25 @@ public class DemoAssignmentStep implements DemoDataSeeder.DemoStep {
             for (Map<String, Object> c : jdbc.queryForList("SELECT id, target_data_type FROM kpi WHERE parent_id = ? AND deleted = 0 ORDER BY code", kid)) {
                 out.add(input(((Number) c.get("id")).longValue(), unitId, year, BigDecimal.valueOf(50), (String) c.get("target_data_type")));
             }
+        }
+        return out;
+    }
+
+    /** Chỉ tiêu cấp Tập đoàn: TONG → Σ chỉ tiêu đơn vị con; cách tính khác → trung bình. Giữ trọng số của bộ KPI */
+    private List<DetailInput> groupDetails(Long root, List<Long> children, int year) {
+        List<DetailInput> base = details(root, year, SET);
+        List<List<DetailInput>> kids = children.stream().map(u -> details(u, year, SET)).toList();
+        List<DetailInput> out = new ArrayList<>();
+        for (int i = 0; i < base.size(); i++) {
+            DetailInput b = base.get(i);
+            boolean sum = "TONG".equals(jdbc.queryForObject("SELECT group_aggregation FROM kpi WHERE id = ?", String.class, b.kpiId()));
+            final int idx = i;
+            Function<Function<DetailInput, BigDecimal>, BigDecimal> agg = g -> {
+                BigDecimal s = kids.stream().map(k -> g.apply(k.get(idx))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                return sum ? s : s.divide(BigDecimal.valueOf(Math.max(1, kids.size())), 4, RoundingMode.HALF_UP);
+            };
+            out.add(new DetailInput(null, b.kpiId(), root, b.weight(), agg.apply(DetailInput::targetQ1), agg.apply(DetailInput::targetQ2), agg.apply(DetailInput::targetH1),
+                    agg.apply(DetailInput::targetQ3), agg.apply(DetailInput::targetQ4), agg.apply(DetailInput::targetYear), null));
         }
         return out;
     }

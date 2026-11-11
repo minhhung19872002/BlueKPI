@@ -1,0 +1,140 @@
+[
+  {
+    "file": "01-dang-nhap.png",
+    "screen": "Đăng nhập"
+  },
+  {
+    "file": "02-dashboard.png",
+    "screen": "Dashboard TGĐ BSC"
+  },
+  {
+    "file": "02-dashboard--danh-sach-kpi.png",
+    "screen": "Dashboard TGĐ BSC",
+    "tab": "Danh Sách Chi Tiết Các KPI"
+  },
+  {
+    "file": "02-dashboard--chi-tiet-kpi-trong-tam.png",
+    "screen": "Dashboard TGĐ BSC",
+    "tab": "Chi tiết KPI trọng tâm"
+  },
+  {
+    "file": "02-dashboard--bang-tong-hop-tct.png",
+    "screen": "Dashboard TGĐ BSC",
+    "tab": "Bảng tổng hợp kết quả các KPI giao cho đơn vị"
+  },
+  {
+    "file": "02-dashboard--ban-do-chien-luoc.png",
+    "screen": "Dashboard TGĐ BSC",
+    "tab": "Bản đồ chiến lược"
+  },
+  {
+    "file": "02-dashboard--khoi-tinh.png",
+    "screen": "Dashboard TGĐ BSC",
+    "tab": "Khối VNPT tỉnh/thành phố"
+  },
+  {
+    "file": "03-kpi-don-vi-cua-toi.png",
+    "screen": "KPI đơn vị của tôi"
+  },
+  {
+    "file": "04-danh-muc-kpi.png",
+    "screen": "Danh mục chỉ tiêu KPI"
+  },
+  {
+    "file": "04-danh-muc-kpi--don-vi-do.png",
+    "screen": "Danh mục chỉ tiêu KPI",
+    "tab": "Đơn vị đo"
+  },
+  {
+    "file": "04-danh-muc-kpi--vien-canh.png",
+    "screen": "Danh mục chỉ tiêu KPI",
+    "tab": "Viễn cảnh"
+  },
+  {
+    "file": "04-danh-muc-kpi--dinh-nghia-kpi-cong-thuc.png",
+    "screen": "Danh mục chỉ tiêu KPI",
+    "tab": "Định nghĩa KPI công thức"
+  },
+  {
+    "file": "05-muc-tieu-trong-tam.png",
+    "screen": "Quản lý mục tiêu trọng tâm"
+  },
+  {
+    "file": "06-giao-kpi.png",
+    "screen": "Giao KPI"
+  },
+  {
+    "file": "06-giao-kpi--danh-sach-giao-kpi-theo-chi-tieu.png",
+    "screen": "Giao KPI",
+    "tab": "Danh sách giao KPI theo chỉ tiêu"
+  },
+  {
+    "file": "07-chien-luoc.png",
+    "screen": "Quản lý bản đồ chiến lược"
+  },
+  {
+    "file": "07-chien-luoc--cap-nhat.png",
+    "screen": "Quản lý bản đồ chiến lược",
+    "tab": "Cập nhật chiến lược"
+  },
+  {
+    "file": "08-danh-gia-kpi.png",
+    "screen": "Đánh giá KPI"
+  },
+  {
+    "file": "08-danh-gia-kpi--theo-doi-ket-qua-tham-dinh-va-phan-hoi.png",
+    "screen": "Đánh giá KPI",
+    "tab": "Theo dõi kết quả thẩm định và phản hồi"
+  },
+  {
+    "file": "09-tong-hop-bsc.png",
+    "screen": "Tổng hợp kết quả BSC"
+  },
+  {
+    "file": "09-tong-hop-bsc--theo-doi-ket-qua-tham-dinh-va-phan-hoi.png",
+    "screen": "Tổng hợp kết quả BSC",
+    "tab": "Theo dõi kết quả thẩm định và phản hồi"
+  },
+  {
+    "file": "10-quan-tri-he-thong.png",
+    "screen": "Quản trị hệ thống"
+  },
+  {
+    "file": "10-quan-tri-he-thong--vai-tro.png",
+    "screen": "Quản trị hệ thống",
+    "tab": "Vai trò"
+  },
+  {
+    "file": "10-quan-tri-he-thong--quyen.png",
+    "screen": "Quản trị hệ thống",
+    "tab": "Quyền"
+  },
+  {
+    "file": "10-quan-tri-he-thong--danh-sach-don-vi.png",
+    "screen": "Quản trị hệ thống",
+    "tab": "Danh sách đơn vị"
+  },
+  {
+    "file": "10-quan-tri-he-thong--lich-dong-bo.png",
+    "screen": "Quản trị hệ thống",
+    "tab": "Lịch đồng bộ"
+  },
+  {
+    "file": "10-quan-tri-he-thong--tham-so-he-thong.png",
+    "screen": "Quản trị hệ thống",
+    "tab": "Tham số hệ thống"
+  },
+  {
+    "file": "10-quan-tri-he-thong--nhat-ky-he-thong.png",
+    "screen": "Quản trị hệ thống",
+    "tab": "Nhật ký hệ thống"
+  },
+  {
+    "file": "11-thong-bao.png",
+    "screen": "Thông báo"
+  },
+  {
+    "file": "12-thong-tin-ca-nhan.png",
+    "screen": "Thông tin cá nhân"
+  }
+]

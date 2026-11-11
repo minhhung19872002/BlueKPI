@@ -1,29 +1,39 @@
 # Trạng thái thực hiện (handoff) — cập nhật 11/11/2026
 
-Thực hiện theo `PROMPT-KPI-BSC.md` / `docs/SPEC.md`, các phase P0 → P9. Bảng truy vết: `docs/TRACEABILITY.md` (sinh bằng `node scripts/gen-traceability.mjs`; ☑ chỉ khi STT đã được ghi vào `docs/traceability-done.txt` sau khi e2e xanh).
+Thực hiện theo `PROMPT-KPI-BSC.md` / `docs/SPEC.md`, phase P0 → P9 **đã hoàn tất**, kèm kiểm tra chéo PHẦN C. Bảng truy vết: `docs/TRACEABILITY.md` (sinh bằng `node scripts/gen-traceability.mjs`) — **173/173 STT ☑**, 7/7 mục kiến trúc, 11/11 mục phi chức năng.
 
-## Đã xong (đã commit trước: P0, P1, P2)
-- P0 Nền tảng, P1 Quản trị hệ thống, P2 Danh mục KPI — e2e xanh, đã tick.
+## Kết quả kiểm thử (lần chạy cuối)
 
-## Đã code, đã test một phần (commit này — gom P3 → P7 WIP)
-| Phase | Backend | Frontend | Kiểm thử |
-|---|---|---|---|
-| P3 Giao KPI (29–35) | xong; sửa tìm theo mã KPI con / KPI con giao riêng (`AssignmentMapper.xml` kWhere) | xong | `AssignmentIT` xanh; e2e `p3-assign` 21/21 xanh (54.1 đã chỉnh cho thứ tự thông báo) |
-| P4 Đánh giá + KPI của tôi (18–22, 39–44, 49.1) | xong; sửa NPE `manualTemplate`/`manual-import` (`EvaluationService`) | xong | e2e `p4-eval` 17/17 xanh (trên jar trước khi sửa NPE; test 44.2 đang dùng Q3 để né lỗi cũ — có thể chuyển lại Q4) |
-| P5 Tổng hợp BSC (45–54) | xong (`BscService`, `BscSummaryService`, `ReportService` JXLS, job nhắc hạn / tính lại BSC) | xong (`features/bsc`) | `BscIT` xanh; e2e `p5-bsc` chưa chạy trọn — các lỗi đã sửa: race khi lọc (46.3/45.x), template JXLS nhóm “Báo cáo KPI từng tỉnh” (comment jx:each sai cột → đã sửa), timeout tính lại |
-| P6 Chiến lược (36–38) | xong (`modules/strategy`, job `HOAN_TAT_CHIEN_LUOC`, seed `DemoStrategyStep`) | xong (`features/strategy`, XYFlow + Dagre + html-to-image) | `StrategyIT` xanh; Vitest bản đồ xanh; e2e `p6-strategy`: 36.1–36.4 xanh, 37.1 sửa checkbox disabled (DataGrid), 37.2 sửa cuộn canvas — cần chạy lại |
-| P7 Dashboard (6–17) | xong (`modules/dashboard`, `/api/dashboard/*`) | **dở dang** — agent dừng giữa chừng: `features/dashboard/{api,types}.ts`, `components/{Blocks,Charts,Dialogs}.tsx`, `pages/DashboardPage.tsx` (tsc + lint sạch, chưa kiểm thử) | `DashboardIT` xanh; chưa có `e2e/p7-dashboard.spec.ts` |
-| P8 (một phần) | `AdminBootstrap` (KPI_BOOTSTRAP_ADMIN_PASSWORD), `StartupSecurityCheck` chặn mật khẩu mặc định | — | — |
-| P8/P9 hạ tầng | `deploy/nginx/*`, `deploy/systemd/kpi-bsc.service`, `deploy/env.example`, `deploy/scripts/{backup,restore,minio-mirror,install,package,seed-volume}.sh`, `perf/k6-mix.js`, `.github/workflows/ci.yml`, `.zap/rules.tsv` | | chưa chạy thử |
+| Bộ | Kết quả |
+|---|---|
+| `./mvnw verify` | 87 unit (engine 54 ca, bảo mật, SSRF, log mask) + 24 integration (Testcontainers MariaDB + MinIO) — **xanh** |
+| `npm run lint && npm run test` | lint sạch, typecheck sạch, Vitest 15/15 |
+| `npm run e2e` (cả bộ, DB reset) | **187/187** (P0–P8; 1 spec HDSD bỏ qua khi không có `DOCS=1`) — mọi STT có ≥ 1 e2e |
+| k6 | 100 TPS × 10 phút p95 < 100 ms, lỗi 0,0075 %; 500 user đồng thời 0 lỗi — `docs/perf-report.md` |
+| Bảo mật | ZAP FAIL 0, Semgrep 0 ERROR, OSV đã vá (2 CVE Spring không ảnh hưởng), npm audit 0 high — `docs/ATTT.md` §11.1 |
 
-## Việc còn lại (theo thứ tự đề xuất)
-1. Rebuild jar (`cd backend && ./mvnw -B package -DskipTests`), chạy lại e2e `p5-bsc`, `p6-strategy` → sửa đến xanh; chạy lại `p4-eval` (sau sửa NPE).
-2. Hoàn thiện P7 frontend + viết `e2e/p7-dashboard.spec.ts` (mỗi STT 6.1…17.8 + SiteMap + phân quyền tinh_hni).
-3. Chạy toàn bộ: `./mvnw verify`, `npm run lint && npm run test && npm run e2e`; ghi STT vào `docs/traceability-done.txt`, chạy `gen-traceability`.
-4. P8: CAS e2e với mock (`deploy/mocks/mock-cas.mjs`), chạy k6 (docker `grafana/k6`, đặt `KPI_LOGIN_RATE_LIMIT` cao khi đo) → `docs/perf-report.md`; tối ưu “Tính lại điểm đánh giá” (~7s/696 kết quả); Semgrep/ZAP/Dependency-Check qua docker; bảo trì partition `audit_log` (sau 2027-06 rơi vào `pmax`).
-5. P9: `docs/HDSD/*.md` (ảnh Playwright), `HDQT.md`, `VAN-HANH.md` (đo RTO restore thật), `TRIEN-KHAI.md`, `ATTT.md`, `KIEN-TRUC.md`, `BAO-CAO-KIEM-THU.md`; test `deploy/scripts/package.sh`; đối chiếu PHẦN C → báo cáo cuối.
-6. Cập nhật `docs/DECISIONS.md` / `docs/OPEN-QUESTIONS.md`: giả định dashboard (gộp khối tỉnh = trung bình; giai đoạn = lũy kế “Cả năm”), demo để Q2/H1 năm hiện tại chưa chốt và “Cả năm” năm trước chưa TGĐ duyệt (phục vụ e2e 48.x/50.x), số liệu demo cấp Tập đoàn (% TH/KH rất lớn do KH của công ty mẹ ≠ tổng đơn vị con).
+Báo cáo nghiệm thu: `docs/BAO-CAO-KIEM-THU.md` (`node scripts/gen-test-report.mjs` sau khi chạy e2e + verify).
+
+## Phase
+
+| Phase | Trạng thái | Commit |
+|---|---|---|
+| P0–P2 | xong | `fa20b7f`, `eaca9a1`, `595b52a` |
+| P3–P6 | xong (WIP `24c4924` + sửa e2e chạy cả bộ) | `24c4924`, `c6c1be0` |
+| P7 Dashboard | xong — e2e 6.1–17.8, SiteMap, phân quyền, API < 1 s; sửa click cột biểu đồ (ECharts 6) | `c6c1be0` |
+| P8 Tích hợp & cứng hóa | xong — CAS e2e (mock), SSRF, mật khẩu admin prod, log mask, ClamAV fail-closed, TTL cấu hình, job dọn tệp, readiness DB; k6; ZAP/Semgrep/OSV; vá thư viện; deadlock pool đăng nhập | `d5f8aa9`, `6b32158` |
+| Kiểm tra chéo PHẦN C | xong — 2 Blocker (3.9 gán vai trò, 46.4/47.4 thu hồi sau chốt) + 4 Minor đã sửa | `572a95d` |
+| P9 Bàn giao | xong — HDSD 9 phân hệ (30 ảnh), HDQT, VAN-HANH (RTO đo lần 1), TRIEN-KHAI, ATTT, KIEN-TRUC, BÁO CÁO KIỂM THỬ, gói `kpi-bsc-<version>.tar.gz` | commit P9 |
+
+## Việc còn lại / rủi ro (cần Chủ đầu tư hoặc môi trường thật)
+
+1. **Đo lại trên staging**: RTO khôi phục với dữ liệu cỡ thật (`docs/VAN-HANH.md` §8.1 lần 2–3), k6 trên 2 node sau F5, `seed-volume` quy mô lớn (OPEN-QUESTIONS #17).
+2. **Pentest bên ngoài** (PHẦN D §1.d) và chạy pipeline CI thật (Dependency-Check cần `NVD_API_KEY`; ZAP cần `STAGING_URL`).
+3. **Cấu hình theo hạ tầng thật**: dải IP F5 trong `set_real_ip_from` (`deploy/nginx/kpi.conf`), `KPI_SOURCE_ALLOWED_HOSTS`, CAS URL/thuộc tính, SMTP, Zalo OA (OPEN-QUESTIONS #6).
+4. Spring Framework 6.2.19 còn 2 CVE chỉ vá ở 7.x (không ảnh hưởng — suppression hết hạn 31/03/2027): rà soát khi có bản 6.2.x vá hoặc khi E-HSMT cho phép Spring Boot 4.
+5. Các câu hỏi mở `docs/OPEN-QUESTIONS.md` (mẫu báo cáo chính thức, khung điểm, thuật ngữ R2/BCL, ký số TGĐ…).
 
 ## Ghi chú môi trường dev
-- Hạ tầng: `docker compose -f deploy/docker-compose.dev.yml up -d` (MariaDB 3307, MinIO 9100/9101, Mailpit 1026/8026, mock CAS 8091, mock nguồn KPI 8092). Mật khẩu tài khoản seed: `Kpi@2026`.
-- e2e mặc định: BE 8089, FE 4174, DB `kpi_bsc_e2e`; có thể cô lập bằng `E2E_DB/E2E_BE_PORT/E2E_FE_PORT/E2E_DIST/E2E_JAR`. Không tắt java theo tên image (cổng 8080/9000/1025/8025 thuộc dự án khác).
+- Hạ tầng: `docker compose -f deploy/docker-compose.dev.yml up -d` (MariaDB 3307, MinIO 9100/9101, Mailpit 1026/8026, mock CAS 8091, mock nguồn KPI 8092). Mật khẩu tài khoản seed dev: `Kpi@2026` (chỉ seed-dev; production không có mật khẩu mặc định — xem `docs/HDQT.md` §2).
+- JDK 21 bắt buộc (`JAVA_HOME`); e2e mặc định BE 8089, FE 4174, DB `kpi_bsc_e2e` (cô lập bằng `E2E_DB/E2E_BE_PORT/E2E_FE_PORT/E2E_DIST/E2E_JAR`). CAS e2e cần mock CAS 8091.
+- HDSD: `cd frontend && DOCS=1 E2E_REUSE=1 E2E_FE_PORT=<fe> E2E_BE_PORT=<be> npx playwright test e2e/hdsd-screens.spec.ts` → `node scripts/gen-hdsd.mjs`.

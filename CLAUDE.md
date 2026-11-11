@@ -92,7 +92,7 @@ kpi-bsc/
     ├── docker-compose.dev.yml  # mariadb, minio, mailpit, mock-cas, mock-kpi-source
     ├── nginx/kpi.conf
     ├── systemd/kpi-backend.service
-    └── scripts/                # backup-db.sh, restore-db.sh, minio-mirror.sh
+    └── scripts/                # backup.sh, restore.sh, minio-mirror.sh, install.sh, package.sh, seed-volume.sh
 ```
 
 ## 4. Quy ước bắt buộc

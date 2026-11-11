@@ -15,6 +15,7 @@ install -m 750 scripts/*.sh "$APP/scripts/"
 install -m 644 systemd/kpi-bsc.service /etc/systemd/system/kpi-bsc.service
 install -m 644 nginx/kpi.conf /etc/nginx/sites-available/kpi.conf
 install -m 644 nginx/kpi-proxy.conf /etc/nginx/kpi-proxy.conf
+install -m 644 nginx/kpi-security-headers.conf /etc/nginx/kpi-security-headers.conf
 ln -sf /etc/nginx/sites-available/kpi.conf /etc/nginx/sites-enabled/kpi.conf
 nginx -t && systemctl reload nginx
 systemctl daemon-reload && systemctl enable --now kpi-bsc
