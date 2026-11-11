@@ -1,4 +1,4 @@
-# Trạng thái thực hiện (handoff) — cập nhật 11/11/2026
+# Trạng thái thực hiện (handoff) — cập nhật 12/11/2026
 
 Thực hiện theo `PROMPT-KPI-BSC.md` / `docs/SPEC.md`, phase P0 → P9 **đã hoàn tất**, kèm kiểm tra chéo PHẦN C. Bảng truy vết: `docs/TRACEABILITY.md` (sinh bằng `node scripts/gen-traceability.mjs`) — **173/173 STT ☑**, 7/7 mục kiến trúc, 11/11 mục phi chức năng.
 
@@ -27,7 +27,7 @@ Báo cáo nghiệm thu: `docs/BAO-CAO-KIEM-THU.md` (`node scripts/gen-test-repor
 
 ## Việc còn lại / rủi ro (cần Chủ đầu tư hoặc môi trường thật)
 
-1. **Đo lại trên staging**: RTO khôi phục với dữ liệu cỡ thật (`docs/VAN-HANH.md` §8.1 lần 2–3), k6 trên 2 node sau F5, `seed-volume` quy mô lớn (OPEN-QUESTIONS #17).
+1. **Đo lại trên staging thật** (đã diễn tập tại dev): sao lưu/khôi phục bằng `backup.sh`/`restore.sh` với 685 MB — logical 323 s, physical 23 s, khớp 100 % (`docs/VAN-HANH.md` §8.1 lần 2–3); `seed-volume` 2 triệu audit — dashboard < 150 ms, k6 100 TPS đạt (`docs/perf-report.md` §5b). Còn: đo trên phần cứng DB_01/DB_02 + 2 node sau F5 (§8.1 lần 4).
 2. **Pentest bên ngoài** (PHẦN D §1.d) và chạy pipeline CI thật (Dependency-Check cần `NVD_API_KEY`; ZAP cần `STAGING_URL`).
 3. **Cấu hình theo hạ tầng thật**: dải IP F5 trong `set_real_ip_from` (`deploy/nginx/kpi.conf`), `KPI_SOURCE_ALLOWED_HOSTS`, CAS URL/thuộc tính, SMTP, Zalo OA (OPEN-QUESTIONS #6).
 4. Spring Framework 6.2.19 còn 2 CVE chỉ vá ở 7.x (không ảnh hưởng — suppression hết hạn 31/03/2027): rà soát khi có bản 6.2.x vá hoặc khi E-HSMT cho phép Spring Boot 4.
