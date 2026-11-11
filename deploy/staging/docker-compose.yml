@@ -1,0 +1,78 @@
+# Staging KPI-BSC trên VM dùng chung (BlueStar 14.225.83.93) — sau Caddy dùng chung (~/proxy), KHÔNG mở cổng host.
+# Thành phần giống production (PHẦN B §10) nhưng gọn trong 1 VM: nginx (SPA + /api) → Spring Boot (profile prod) → MariaDB 10.11 + MinIO.
+# Không build image trên VM: app chạy jar dựng sẵn (artifacts/kpi-bsc.jar) trên image JRE chính thức; web là frontend/dist.
+# Dùng qua wrapper: ./kpi-staging.sh <lệnh compose>   (đọc .env sinh bởi gen-env.sh)
+name: kpibsc
+services:
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?}
+      MARIADB_DATABASE: kpi_bsc
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      DB_MIGRATE_PASSWORD: ${DB_MIGRATE_PASSWORD:?}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_vietnamese_ci", "--innodb-buffer-pool-size=384M",
+              "--max-connections=80", "--log-bin=mysql-bin", "--binlog-format=ROW", "--server-id=1", "--expire-logs-days=7"]
+    volumes:
+      - db:/var/lib/mysql
+      - ./mariadb-init:/docker-entrypoint-initdb.d:ro
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      retries: 30
+    deploy: { resources: { limits: { memory: 900m, cpus: "1.5" } } }
+    networks: [kpibsc]
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    restart: unless-stopped
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:?}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:?}
+    volumes: [minio:/data]
+    deploy: { resources: { limits: { memory: 384m, cpus: "0.5" } } }
+    networks: [kpibsc]
+
+  app:
+    image: eclipse-temurin:21-jre
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+      minio: { condition: service_started }
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: "8088"
+      DB_URL: jdbc:mariadb://db:3306/kpi_bsc
+      DB_SSL_MODE: disable   # mạng Docker nội bộ của staging; production dùng verify-full
+      TZ: Asia/Ho_Chi_Minh
+      JAVA_TOOL_OPTIONS: -Xms256m -Xmx768m -XX:+UseG1GC -XX:MaxMetaspaceSize=256m
+    command: ["java", "-jar", "/opt/kpi-bsc/kpi-bsc.jar"]
+    volumes:
+      - ./artifacts/kpi-bsc.jar:/opt/kpi-bsc/kpi-bsc.jar:ro
+    stop_grace_period: 30s
+    deploy: { resources: { limits: { memory: 1200m, cpus: "2" } } }
+    networks: [kpibsc]
+
+  web:
+    image: nginx:1.24-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    volumes:
+      - ./artifacts/web:/opt/kpi-bsc/web:ro
+      - ./nginx/staging.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../nginx/kpi-security-headers.conf:/etc/nginx/kpi-security-headers.conf:ro
+      - ./nginx/proxy.conf:/etc/nginx/kpi-proxy.conf:ro
+    deploy: { resources: { limits: { memory: 64m, cpus: "0.5" } } }
+    networks: [kpibsc]
+
+volumes:
+  db:
+  minio:
+
+networks:
+  kpibsc:
+    name: kpibsc_net

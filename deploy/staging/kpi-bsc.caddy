@@ -1,0 +1,14 @@
+# Site KPI-BSC staging cho Caddy dùng chung (~/proxy/sites/kpi-bsc.caddy trên VM BlueStar)
+# Caddy phải được gắn vào mạng kpibsc_net: docker network connect kpibsc_net proxy-caddy
+kpi-bsc.14.225.83.93.sslip.io {
+	encode zstd gzip
+	reverse_proxy kpibsc-web-1:80
+}
+
+# MinIO (URL ký trước tải tệp minh chứng/báo cáo) — trình duyệt cần truy cập trực tiếp
+kpi-bsc-files.14.225.83.93.sslip.io {
+	request_body {
+		max_size 20MB
+	}
+	reverse_proxy kpibsc-minio-1:9000
+}

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Wrapper docker compose cho staging: ./kpi-staging.sh up -d | ps | logs -f app | down …
+cd "$(dirname "$0")" && exec docker compose --env-file .env -f docker-compose.yml "$@"

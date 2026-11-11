@@ -29,3 +29,8 @@ dist-package/
 
 # Vitest 5 cache
 frontend/.vitest/
+
+# Staging (VM BlueStar): secret + artifact + backup không commit
+deploy/staging/.env
+deploy/staging/artifacts/
+deploy/staging/backups/
