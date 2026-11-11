@@ -1,6 +1,6 @@
 # BÁO CÁO KIỂM THỬ — Phần mềm quản trị và theo dõi chỉ tiêu KPI theo BSC
 
-> Sinh tự động bằng `node scripts/gen-test-report.mjs` lúc 11/11/2026 23:35 từ kết quả chạy thực tế (Playwright, JUnit/Testcontainers, Vitest). Không chỉnh tay.
+> Sinh tự động bằng `node scripts/gen-test-report.mjs` lúc 12/11/2026 02:08 từ kết quả chạy thực tế (Playwright, JUnit/Testcontainers, Vitest). Không chỉnh tay.
 
 ## 1. Tổng hợp
 
@@ -8,9 +8,9 @@
 |---|---|---|---|---|
 | E2E theo STT (1024×768, dữ liệu seed) | Playwright | 187 | 187 | 0 |
 | Unit backend (engine ≥ 40 ca, bảo mật) | JUnit 5 | 87 | 87 | 0 |
-| Integration backend (MariaDB + MinIO Testcontainers) | JUnit 5 | 24 | 24 | 0 |
+| Integration backend (MariaDB + MinIO Testcontainers) | JUnit 5 | 25 | 25 | 0 |
 
-Mã STT có e2e: **173/173**. Tổng JUnit: 111 ca, lỗi 0.
+Mã STT có e2e: **173/173**. Tổng JUnit: 112 ca, lỗi 0.
 
 ## 2. Kết quả theo mã STT (E-HSMT)
 
@@ -194,15 +194,15 @@ Mã STT có e2e: **173/173**. Tổng JUnit: 111 ca, lỗi 0.
 
 | Ca kiểm thử | File | Kết quả | Thời gian |
 |---|---|---|---|
-| SiteMap 1 – Tập đoàn: Năm hiện tại → Năm X → nút Quý → Quý y | p7-dashboard.spec.ts | Đạt | 8.4s |
-| SiteMap 2 – Tập đoàn: Giai đoạn → Giai đoạn X–Y (năm đầu) → chọn năm X trên biểu đồ → Năm/Quý | p7-dashboard.spec.ts | Đạt | 3.6s |
-| SiteMap 2b – Nhấn vào cột của một năm trên biểu đồ giai đoạn (onClick ECharts) | p7-dashboard.spec.ts | Đạt | 3.6s |
-| SiteMap 3 – Nút Bản đồ chiến lược → bản đồ của năm tương ứng; từ biểu giai đoạn cũng mở được | p7-dashboard.spec.ts | Đạt | 3.7s |
-| SiteMap 4 – Chọn đơn vị: Năm hiện tại ↔ Năm X ↔ Quý; Giai đoạn ↔ năm X trên biểu đồ | p7-dashboard.spec.ts | Đạt | 4.1s |
+| SiteMap 1 – Tập đoàn: Năm hiện tại → Năm X → nút Quý → Quý y | p7-dashboard.spec.ts | Đạt | 3.5s |
+| SiteMap 2 – Tập đoàn: Giai đoạn → Giai đoạn X–Y (năm đầu) → chọn năm X trên biểu đồ → Năm/Quý | p7-dashboard.spec.ts | Đạt | 3.1s |
+| SiteMap 2b – Nhấn vào cột của một năm trên biểu đồ giai đoạn (onClick ECharts) | p7-dashboard.spec.ts | Đạt | 3.3s |
+| SiteMap 3 – Nút Bản đồ chiến lược → bản đồ của năm tương ứng; từ biểu giai đoạn cũng mở được | p7-dashboard.spec.ts | Đạt | 2.8s |
+| SiteMap 4 – Chọn đơn vị: Năm hiện tại ↔ Năm X ↔ Quý; Giai đoạn ↔ năm X trên biểu đồ | p7-dashboard.spec.ts | Đạt | 3.7s |
 | SiteMap 5 – Chọn tỉnh: Tỉnh – Năm hiện tại → Năm X → nút Quý → Quý I năm X | p7-dashboard.spec.ts | Đạt | 3.3s |
-| Phân quyền – Người dùng cấp đơn vị chỉ xem dữ liệu đơn vị mình | p7-dashboard.spec.ts | Đạt | 2.7s |
-| Phân quyền – Lập chiến lược xem được biểu Tập đoàn và bản đồ chiến lược | p7-dashboard.spec.ts | Đạt | 2.5s |
-| P7 hiệu năng – API dashboard < 1s trên dữ liệu seed | p7-dashboard.spec.ts | Đạt | 2.4s |
+| Phân quyền – Người dùng cấp đơn vị chỉ xem dữ liệu đơn vị mình | p7-dashboard.spec.ts | Đạt | 2.5s |
+| Phân quyền – Lập chiến lược xem được biểu Tập đoàn và bản đồ chiến lược | p7-dashboard.spec.ts | Đạt | 3.1s |
+| P7 hiệu năng – API dashboard < 1s trên dữ liệu seed | p7-dashboard.spec.ts | Đạt | 2.1s |
 
 ## 4. Kiểm thử backend (JUnit)
 
@@ -211,7 +211,7 @@ Mã STT có e2e: **173/173**. Tổng JUnit: 111 ca, lỗi 0.
 | Integration | `modules.AssignmentIT` | 2 | 0 | 0 |
 | Integration | `modules.BscIT` | 2 | 0 | 0 |
 | Integration | `modules.CatalogIT` | 4 | 0 | 0 |
-| Integration | `modules.DashboardIT` | 2 | 0 | 0 |
+| Integration | `modules.DashboardIT` | 3 | 0 | 0 |
 | Integration | `modules.StrategyIT` | 2 | 0 | 0 |
 | Integration | `modules.SystemAdminIT` | 6 | 0 | 0 |
 | Integration | `security.AuthControllerIT` | 6 | 0 | 0 |

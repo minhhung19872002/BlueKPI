@@ -84,6 +84,7 @@ public class SyncService {
     }
 
     SyncOutcome run(EvalKpi ek, List<ComponentValue> apiComps, List<Result> rows, Long batchId) {
+        long t0 = System.currentTimeMillis();
         AtomicInteger ok = new AtomicInteger(), fail = new AtomicInteger();
         Map<Long, FormulaDefinition> formulas = new HashMap<>();
         apiComps.forEach(c -> formulas.computeIfAbsent(c.getFormulaDefinitionId(), formulaMapper::findById));
@@ -106,8 +107,10 @@ public class SyncService {
             }, POOL));
         }
         CompletableFuture.allOf(fs.toArray(new CompletableFuture[0])).join();
+        long t1 = System.currentTimeMillis();
         mapper.touchSynced(ek.getId());
         calc.recalc(rows.stream().map(Result::getId).toList());
+        long t2 = System.currentTimeMillis();
         // kết quả đã có → “Đã có kết quả”; KPI-kỳ → “Đã chấm”
         List<Result> fresh = mapper.findResultsByIds(rows.stream().map(Result::getId).toList());
         List<Result> toDone = fresh.stream().filter(x -> x.getFinalResult() != null && (EvaluationStateMachine.CHUA_CO_KQ.equals(x.getStatus())
@@ -118,6 +121,7 @@ public class SyncService {
         String status = fail.get() == 0 ? "THANH_CONG" : ok.get() == 0 ? "LOI" : "MOT_PHAN";
         batchMapper.finish(batchId, status, rows.size(), ok.get(), fail.get(), msg);
         audit.log("DONG_BO", "evaluation_kpi", ek.getId(), null, Map.of("message", msg, "batchId", batchId));
+        log.info("Đồng bộ {} {}/{} – {} đơn vị: gọi nguồn {} ms, tính điểm {} ms, trạng thái {} ms", ek.getKpiCode(), ek.getPeriodCode(), ek.getYear(), rows.size(), t1 - t0, t2 - t1, System.currentTimeMillis() - t2);
         return new SyncOutcome(batchId, rows.size(), ok.get(), fail.get(), false, msg);
     }
 

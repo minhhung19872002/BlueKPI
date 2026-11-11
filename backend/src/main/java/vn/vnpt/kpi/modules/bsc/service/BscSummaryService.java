@@ -98,7 +98,9 @@ public class BscSummaryService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onBscChanged(EvaluationCalcService.BscChangedEvent e) {
         try {
+            long t0 = System.currentTimeMillis();
             recompute(e.year(), e.period());
+            log.info("Tính lại bsc_unit_summary {} {} sau thay đổi kết quả: {} ms", e.year(), e.period(), System.currentTimeMillis() - t0);
         } catch (Exception ex) {
             log.warn("Tính bsc_unit_summary {} {} lỗi: {}", e.year(), e.period(), ex.getMessage());
         }

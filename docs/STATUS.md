@@ -6,9 +6,9 @@ Thực hiện theo `PROMPT-KPI-BSC.md` / `docs/SPEC.md`, phase P0 → P9 **đã 
 
 | Bộ | Kết quả |
 |---|---|
-| `./mvnw verify` | 87 unit (engine 54 ca, bảo mật, SSRF, log mask) + 24 integration (Testcontainers MariaDB + MinIO) — **xanh** |
+| `./mvnw verify` | 87 unit (engine 54 ca, bảo mật, SSRF, log mask) + 25 integration (Testcontainers MariaDB + MinIO) — **xanh** |
 | `npm run lint && npm run test` | lint sạch, typecheck sạch, Vitest 15/15 |
-| `npm run e2e` (cả bộ, DB reset) | **187/187** (P0–P8; 1 spec HDSD bỏ qua khi không có `DOCS=1`) — mọi STT có ≥ 1 e2e |
+| `npm run e2e` (DB reset) | **187/187** trên mã cuối cùng (12/11/2026, chạy theo 7 nhóm spec — mỗi nhóm reset CSDL về seed — vì máy dev thiếu RAM khi chạy liền 188 test; 1 spec HDSD bỏ qua khi không có `DOCS=1`) — mọi STT có ≥ 1 e2e |
 | k6 | 100 TPS × 10 phút p95 < 100 ms, lỗi 0,0075 %; 500 user đồng thời 0 lỗi — `docs/perf-report.md` |
 | Bảo mật | ZAP FAIL 0, Semgrep 0 ERROR, OSV đã vá (2 CVE Spring không ảnh hưởng), npm audit 0 high — `docs/ATTT.md` §11.1 |
 
