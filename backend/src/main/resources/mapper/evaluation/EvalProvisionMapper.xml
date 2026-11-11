@@ -9,7 +9,7 @@
     FROM kpi_assignment_detail d JOIN kpi k ON k.id = d.kpi_id
     CROSS JOIN (SELECT 'Q1' AS code UNION ALL SELECT 'Q2' UNION ALL SELECT 'H1' UNION ALL SELECT 'Q3' UNION ALL SELECT 'Q4' UNION ALL SELECT 'Y') p
     WHERE d.id IN <include refid="ids"/>
-    ON DUPLICATE KEY UPDATE deleted = 0
+    ON DUPLICATE KEY UPDATE evaluation_kpi.deleted = 0
   </insert>
 
   <!-- KH giao kỳ: adj_<kỳ> nếu khác NULL, ngược lại target_<kỳ>; kỳ Y lấy target_year (PHẦN B §6.1).
@@ -29,9 +29,9 @@
     WHERE d.id IN <include refid="ids"/>
     ON DUPLICATE KEY UPDATE
       assignment_detail_id = VALUES(assignment_detail_id),
-      plan_value = IF(status IN ('CHOT_DANH_GIA','TGD_DA_DUYET'), plan_value, VALUES(plan_value)),
-      year_plan_value = IF(status IN ('CHOT_DANH_GIA','TGD_DA_DUYET'), year_plan_value, VALUES(year_plan_value)),
-      deleted = 0
+      plan_value = IF(evaluation_result.status IN ('CHOT_DANH_GIA','TGD_DA_DUYET'), evaluation_result.plan_value, VALUES(plan_value)),
+      year_plan_value = IF(evaluation_result.status IN ('CHOT_DANH_GIA','TGD_DA_DUYET'), evaluation_result.year_plan_value, VALUES(year_plan_value)),
+      evaluation_result.deleted = 0
   </insert>
 
   <select id="resultIdsOfDetails" resultType="long">

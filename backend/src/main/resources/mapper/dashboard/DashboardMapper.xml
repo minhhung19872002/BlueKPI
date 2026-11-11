@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Dashboard TGĐ BSC (6–17): đọc evaluation_result + bsc_unit_summary -->
+<mapper namespace="vn.vnpt.kpi.modules.dashboard.mapper.DashboardMapper">
+  <select id="rootUnit" resultType="map">
+    SELECT id, code, name, unit_type AS unitType, level FROM org_unit WHERE deleted = 0 AND parent_id IS NULL ORDER BY sort_order, id LIMIT 1
+  </select>
+  <select id="unit" resultType="map">
+    SELECT id, code, name, unit_type AS unitType, level, parent_id AS parentId FROM org_unit WHERE id = #{id} AND deleted = 0
+  </select>
+  <select id="provinceIds" resultType="long">
+    SELECT id FROM org_unit WHERE deleted = 0 AND unit_type = 'VNPT_TINH' AND status = 'HIEU_LUC'
+  </select>
+  <select id="stages" resultType="map">
+    SELECT id, code, name, from_year AS fromYear, to_year AS toYear FROM evaluation_stage WHERE deleted = 0 ORDER BY from_year DESC
+  </select>
+  <select id="stage" resultType="map">
+    SELECT id, code, name, from_year AS fromYear, to_year AS toYear FROM evaluation_stage WHERE id = #{id} AND deleted = 0
+  </select>
+
+  <!-- Kết quả KPI gốc (không gồm KPI con) của tập đơn vị trong các (năm, kỳ) -->
+  <select id="kpiRows" resultType="map">
+    SELECT r.org_unit_id AS unitId, ek.year, ek.period_code AS period, k.id AS kpiId, k.code AS kpiCode, k.name AS kpiName, k.is_focus AS isFocus,
+      pe.id AS perspectiveId, pe.name AS perspectiveName, pe.color AS perspectiveColor, pe.sort_order AS perspectiveSort, uom.name AS unitOfMeasureName,
+      r.plan_value AS planValue, r.year_plan_value AS yearPlanValue, r.final_result AS finalResult, r.completion_rate AS completionRate,
+      r.year_completion_rate AS yearCompletionRate, r.score, r.bsc_score AS bscScore, r.rating, r.status, r.updated_at AS updatedAt
+    FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id JOIN kpi k ON k.id = ek.kpi_id
+      JOIN perspective pe ON pe.id = k.perspective_id LEFT JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id
+    WHERE r.deleted = 0 AND k.parent_id IS NULL
+      AND r.org_unit_id IN <foreach collection="unitIds" item="u" open="(" separator="," close=")">#{u}</foreach>
+      AND ek.year IN <foreach collection="years" item="y" open="(" separator="," close=")">#{y}</foreach>
+      AND ek.period_code = #{period}
+      <if test="kpiId != null">AND k.id = #{kpiId}</if>
+      <if test="focusOnly">AND k.is_focus = 1</if>
+    ORDER BY pe.sort_order, k.code
+  </select>
+
+  <select id="lastUpdated" resultType="java.time.LocalDateTime">
+    SELECT MAX(r.updated_at) FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE r.deleted = 0 AND (r.final_result IS NOT NULL OR r.score IS NOT NULL)
+      AND r.org_unit_id IN <foreach collection="unitIds" item="u" open="(" separator="," close=")">#{u}</foreach>
+      AND ek.year IN <foreach collection="years" item="y" open="(" separator="," close=")">#{y}</foreach>
+      AND ek.period_code = #{period}
+  </select>
+
+  <!-- Kỳ gần nhất đã có kết quả (17.1) -->
+  <select id="latestPeriod" resultType="string">
+    SELECT ek.period_code FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE r.deleted = 0 AND r.org_unit_id = #{unitId} AND ek.year = #{year} AND r.final_result IS NOT NULL
+    GROUP BY ek.period_code ORDER BY FIELD(ek.period_code, 'Q1', 'Q2', 'H1', 'Q3', 'Q4', 'Y') DESC LIMIT 1
+  </select>
+
+  <sql id="sumCols">
+    s.org_unit_id AS unitId, o.code AS unitCode, o.name AS unitName, o.unit_type AS unitType, o.level, o.parent_id AS parentId, s.year, s.period_code AS period,
+    s.total_kpi AS totalKpi, s.achieved, s.not_achieved AS notAchieved, s.tracking, s.warning, s.completion_rate AS completionRate,
+    s.bsc_score AS bscScore, s.rank_in_group AS rankInGroup, s.rank_group AS rankGroup, s.prev_bsc_score AS prevBscScore, s.prev_rank AS prevRank, s.computed_at AS computedAt
+  </sql>
+  <select id="summaries" resultType="map">
+    SELECT <include refid="sumCols"/> FROM bsc_unit_summary s JOIN org_unit o ON o.id = s.org_unit_id
+    WHERE o.deleted = 0
+      <if test="unitIds != null">AND s.org_unit_id IN <foreach collection="unitIds" item="u" open="(" separator="," close=")">#{u}</foreach></if>
+      <if test="rankGroup != null">AND s.rank_group = #{rankGroup}</if>
+      <if test="parentId != null">AND o.parent_id = #{parentId}</if>
+      AND s.year IN <foreach collection="years" item="y" open="(" separator="," close=")">#{y}</foreach>
+      <if test="period != null">AND s.period_code = #{period}</if>
+    ORDER BY s.year, FIELD(s.period_code, 'Q1', 'Q2', 'H1', 'Q3', 'Q4', 'Y'), COALESCE(s.rank_in_group, 9999), o.sort_order, o.code
+  </select>
+
+  <!-- 17.5 Phân rã kết quả các đơn vị con cùng được giao KPI -->
+  <select id="breakdown" resultType="map">
+    SELECT o.id AS unitId, o.code AS unitCode, o.name AS unitName, r.final_result AS finalResult, r.completion_rate AS completionRate,
+      r.score, r.bsc_score AS bscScore, r.rating, r.status
+    FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id JOIN org_unit o ON o.id = r.org_unit_id
+    WHERE r.deleted = 0 AND ek.kpi_id = #{kpiId} AND ek.year = #{year} AND ek.period_code = #{period} AND o.parent_id = #{parentId}
+    ORDER BY o.sort_order, o.code
+  </select>
+  <select id="childCount" resultType="int">SELECT COUNT(*) FROM org_unit WHERE parent_id = #{parentId} AND deleted = 0</select>
+</mapper>

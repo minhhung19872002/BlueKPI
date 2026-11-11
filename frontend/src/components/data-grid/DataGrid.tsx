@@ -119,13 +119,12 @@ export function DataGrid<T>({
         >
           {selectable && (
             <td className="w-10 px-2 py-2 text-center" onClick={(e) => e.stopPropagation()}>
-              {canSel && (
-                <Checkbox
-                  checked={selSet.has(k)}
-                  aria-label="Chọn dòng"
-                  onCheckedChange={(v) => onSelectedChange?.(v ? [...selected, k] : selected.filter((x) => x !== k))}
-                />
-              )}
+              <Checkbox
+                checked={canSel && selSet.has(k)}
+                disabled={!canSel}
+                aria-label="Chọn dòng"
+                onCheckedChange={(v) => onSelectedChange?.(v ? [...selected, k] : selected.filter((x) => x !== k))}
+              />
             </td>
           )}
           {showStt && <td className="w-14 px-2 py-2 text-center text-slate-500">{stt}</td>}

@@ -113,6 +113,9 @@ springdoc:
   packages-to-scan: vn.vnpt.kpi
 
 kpi:
+  bootstrap:
+    admin-username: ${KPI_BOOTSTRAP_ADMIN_USERNAME:admin}
+    admin-password: ${KPI_BOOTSTRAP_ADMIN_PASSWORD:}
   security:
     jwt-secret: ${KPI_JWT_SECRET:}
     jwt-secret-previous: ${KPI_JWT_SECRET_PREVIOUS:}

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.bsc.mapper.BscMapper">
+
+  <!-- Điểm BSC đơn vị = Σ score×w / Σ w (KPI đã có điểm); % TH/KH đơn vị = TB có trọng số % TH/KH kỳ của KPI gốc -->
+  <select id="aggregateUnits" resultType="map">
+    SELECT r.org_unit_id AS unitId, o.unit_type AS unitType, o.code AS unitCode,
+      COUNT(*) AS total,
+      SUM(r.rating = 'DAT_VUOT') AS achieved,
+      SUM(r.rating = 'CHUA_DAT') AS notAchieved,
+      SUM(r.rating = 'DANG_THEO_DOI') AS tracking,
+      SUM(r.rating = 'CHUA_DAT' OR (r.completion_rate IS NOT NULL AND r.completion_rate &lt; #{warningRate})) AS warning,
+      SUM(CASE WHEN r.completion_rate IS NOT NULL THEN r.completion_rate * COALESCE(d.weight, 1) END)
+        / NULLIF(SUM(CASE WHEN r.completion_rate IS NOT NULL THEN COALESCE(d.weight, 1) END), 0) AS completionRate,
+      SUM(CASE WHEN r.score IS NOT NULL THEN r.score * COALESCE(d.weight, 1) END)
+        / NULLIF(SUM(CASE WHEN r.score IS NOT NULL THEN COALESCE(d.weight, 1) END), 0) AS bscScore
+    FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id JOIN kpi k ON k.id = ek.kpi_id
+    JOIN org_unit o ON o.id = r.org_unit_id LEFT JOIN kpi_assignment_detail d ON d.id = r.assignment_detail_id
+    WHERE r.deleted = 0 AND ek.deleted = 0 AND ek.year = #{year} AND ek.period_code = #{period} AND k.parent_id IS NULL
+    GROUP BY r.org_unit_id, o.unit_type, o.code
+  </select>
+
+  <insert id="upsertSummary" parameterType="map">
+    INSERT INTO bsc_unit_summary (org_unit_id, year, period_code, total_kpi, achieved, not_achieved, tracking, warning, completion_rate, bsc_score, computed_at)
+    VALUES (#{unitId}, #{year}, #{period}, #{total}, #{achieved}, #{notAchieved}, #{tracking}, #{warning}, #{completionRate}, #{bscScore}, NOW(3))
+    ON DUPLICATE KEY UPDATE total_kpi = VALUES(total_kpi), achieved = VALUES(achieved), not_achieved = VALUES(not_achieved), tracking = VALUES(tracking),
+      warning = VALUES(warning), completion_rate = VALUES(completion_rate), bsc_score = VALUES(bsc_score), computed_at = NOW(3)
+  </insert>
+  <delete id="deleteSummaryNotIn">
+    DELETE FROM bsc_unit_summary WHERE year = #{year} AND period_code = #{period}
+    <if test="unitIds != null and !unitIds.isEmpty()">AND org_unit_id NOT IN <foreach collection="unitIds" item="i" open="(" separator="," close=")">#{i}</foreach></if>
+  </delete>
+  <select id="summaries" resultType="map">
+    SELECT s.org_unit_id AS unitId, o.code AS unitCode, o.name AS unitName, o.unit_type AS unitType, o.parent_id AS parentId, o.level,
+      s.total_kpi AS totalKpi, s.achieved, s.not_achieved AS notAchieved, s.tracking, s.warning, s.completion_rate AS completionRate,
+      s.bsc_score AS bscScore, s.rank_in_group AS rankInGroup, s.rank_group AS rankGroup, s.prev_bsc_score AS prevBscScore, s.prev_rank AS prevRank,
+      s.computed_at AS computedAt
+    FROM bsc_unit_summary s JOIN org_unit o ON o.id = s.org_unit_id
+    WHERE s.year = #{year} AND s.period_code = #{period} ORDER BY o.level, o.sort_order, o.code
+  </select>
+  <update id="updateRank">
+    UPDATE bsc_unit_summary SET rank_in_group = #{rank}, rank_group = #{group}, prev_bsc_score = #{prevScore}, prev_rank = #{prevRank}
+    WHERE year = #{year} AND period_code = #{period} AND org_unit_id = #{unitId}
+  </update>
+
+  <!-- 48.x đủ điều kiện: mọi dòng có kết quả cuối, trạng thái ∈ {Đã có KQ, Đã xử lý điều chỉnh} -->
+  <select id="notEligibleForClose" resultType="map">
+    SELECT o.code AS unitCode, o.name AS unitName, COUNT(*) AS pending
+    FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id JOIN org_unit o ON o.id = r.org_unit_id
+    WHERE r.deleted = 0 AND ek.year = #{year} AND ek.period_code = #{period}
+      AND (r.status NOT IN ('DA_CO_KQ','DA_XU_LY_DIEU_CHINH','CHOT_DANH_GIA','TGD_DA_DUYET') OR (r.final_result IS NULL AND r.score IS NULL))
+    GROUP BY o.id, o.code, o.name ORDER BY o.level, o.sort_order, o.code
+  </select>
+  <select id="notEligibleForApprove" resultType="map">
+    SELECT o.code AS unitCode, o.name AS unitName, COUNT(*) AS pending
+    FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id JOIN org_unit o ON o.id = r.org_unit_id
+    WHERE r.deleted = 0 AND ek.year = #{year} AND ek.period_code = #{period} AND r.status NOT IN ('CHOT_DANH_GIA','TGD_DA_DUYET')
+    GROUP BY o.id, o.code, o.name ORDER BY o.level, o.sort_order, o.code
+  </select>
+  <select id="resultIdsOfPeriod" resultType="long">
+    SELECT r.id FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE r.deleted = 0 AND ek.year = #{year} AND ek.period_code = #{period}
+    <if test="statuses != null">AND r.status IN <foreach collection="statuses" item="s" open="(" separator="," close=")">#{s}</foreach></if>
+  </select>
+  <select id="periodClosing" resultType="map">
+    SELECT id, year, period_code AS periodCode, status, closed_by AS closedBy, closed_at AS closedAt, approved_by AS approvedBy, approved_at AS approvedAt
+    FROM period_closing WHERE year = #{year} AND period_code = #{period}
+  </select>
+  <insert id="insertClosing">
+    INSERT INTO period_closing (year, period_code, status, closed_by, closed_at, snapshot, created_by, updated_by)
+    VALUES (#{year}, #{period}, 'CHOT', #{by}, NOW(3), #{snapshot}, #{by}, #{by})
+    ON DUPLICATE KEY UPDATE status = 'CHOT', closed_by = #{by}, closed_at = NOW(3), snapshot = #{snapshot}, updated_at = NOW(3)
+  </insert>
+  <update id="approveClosing">
+    UPDATE period_closing SET status = 'TGD_DA_DUYET', approved_by = #{by}, approved_at = NOW(3), updated_by = #{by}, updated_at = NOW(3)
+    WHERE year = #{year} AND period_code = #{period}
+  </update>
+  <select id="unitIdsOfPeriod" resultType="long">
+    SELECT DISTINCT r.org_unit_id FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE r.deleted = 0 AND ek.year = #{year} AND ek.period_code = #{period}
+  </select>
+  <select id="countResultsOfPeriod" resultType="int">
+    SELECT COUNT(*) FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id WHERE r.deleted = 0 AND ek.year = #{year} AND ek.period_code = #{period}
+  </select>
+</mapper>

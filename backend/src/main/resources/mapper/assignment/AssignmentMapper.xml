@@ -128,8 +128,10 @@
     JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id JOIN org_unit au ON au.id = k.assigning_unit_id
   </sql>
   <sql id="kWhere">
-    WHERE d.deleted = 0 AND k.parent_id IS NULL
-    <if test="f.keyword != null">AND (k.code LIKE #{f.keyword} OR k.name LIKE #{f.keyword})</if>
+    WHERE d.deleted = 0
+      AND (k.parent_id IS NULL OR NOT EXISTS (SELECT 1 FROM kpi_assignment_detail pd WHERE pd.kpi_id = k.parent_id AND pd.year = d.year AND pd.deleted = 0))
+    <if test="f.keyword != null">AND (k.code LIKE #{f.keyword} OR k.name LIKE #{f.keyword}
+      OR EXISTS (SELECT 1 FROM kpi c WHERE c.parent_id = k.id AND c.deleted = 0 AND (c.code LIKE #{f.keyword} OR c.name LIKE #{f.keyword})))</if>
     <if test="f.year != null">AND d.year = #{f.year}</if>
     <if test="f.perspectiveId != null">AND k.perspective_id = #{f.perspectiveId}</if>
     <include refid="common.scope"><property name="col" value="d.org_unit_id"/></include>

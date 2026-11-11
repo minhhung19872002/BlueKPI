@@ -25,3 +25,4 @@ perf/results/
 frontend/dist-*/
 frontend/test-results-*/
 backend/e2e-jars/
+dist-package/

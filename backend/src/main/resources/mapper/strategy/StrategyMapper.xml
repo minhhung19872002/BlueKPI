@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.strategy.mapper.StrategyMapper">
+  <sql id="cols">
+    s.id, s.code, s.name, s.org_unit_id, o.code AS org_unit_code, o.name AS org_unit_name, s.owner_user_id, u.full_name AS owner_name, u.username AS owner_username,
+    s.stage_id, st.name AS stage_name, st.from_year AS stage_from_year, st.to_year AS stage_to_year, s.year, s.status, s.viewport,
+    (SELECT COUNT(*) FROM strategy_objective so WHERE so.strategy_id = s.id) AS objective_count,
+    (SELECT COUNT(*) FROM strategy_kpi sk WHERE sk.strategy_id = s.id) AS kpi_count,
+    s.created_by, s.created_at, s.updated_by, s.updated_at, s.version
+  </sql>
+  <sql id="from">
+    FROM strategy s JOIN org_unit o ON o.id = s.org_unit_id JOIN app_user u ON u.id = s.owner_user_id JOIN evaluation_stage st ON st.id = s.stage_id
+  </sql>
+  <sql id="where">
+    WHERE s.deleted = 0
+    <if test="f.keyword != null">AND (s.code LIKE #{f.keyword} OR s.name LIKE #{f.keyword})</if>
+    <if test="f.ownerUserId != null">AND s.owner_user_id = #{f.ownerUserId}</if>
+    <if test="f.orgUnitId != null">AND s.org_unit_id = #{f.orgUnitId}</if>
+    <if test="f.status != null">AND s.status = #{f.status}</if>
+    <!-- “Khoảng thời gian”: giao với giai đoạn -->
+    <if test="f.fromYear != null">AND st.to_year &gt;= #{f.fromYear}</if>
+    <if test="f.toYear != null">AND st.from_year &lt;= #{f.toYear}</if>
+    <include refid="common.scope"><property name="col" value="s.org_unit_id"/></include>
+  </sql>
+  <select id="search" resultType="vn.vnpt.kpi.modules.strategy.model.StrategyModels$Strategy">
+    SELECT <include refid="cols"/> <include refid="from"/> <include refid="where"/>
+    ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="count" resultType="long">SELECT COUNT(*) <include refid="from"/> <include refid="where"/></select>
+  <select id="find" resultType="vn.vnpt.kpi.modules.strategy.model.StrategyModels$Strategy">
+    SELECT <include refid="cols"/> <include refid="from"/> WHERE s.id = #{id} AND s.deleted = 0
+  </select>
+  <select id="maxCodeSeq" resultType="int">
+    SELECT COALESCE(MAX(CAST(SUBSTRING(code, CHAR_LENGTH(#{prefix}) + 1) AS UNSIGNED)), 0) FROM strategy WHERE code LIKE CONCAT(#{prefix}, '%') FOR UPDATE
+  </select>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO strategy (code, name, org_unit_id, owner_user_id, stage_id, year, status, created_by, updated_by)
+    VALUES (#{code}, #{name}, #{orgUnitId}, #{ownerUserId}, #{stageId}, #{year}, #{status}, #{createdBy}, #{updatedBy})
+  </insert>
+  <update id="update">
+    UPDATE strategy SET name = #{name}, org_unit_id = #{orgUnitId}, owner_user_id = #{ownerUserId}, stage_id = #{stageId}, year = #{year}, status = #{status},
+      updated_by = #{updatedBy}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="softDelete">
+    UPDATE strategy SET deleted = 1, code = CONCAT(code, '#', id), updated_by = #{by}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+  <update id="touch">
+    UPDATE strategy SET viewport = COALESCE(#{viewport}, viewport), updated_by = #{by}, updated_at = NOW(3), version = version + 1
+    WHERE id = #{id} AND version = #{version} AND deleted = 0
+  </update>
+
+  <!-- ===================== Bản đồ ===================== -->
+  <select id="lanes" resultType="vn.vnpt.kpi.modules.strategy.model.StrategyModels$Lane">
+    SELECT id, code, name, color, sort_order FROM perspective WHERE deleted = 0 AND status = 'HIEU_LUC' ORDER BY sort_order, code
+  </select>
+  <select id="nodes" resultType="vn.vnpt.kpi.modules.strategy.model.StrategyModels$MapNode">
+    SELECT so.objective_id, ob.code, ob.name, ob.description, ob.perspective_id, p.code AS perspective_code, p.name AS perspective_name,
+           p.color AS perspective_color, p.sort_order AS perspective_sort, so.pos_x, so.pos_y
+    FROM strategy_objective so JOIN strategic_objective ob ON ob.id = so.objective_id JOIN perspective p ON p.id = ob.perspective_id
+    WHERE so.strategy_id = #{strategyId} ORDER BY p.sort_order, ob.code
+  </select>
+  <select id="links" resultType="vn.vnpt.kpi.modules.strategy.model.StrategyModels$MapLink">
+    SELECT id, source_objective_id AS source, target_objective_id AS target, source_handle, target_handle FROM strategy_link WHERE strategy_id = #{strategyId} ORDER BY id
+  </select>
+  <select id="kpis" resultType="vn.vnpt.kpi.modules.strategy.model.StrategyModels$MapKpi">
+    SELECT sk.objective_id, sk.kpi_id, k.code AS kpi_code, k.name AS kpi_name
+    FROM strategy_kpi sk JOIN kpi k ON k.id = sk.kpi_id WHERE sk.strategy_id = #{strategyId} ORDER BY k.code
+  </select>
+  <delete id="deleteNodes">DELETE FROM strategy_objective WHERE strategy_id = #{strategyId}</delete>
+  <delete id="deleteLinks">DELETE FROM strategy_link WHERE strategy_id = #{strategyId}</delete>
+  <delete id="deleteKpis">DELETE FROM strategy_kpi WHERE strategy_id = #{strategyId}</delete>
+  <insert id="insertNodes">
+    INSERT INTO strategy_objective (strategy_id, objective_id, pos_x, pos_y, created_by, updated_by) VALUES
+    <foreach collection="nodes" item="n" separator=",">(#{strategyId}, #{n.objectiveId}, #{n.posX}, #{n.posY}, #{by}, #{by})</foreach>
+  </insert>
+  <insert id="insertLinks">
+    INSERT INTO strategy_link (strategy_id, source_objective_id, target_objective_id, source_handle, target_handle, created_by, updated_by) VALUES
+    <foreach collection="links" item="l" separator=",">(#{strategyId}, #{l.source}, #{l.target}, #{l.sourceHandle}, #{l.targetHandle}, #{by}, #{by})</foreach>
+  </insert>
+  <insert id="insertKpis">
+    INSERT INTO strategy_kpi (strategy_id, objective_id, kpi_id, created_by, updated_by) VALUES
+    <foreach collection="kpis" item="k" separator=",">(#{strategyId}, #{k.objectiveId}, #{k.kpiId}, #{by}, #{by})</foreach>
+  </insert>
+  <select id="objectivesByIds" resultType="map">
+    SELECT id, code, status FROM strategic_objective WHERE deleted = 0 AND id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+  <select id="existingKpiIds" resultType="long">
+    SELECT id FROM kpi WHERE deleted = 0 AND id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+
+  <!-- 37.4: KPI của mục tiêu + kết quả kỳ gần nhất (hoặc kỳ chỉ định) của đơn vị chiến lược trong năm -->
+  <select id="objectiveKpis" resultType="vn.vnpt.kpi.modules.strategy.model.StrategyModels$ObjectiveKpi">
+    SELECT k.id AS kpi_id, k.code AS kpi_code, k.name AS kpi_name, uom.name AS unit_of_measure_name,
+           ek.year, ek.period_code, r.plan_value, r.final_result, r.completion_rate, r.score, r.rating
+    FROM strategy_kpi sk JOIN kpi k ON k.id = sk.kpi_id LEFT JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id
+    LEFT JOIN evaluation_result r ON r.id = (
+      SELECT r2.id FROM evaluation_result r2 JOIN evaluation_kpi ek2 ON ek2.id = r2.evaluation_kpi_id
+      WHERE r2.deleted = 0 AND ek2.kpi_id = k.id AND r2.org_unit_id = #{unitId} AND ek2.year = #{year}
+      <choose>
+        <when test="period != null">AND ek2.period_code = #{period}</when>
+        <otherwise>AND r2.final_result IS NOT NULL</otherwise>
+      </choose>
+      ORDER BY FIELD(ek2.period_code, 'Q1', 'Q2', 'H1', 'Q3', 'Q4', 'Y') DESC LIMIT 1)
+    LEFT JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE sk.strategy_id = #{strategyId} AND sk.objective_id = #{objectiveId}
+    ORDER BY k.code
+  </select>
+
+  <update id="completeFinished">
+    UPDATE strategy s JOIN evaluation_stage st ON st.id = s.stage_id
+    SET s.status = 'HOAN_THANH', s.updated_by = 'system', s.updated_at = NOW(3), s.version = s.version + 1
+    WHERE s.deleted = 0 AND s.status = 'DANG_THUC_HIEN' AND st.to_year &lt; #{year}
+  </update>
+  <select id="latestForUnit" resultType="long">
+    SELECT s.id FROM strategy s JOIN evaluation_stage st ON st.id = s.stage_id
+    WHERE s.deleted = 0 AND s.org_unit_id = #{unitId} AND st.from_year &lt;= #{year} AND st.to_year &gt;= #{year}
+    ORDER BY s.status = 'DANG_THUC_HIEN' DESC, s.year DESC, s.id DESC LIMIT 1
+  </select>
+</mapper>

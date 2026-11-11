@@ -20,7 +20,7 @@ import java.util.Locale;
 @Profile("prod")
 public class StartupSecurityCheck {
     static final List<String> DEFAULT_MARKERS = List.of("dev_only", "changeme", "change-me", "default", "kpi_app_dev",
-            "kpi_migrate_dev", "minioadmin", "password", "secret-dev", "dev-secret");
+            "kpi_migrate_dev", "minioadmin", "password", "secret-dev", "dev-secret", "kpi@2026", "admin@123", "123456");
 
     private final JwtProperties jwt;
     private final Environment env;
@@ -39,6 +39,8 @@ public class StartupSecurityCheck {
         if (isDefault(env.getProperty("spring.datasource.password"))) problems.add("Mật khẩu DB đang dùng giá trị mặc định");
         if (isDefault(env.getProperty("kpi.minio.secret-key"))) problems.add("MinIO secret key đang dùng giá trị mặc định");
         if (isDefault(jwt.piiEncryptionKey())) problems.add("KPI_PII_KEY đang dùng giá trị mặc định");
+        String bootstrap = env.getProperty("kpi.bootstrap.admin-password");
+        if (bootstrap != null && !bootstrap.isBlank() && isDefault(bootstrap)) problems.add("KPI_BOOTSTRAP_ADMIN_PASSWORD đang dùng mật khẩu mặc định/yếu");
         if (!problems.isEmpty()) {
             throw new IllegalStateException("StartupSecurityCheck thất bại — từ chối khởi động: " + String.join("; ", problems));
         }

@@ -47,6 +47,7 @@ public class DemoDataSeeder {
     @Order(100)
     public void seed() {
         if (!enabled) return;
+        vn.vnpt.kpi.modules.evaluation.service.EvaluationCalcService.setBulkMode(true);
         try {
             Integer n = jdbc.queryForObject("SELECT COUNT(*) FROM kpi", Integer.class);
             if (n == null || n == 0) seedKpis();
@@ -58,6 +59,8 @@ public class DemoDataSeeder {
             }
         } catch (Exception e) {
             log.error("Seed demo thất bại", e);
+        } finally {
+            vn.vnpt.kpi.modules.evaluation.service.EvaluationCalcService.setBulkMode(false);
         }
     }
 

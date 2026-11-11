@@ -87,6 +87,7 @@ export const EP = {
     close: '/bsc/close',
     approveCheck: '/bsc/approve/check',
     approve: '/bsc/approve',
+    result: (id: number) => `/bsc/results/${id}`,
   },
   reports: {
     byTemplate: (code: string) => `/reports/${code}`,

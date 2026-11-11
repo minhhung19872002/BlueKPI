@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.vnpt.kpi.modules.evaluation.mapper.EvaluationMapper">
+
+  <!-- ===================== KPI × kỳ ===================== -->
+  <sql id="ekCols">
+    ek.id, ek.kpi_id, k.code AS kpi_code, k.name AS kpi_name, k.parent_id AS parent_kpi_id, pk.code AS parent_kpi_code,
+    k.perspective_id, pe.name AS perspective_name, pe.color AS perspective_color, uom.name AS unit_of_measure_name,
+    au.name AS assigning_unit_name, eu.name AS evaluating_unit_name, k.evaluating_officer_id,
+    ek.year, ek.period_code, ek.status, ek.result_type, k.data_source, k.target_data_type, k.completion_formula, k.completion_expression,
+    k.result_expression, k.group_aggregation, k.group_expression, k.scoring_method_id, sm.name AS scoring_method_name,
+    sm.type AS scoring_method_type, sm.config AS scoring_config, k.score_by_result, ek.last_synced_at, ek.updated_at, ek.version
+  </sql>
+  <sql id="ekJoins">
+    JOIN kpi k ON k.id = ek.kpi_id LEFT JOIN kpi pk ON pk.id = k.parent_id
+    JOIN perspective pe ON pe.id = k.perspective_id JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id
+    JOIN org_unit au ON au.id = k.assigning_unit_id JOIN org_unit eu ON eu.id = k.evaluating_unit_id
+    JOIN scoring_method sm ON sm.id = k.scoring_method_id
+  </sql>
+  <sql id="ekWhere">
+    WHERE ek.deleted = 0
+    <if test="f.keyword != null">AND (k.code LIKE #{f.keyword} OR k.name LIKE #{f.keyword})</if>
+    <if test="f.year != null">AND ek.year = #{f.year}</if>
+    <if test="f.period != null">AND ek.period_code = #{f.period}</if>
+    <if test="f.perspectiveId != null">AND k.perspective_id = #{f.perspectiveId}</if>
+    <if test="f.status != null">AND ek.status = #{f.status}</if>
+    <if test="f.resultType != null">AND ek.result_type = #{f.resultType}</if>
+    <if test="scope != null and !scope.all">
+      AND EXISTS (SELECT 1 FROM evaluation_result rs WHERE rs.evaluation_kpi_id = ek.id AND rs.deleted = 0
+        <include refid="common.scope"><property name="col" value="rs.org_unit_id"/></include>)
+    </if>
+  </sql>
+  <select id="searchEvalKpis" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$EvalKpi">
+    SELECT <include refid="ekCols"/>,
+      (SELECT COUNT(*) FROM evaluation_result r WHERE r.evaluation_kpi_id = ek.id AND r.deleted = 0) AS unit_count,
+      (SELECT COUNT(*) FROM evaluation_result r WHERE r.evaluation_kpi_id = ek.id AND r.deleted = 0 AND r.final_result IS NOT NULL) AS result_count
+    FROM evaluation_kpi ek <include refid="ekJoins"/>
+    <include refid="ekWhere"/>
+    ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countEvalKpis" resultType="long">
+    SELECT COUNT(*) FROM evaluation_kpi ek JOIN kpi k ON k.id = ek.kpi_id <include refid="ekWhere"/>
+  </select>
+  <select id="findEvalKpi" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$EvalKpi">
+    SELECT <include refid="ekCols"/>,
+      (SELECT COUNT(*) FROM evaluation_result r WHERE r.evaluation_kpi_id = ek.id AND r.deleted = 0) AS unit_count
+    FROM evaluation_kpi ek <include refid="ekJoins"/> WHERE ek.id = #{id} AND ek.deleted = 0
+  </select>
+  <select id="findEvalKpiByKey" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$EvalKpi">
+    SELECT <include refid="ekCols"/> FROM evaluation_kpi ek <include refid="ekJoins"/>
+    WHERE ek.kpi_id = #{kpiId} AND ek.year = #{year} AND ek.period_code = #{period} AND ek.deleted = 0
+  </select>
+  <select id="findEvalKpisOfPeriod" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$EvalKpi">
+    SELECT <include refid="ekCols"/> FROM evaluation_kpi ek <include refid="ekJoins"/>
+    WHERE ek.year = #{year} AND ek.period_code = #{period} AND ek.deleted = 0 ORDER BY k.parent_id IS NULL, k.id
+  </select>
+  <select id="evalKpiIdsWithApi" resultType="long">
+    SELECT DISTINCT ek.id FROM evaluation_kpi ek JOIN kpi_component c ON c.kpi_id = ek.kpi_id AND c.deleted = 0 AND c.source = 'API'
+    WHERE ek.deleted = 0 AND ek.year = #{year} AND ek.status &lt;&gt; 'CHOT_KQ_R2'
+      AND ek.period_code IN <foreach collection="periods" item="p" open="(" separator="," close=")">#{p}</foreach>
+  </select>
+  <update id="setEvalKpiStatus">
+    UPDATE evaluation_kpi SET status = #{status}, updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id}
+  </update>
+  <update id="touchSynced">UPDATE evaluation_kpi SET last_synced_at = NOW(3) WHERE id = #{id}</update>
+
+  <!-- ===================== Kết quả ===================== -->
+  <sql id="rCols">
+    r.id, r.evaluation_kpi_id, ek.kpi_id, k.code AS kpi_code, k.name AS kpi_name, k.parent_id AS parent_kpi_id,
+    pe.name AS perspective_name, pe.color AS perspective_color, uom.name AS unit_of_measure_name,
+    ek.year, ek.period_code, ek.status AS eval_kpi_status,
+    r.org_unit_id, o.code AS org_unit_code, o.name AS org_unit_name, o.unit_type, r.assignment_detail_id, d.weight,
+    r.plan_value, r.year_plan_value, r.kpi_result, r.prev_adjustment, r.adjustment, r.final_result, r.completion_rate, r.year_completion_rate,
+    r.score, r.manual_score, r.bsc_score, r.rating, r.status, r.description, r.calc_error, r.result_before_adjust, r.result_after_adjust,
+    r.updated_at, r.version
+  </sql>
+  <sql id="rJoins">
+    JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id JOIN kpi k ON k.id = ek.kpi_id
+    JOIN perspective pe ON pe.id = k.perspective_id JOIN unit_of_measure uom ON uom.id = k.unit_of_measure_id
+    JOIN org_unit o ON o.id = r.org_unit_id LEFT JOIN kpi_assignment_detail d ON d.id = r.assignment_detail_id
+  </sql>
+  <sql id="rWhere">
+    WHERE r.deleted = 0
+    <if test="f.evalKpiId != null">AND r.evaluation_kpi_id = #{f.evalKpiId}</if>
+    <if test="f.ids != null and !f.ids.isEmpty()">AND r.id IN <foreach collection="f.ids" item="i" open="(" separator="," close=")">#{i}</foreach></if>
+    <if test="f.unitId != null">AND r.org_unit_id = #{f.unitId}</if>
+    <if test="f.kpiId != null">AND ek.kpi_id = #{f.kpiId}</if>
+    <if test="f.year != null">AND ek.year = #{f.year}</if>
+    <if test="f.period != null">AND ek.period_code = #{f.period}</if>
+    <if test="f.keyword != null">AND (o.code LIKE #{f.keyword} OR o.name LIKE #{f.keyword} OR k.code LIKE #{f.keyword} OR k.name LIKE #{f.keyword})</if>
+    <if test="f.unitKeyword != null">AND (o.code LIKE #{f.unitKeyword} OR o.name LIKE #{f.unitKeyword})</if>
+    <if test="f.status != null">AND r.status = #{f.status}</if>
+    <if test="f.statuses != null and !f.statuses.isEmpty()">AND r.status IN <foreach collection="f.statuses" item="s" open="(" separator="," close=")">#{s}</foreach></if>
+    <if test="f.rating != null">AND r.rating = #{f.rating}</if>
+    <if test="f.perspectiveId != null">AND k.perspective_id = #{f.perspectiveId}</if>
+    <if test="f.resultType != null">AND ek.result_type = #{f.resultType}</if>
+    <if test="f.hasResult != null">AND (r.final_result IS NOT NULL OR r.score IS NOT NULL)</if>
+    <if test="f.rootOnly != null">AND k.parent_id IS NULL</if>
+    <include refid="common.scope"><property name="col" value="r.org_unit_id"/></include>
+  </sql>
+  <select id="searchResults" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$Result">
+    SELECT <include refid="rCols"/>,
+      (SELECT COALESCE(a.handling_reason, a.proposal_note) FROM adjustment_request a WHERE a.result_id = r.id AND a.deleted = 0 ORDER BY a.id DESC LIMIT 1) AS feedback
+    FROM evaluation_result r <include refid="rJoins"/>
+    <include refid="rWhere"/>
+    ORDER BY ${q.orderBy} LIMIT #{q.size} OFFSET #{q.offset}
+  </select>
+  <select id="countResults" resultType="long">
+    SELECT COUNT(*) FROM evaluation_result r <include refid="rJoins"/> <include refid="rWhere"/>
+  </select>
+  <select id="findResult" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$Result">
+    SELECT <include refid="rCols"/> FROM evaluation_result r <include refid="rJoins"/> WHERE r.id = #{id} AND r.deleted = 0
+  </select>
+  <select id="findResultsByIds" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$Result">
+    SELECT <include refid="rCols"/> FROM evaluation_result r <include refid="rJoins"/>
+    WHERE r.deleted = 0 AND r.id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+  <select id="findResultsOfEvalKpi" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$Result">
+    SELECT <include refid="rCols"/> FROM evaluation_result r <include refid="rJoins"/>
+    WHERE r.evaluation_kpi_id = #{evalKpiId} AND r.deleted = 0 ORDER BY o.level, o.sort_order, o.code
+  </select>
+  <select id="parentResultIds" resultType="long">
+    SELECT DISTINCT pr.id FROM evaluation_result cr JOIN evaluation_kpi cek ON cek.id = cr.evaluation_kpi_id JOIN kpi ck ON ck.id = cek.kpi_id
+    JOIN evaluation_kpi pek ON pek.kpi_id = ck.parent_id AND pek.year = cek.year AND pek.period_code = cek.period_code
+    JOIN evaluation_result pr ON pr.evaluation_kpi_id = pek.id AND pr.org_unit_id = cr.org_unit_id AND pr.deleted = 0
+    WHERE cr.id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+  <select id="resultIdsOfPeriod" resultType="long">
+    SELECT r.id FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE r.deleted = 0 AND ek.year = #{year} AND ek.period_code = #{period}
+  </select>
+  <update id="updateCalc">
+    UPDATE evaluation_result SET kpi_result = #{kpiResult}, prev_adjustment = #{prevAdjustment}, final_result = #{finalResult},
+      completion_rate = #{completionRate}, year_completion_rate = #{yearCompletionRate}, score = #{score}, bsc_score = #{bscScore},
+      rating = #{rating}, calc_error = #{calcError}, result_before_adjust = #{resultBeforeAdjust}, result_after_adjust = #{resultAfterAdjust}
+    WHERE id = #{id}
+  </update>
+  <update id="updateInput">
+    UPDATE evaluation_result SET adjustment = #{adjustment}, description = #{description}, manual_score = #{manualScore},
+      updated_by = #{by}, updated_at = NOW(3), version = version + 1 WHERE id = #{id}
+  </update>
+  <update id="setResultStatus">
+    UPDATE evaluation_result SET status = #{status}, updated_by = #{by}, updated_at = NOW(3), version = version + 1
+    WHERE id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </update>
+  <select id="adjustmentsOfYear" resultType="map">
+    SELECT ek.period_code AS period, r.adjustment FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE ek.kpi_id = #{kpiId} AND ek.year = #{year} AND r.org_unit_id = #{orgUnitId} AND r.deleted = 0
+  </select>
+  <select id="totalRootWeight" resultType="java.math.BigDecimal">
+    SELECT COALESCE(SUM(d.weight), 0) FROM kpi_assignment_detail d JOIN kpi k ON k.id = d.kpi_id
+    WHERE d.org_unit_id = #{orgUnitId} AND d.year = #{year} AND d.deleted = 0 AND k.parent_id IS NULL AND d.status &lt;&gt; 'DANG_SOAN'
+  </select>
+  <select id="parentKpiIds" resultType="long">SELECT DISTINCT parent_id FROM kpi WHERE parent_id IS NOT NULL AND deleted = 0</select>
+  <select id="childScores" resultType="map">
+    SELECT r.score, d.weight FROM evaluation_result r JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    JOIN kpi k ON k.id = ek.kpi_id LEFT JOIN kpi_assignment_detail d ON d.id = r.assignment_detail_id
+    WHERE k.parent_id = #{parentKpiId} AND ek.year = #{year} AND ek.period_code = #{period} AND r.org_unit_id = #{orgUnitId} AND r.deleted = 0
+  </select>
+
+  <!-- ===================== Thành phần ===================== -->
+  <select id="findComponentValues" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$ComponentValue">
+    SELECT v.id, v.result_id, v.component_id, c.code, c.name, c.source, c.formula_definition_id, f.code AS formula_code,
+      v.value, v.unit_proposed_value, v.prev_adjustment, v.unit_proposed_adjustment, v.adjustment, v.final_value, v.note, v.synced_at
+    FROM evaluation_component_value v JOIN kpi_component c ON c.id = v.component_id LEFT JOIN formula_definition f ON f.id = c.formula_definition_id
+    WHERE v.result_id IN <foreach collection="resultIds" item="i" open="(" separator="," close=")">#{i}</foreach>
+    ORDER BY v.result_id, c.sort_order, c.id
+  </select>
+  <select id="kpiComponents" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$ComponentValue">
+    SELECT c.id AS component_id, c.code, c.name, c.source, c.formula_definition_id, f.code AS formula_code
+    FROM kpi_component c LEFT JOIN formula_definition f ON f.id = c.formula_definition_id
+    WHERE c.kpi_id = #{kpiId} AND c.deleted = 0 ORDER BY c.sort_order, c.id
+  </select>
+  <insert id="setComponentValue">
+    INSERT INTO evaluation_component_value (result_id, component_id, source, value, synced_at, note, created_by, updated_by)
+    VALUES (#{resultId}, #{componentId}, #{source}, #{value}, IF(#{synced}, NOW(3), NULL), #{note}, 'system', 'system')
+    ON DUPLICATE KEY UPDATE value = VALUES(value), synced_at = IF(#{synced}, NOW(3), synced_at), note = COALESCE(VALUES(note), note),
+      updated_at = NOW(3), version = version + 1
+  </insert>
+  <insert id="setComponentProposal">
+    INSERT INTO evaluation_component_value (result_id, component_id, source, unit_proposed_value, unit_proposed_adjustment, created_by, updated_by)
+    SELECT #{resultId}, c.id, c.source, #{value}, #{adjustment}, 'system', 'system' FROM kpi_component c WHERE c.id = #{componentId}
+    ON DUPLICATE KEY UPDATE unit_proposed_value = VALUES(unit_proposed_value), unit_proposed_adjustment = VALUES(unit_proposed_adjustment), updated_at = NOW(3)
+  </insert>
+  <insert id="setComponentAdjustment">
+    INSERT INTO evaluation_component_value (result_id, component_id, source, adjustment, created_by, updated_by)
+    SELECT #{resultId}, c.id, c.source, #{adjustment}, 'system', 'system' FROM kpi_component c WHERE c.id = #{componentId}
+    ON DUPLICATE KEY UPDATE adjustment = VALUES(adjustment), updated_at = NOW(3)
+  </insert>
+  <update id="updateComponentCalc">UPDATE evaluation_component_value SET prev_adjustment = #{prevAdjustment}, final_value = #{finalValue} WHERE id = #{id}</update>
+  <select id="componentAdjustmentsOfYear" resultType="map">
+    SELECT ek.period_code AS period, v.adjustment FROM evaluation_component_value v JOIN evaluation_result r ON r.id = v.result_id
+    JOIN evaluation_kpi ek ON ek.id = r.evaluation_kpi_id
+    WHERE v.component_id = #{componentId} AND r.org_unit_id = #{orgUnitId} AND ek.year = #{year} AND r.deleted = 0
+  </select>
+
+  <!-- ===================== Đề nghị điều chỉnh / phản hồi / dòng thời gian ===================== -->
+  <insert id="insertAdjustmentRequest" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO adjustment_request (result_id, proposal_note, status, requested_by_id, created_by, updated_by)
+    VALUES (#{resultId}, #{proposalNote}, 'CHO_XU_LY', #{requestedById}, #{createdBy}, #{createdBy})
+  </insert>
+  <sql id="arCols">a.id, a.result_id, a.proposal_note, a.status, a.requested_by_id, u.full_name AS requested_by_name, a.created_by, a.created_at,
+    a.handled_by, a.handled_at, a.handling_reason, a.decision_file_id, f.original_name AS decision_file_name</sql>
+  <select id="findOpenAdjustmentRequest" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$AdjustmentRequest">
+    SELECT <include refid="arCols"/> FROM adjustment_request a LEFT JOIN app_user u ON u.id = a.requested_by_id LEFT JOIN file_object f ON f.id = a.decision_file_id
+    WHERE a.result_id = #{resultId} AND a.status = 'CHO_XU_LY' AND a.deleted = 0 ORDER BY a.id DESC LIMIT 1
+  </select>
+  <select id="findAdjustmentRequests" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$AdjustmentRequest">
+    SELECT <include refid="arCols"/> FROM adjustment_request a LEFT JOIN app_user u ON u.id = a.requested_by_id LEFT JOIN file_object f ON f.id = a.decision_file_id
+    WHERE a.result_id = #{resultId} AND a.deleted = 0 ORDER BY a.id DESC
+  </select>
+  <update id="handleAdjustmentRequest">
+    UPDATE adjustment_request SET status = 'DA_XU_LY', handled_by = #{by}, handled_by_id = #{byId}, handled_at = NOW(3),
+      handling_reason = #{reason}, decision_file_id = #{fileId}, updated_by = #{by}, updated_at = NOW(3) WHERE id = #{id}
+  </update>
+  <select id="filesOf" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$FileRef">
+    SELECT id, original_name, size FROM file_object WHERE owner_type = #{ownerType} AND owner_id = #{ownerId} AND deleted = 0 ORDER BY id
+  </select>
+  <insert id="insertFeedback">
+    INSERT INTO evaluation_feedback (result_id, author_id, content, feedback_type, at) VALUES (#{resultId}, #{authorId}, #{content}, #{type}, NOW(3))
+  </insert>
+  <select id="findFeedback" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$Feedback">
+    SELECT f.id, f.result_id, f.author_id, u.full_name AS author_name, f.content, f.feedback_type, f.at
+    FROM evaluation_feedback f JOIN app_user u ON u.id = f.author_id WHERE f.result_id = #{resultId} ORDER BY f.at, f.id
+  </select>
+  <insert id="insertStatusEvent">
+    INSERT INTO evaluation_status_history (result_id, evaluation_kpi_id, from_status, to_status, note, at, `by`)
+    VALUES (#{resultId}, #{evalKpiId}, #{from}, #{to}, #{note}, NOW(3), #{by})
+  </insert>
+  <select id="findStatusEvents" resultType="vn.vnpt.kpi.modules.evaluation.model.EvalModels$StatusEvent">
+    SELECT id, from_status, to_status, note, at, `by` FROM evaluation_status_history WHERE result_id = #{resultId} ORDER BY at, id
+  </select>
+
+  <select id="periodClosingStatus" resultType="string">
+    SELECT status FROM period_closing WHERE year = #{year} AND period_code = #{period}
+  </select>
+  <select id="maxUpdatedAt" resultType="java.time.LocalDateTime">
+    SELECT MAX(updated_at) FROM evaluation_result WHERE id IN <foreach collection="ids" item="i" open="(" separator="," close=")">#{i}</foreach>
+  </select>
+</mapper>

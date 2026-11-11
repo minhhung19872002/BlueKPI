@@ -22,6 +22,7 @@ public class DemoAssignmentStep implements DemoDataSeeder.DemoStep {
     private final JdbcTemplate jdbc;
     private final AssignmentService service;
     private final DemoSecurity security;
+    private final org.springframework.transaction.support.TransactionTemplate tx;
 
     /** KPI gốc và trọng số (Σ = 100); KPI cha kèm KPI con 50/50 */
     static final Map<String, Integer> SET = new LinkedHashMap<>();
@@ -45,7 +46,7 @@ public class DemoAssignmentStep implements DemoDataSeeder.DemoStep {
 
     @Override
     public void run() {
-        security.runAsAdmin(() -> {
+        security.runAsAdmin(() -> tx.executeWithoutResult(st -> {
             int cur = LocalDate.now().getYear();
             List<Long> units = jdbc.queryForList("SELECT id FROM org_unit WHERE deleted = 0 AND is_kpi_assignable = 1 AND level <= 2 ORDER BY level, sort_order", Long.class);
             List<Long> depts = jdbc.queryForList("SELECT id FROM org_unit WHERE deleted = 0 AND level = 3 AND (code LIKE 'VNPT\\_HNI\\_%' OR code LIKE 'VNPT\\_HCM\\_%' OR code LIKE '%\\_TT1')", Long.class);
@@ -59,7 +60,7 @@ public class DemoAssignmentStep implements DemoDataSeeder.DemoStep {
                 Long u = jdbc.queryForObject("SELECT id FROM org_unit WHERE code = ? AND deleted = 0", Long.class, code);
                 service.createByUnit(new ByUnitRequest(u, cur + 1, details(u, cur + 1, SET), null));
             }
-        });
+        }));
     }
 
     private List<DetailInput> details(Long unitId, int year, Map<String, Integer> set) {

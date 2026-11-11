@@ -1,0 +1,41 @@
+[Unit]
+Description=He thong quan tri KPI theo BSC (Spring Boot)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kpi
+Group=kpi
+WorkingDirectory=/opt/kpi-bsc
+# Secret: /etc/kpi/secrets.env (chmod 600, owner root:kpi) — xem deploy/env.example
+EnvironmentFile=/etc/kpi/secrets.env
+Environment=SPRING_PROFILES_ACTIVE=prod
+Environment=JAVA_HOME=/opt/java/jdk-21
+ExecStart=/opt/java/jdk-21/bin/java -Xms1g -Xmx3g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 \
+  -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/kpi-bsc \
+  -Djava.security.egd=file:/dev/urandom -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Ho_Chi_Minh \
+  -jar /opt/kpi-bsc/kpi-bsc.jar
+SuccessExitStatus=143
+# graceful shutdown (server.shutdown=graceful, 30s) + chờ job Quartz
+TimeoutStopSec=60
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/kpi-bsc /var/lib/kpi-bsc
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target
