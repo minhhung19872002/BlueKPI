@@ -376,8 +376,15 @@ public class DashboardService {
 
     public byte[] corporationTableExcel(Ctx c, Long corpId) {
         Map<String, Object> t = corporationTable(c, corpId);
-        @SuppressWarnings("unchecked") List<Map<String, Object>> rows = (List<Map<String, Object>>) t.get("rows");
+        @SuppressWarnings("unchecked") List<Map<String, Object>> src = (List<Map<String, Object>>) t.get("rows");
+        // “xuất đúng bảng đang xem” (17.8): giữ cột STT như trên dialog
+        List<Map<String, Object>> rows = IntStream.range(0, src.size()).mapToObj(i -> {
+            Map<String, Object> r = new LinkedHashMap<>(src.get(i));
+            r.put("stt", i + 1);
+            return r;
+        }).toList();
         List<ExcelColumn<Map<String, Object>>> cols = List.of(
+                ExcelColumn.of("STT", r -> r.get("stt"), 6),
                 ExcelColumn.of("Đơn vị thành viên", r -> r.get("unitName"), 45), ExcelColumn.of("Tổng số KPI giao", r -> r.get("totalKpi")),
                 ExcelColumn.of("KPI đạt", r -> r.get("achieved")), ExcelColumn.of("KPI cảnh báo", r -> r.get("warning")),
                 ExcelColumn.of("% TH/KH kỳ", r -> r.get("completionRate")), ExcelColumn.of("Điểm BSC đơn vị (thang 5)", r -> r.get("bscScore")),

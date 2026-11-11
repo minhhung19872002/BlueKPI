@@ -21,3 +21,6 @@
 | 15 | Chưa rõ | 36.4 chỉ có “Giai đoạn”, 36.5 có thêm “Năm” | `year` mặc định = năm bắt đầu giai đoạn, sửa được ở 36.5 |
 | 16 | Chưa rõ | “Khóa toàn bộ dữ liệu kỳ” sau TGĐ duyệt có cho mở khóa không | Không có chức năng mở khóa trên UI; chỉ Admin hệ thống thao tác DB theo quy trình vận hành |
 | 17 | Hiệu năng | Dữ liệu “hàng trăm GB” để kiểm thử | Script `deploy/scripts/seed-volume` sinh dữ liệu có tham số quy mô; kiểm thử nội bộ ở quy mô nhỏ hơn, ghi trong `docs/perf-report.md` |
+| 18 | Dashboard | Điểm BSC/số liệu khi gộp “Khối VNPT tỉnh/thành phố” | Thẻ thống kê = tổng số KPI của các tỉnh; Điểm BSC khối = trung bình cộng điểm BSC các tỉnh (không trọng số) |
+| 19 | Dashboard | Kỳ “Giai đoạn” trên dashboard lấy số liệu kỳ nào | Lũy kế số liệu kỳ “Cả năm” từ năm đầu giai đoạn đến năm đang chọn (PHẦN B §6.8); kỳ trước = lũy kế đến năm liền trước |
+| 20 | Dữ liệu demo | Dữ liệu seed phục vụ demo/e2e | Q2 và 6 tháng đầu năm hiện tại để **chưa chốt**, “Cả năm” năm trước **chưa TGĐ duyệt** (phục vụ e2e 48.x/50.x); số liệu cấp Tập đoàn sinh ngẫu nhiên nên % TH/KH có thể rất lớn (KH công ty mẹ ≠ tổng đơn vị con) — không phản ánh nghiệp vụ thật |

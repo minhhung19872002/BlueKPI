@@ -158,7 +158,8 @@ export function VBarChart({
       const { items: its, onPick: pick } = latest.current;
       const pt = [e.offsetX, e.offsetY];
       if (!pick || !chart.containPixel('grid', pt)) return;
-      const idx = chart.convertFromPixel({ xAxisIndex: 0 }, pt) as unknown as number | number[];
+      // ECharts 6: finder xAxisIndex trả về null → dùng gridIndex ([x, y] theo dữ liệu; trục category → chỉ số)
+      const idx = chart.convertFromPixel({ gridIndex: 0 }, pt) as unknown as number | number[];
       const i = Array.isArray(idx) ? idx[0] : idx;
       if (typeof i === 'number' && its[i]) pick(its[i].key);
     });

@@ -23,6 +23,7 @@ async function filter(page: Page, opts: { keyword?: string; year?: string; perio
   if (opts.year) await page.getByRole('combobox', { name: 'Năm', exact: true }).first().selectOption(opts.year);
   if (opts.period) await page.getByRole('combobox', { name: 'Kỳ đánh giá', exact: true }).first().selectOption({ label: opts.period });
   if (opts.status) await page.getByRole('combobox', { name: 'Trạng thái', exact: true }).selectOption({ label: opts.status });
+  else if (opts.status === '') await page.getByRole('combobox', { name: 'Trạng thái', exact: true }).selectOption({ index: 0 });
   if (opts.perspective) await page.getByRole('combobox', { name: 'Viễn cảnh', exact: true }).selectOption({ label: opts.perspective });
   if (opts.dataType) await page.getByRole('combobox', { name: 'Loại dữ liệu', exact: true }).selectOption({ label: opts.dataType });
   await page.getByLabel('Từ khóa tìm kiếm').fill(opts.keyword ?? '');
@@ -266,7 +267,7 @@ test('52.1 Xuất báo cáo TTr94 chi tiết KPI', async ({ page }) => {
 
 test('53.1 Xuất báo cáo KPI từng tỉnh', async ({ page }) => {
   await openBsc(page);
-  await exportReport(page, 'Báo cáo KPI từng tỉnh', 'Khối VNPT tỉnh/thành phố', ['VNPT Hà Nội', 'VNPT Hồ Chí Minh', 'TC-001']);
+  await exportReport(page, 'Báo cáo KPI từng tỉnh', 'Khối VNPT tỉnh/thành phố', ['VNPT Hà Nội', 'VNPT TP. Hồ Chí Minh', 'TC-001']);
 });
 
 // ==================== Tab “Theo dõi kết quả thẩm định và phản hồi” ====================
@@ -290,8 +291,10 @@ test('47.2 Tìm kiếm – Theo dõi kết quả thẩm định và phản hồi
     expect(t).toContain('VNPT_HCM');
     expect(t).toContain('Quý III 2026');
   }
-  await filter(page, { year: '2026', period: 'Quý III', keyword: 'Hà Nội', status: 'ĐV đề nghị điều chỉnh' });
-  await expect(row(page, 'KH-001')).toContainText('ĐV đề nghị điều chỉnh');
+  // tìm theo tên đơn vị; đề nghị điều chỉnh KH-001 của VNPT Hà Nội có thể đã được P4 xử lý khi chạy cả bộ
+  await filter(page, { year: '2026', period: 'Quý III', keyword: 'Hà Nội', status: '' });
+  await expect(row(page, 'KH-001')).toContainText(/ĐV đề nghị điều chỉnh|Đã xử lý điều chỉnh/);
+  for (const t of await page.locator('tbody tr').allInnerTexts()) expect(t).toContain('Hà Nội');
 });
 
 test('47.3 Xem chi tiết – Theo dõi kết quả thẩm định và phản hồi', async ({ page }) => {

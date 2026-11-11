@@ -79,4 +79,4 @@ Phiên bản chính xác đã khóa trong `frontend/package-lock.json`.
 7. **Tính lại BSC async**: `@TransactionalEventListener(phase=AFTER_COMMIT)` + `@Async`; nút “Tính lại điểm đánh giá” chạy đồng bộ.
 8. **Báo cáo JXLS**: template mặc định tự sinh lúc khởi động (nếu bảng `report_template` chưa có file) bằng POI, lưu MinIO; admin thay file khác qua API.
 9. **Dev không có Docker cho chạy app**: backend chạy bằng `mvnw` trên máy, hạ tầng (MariaDB/MinIO/Mailpit/mock CAS/mock KPI source) chạy bằng `deploy/docker-compose.dev.yml`.
-10. **Kỳ đánh giá**: mã kỳ `Q1, Q2, H1, Q3, Q4, Y`; giai đoạn trên dashboard dùng tham số `period=STAGE_<id>`.
+10. **Kỳ đánh giá**: mã kỳ `Q1, Q2, H1, Q3, Q4, Y`; giai đoạn trên dashboard dùng tham số `period=GD:<id>` (id bảng `evaluation_stage`).

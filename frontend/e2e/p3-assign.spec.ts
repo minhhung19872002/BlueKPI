@@ -78,7 +78,7 @@ test('29.1 Lấy danh sách – Giao KPI theo đơn vị', async ({ page }) => {
   const hni = gridRow(grid, 'VNPT Hà Nội');
   await expect(hni).toContainText('2026');
   await expect(hni).toContainText('Đã giao');
-  await expect(hni.getByRole('checkbox')).toHaveCount(0);
+  await expect(hni.getByRole('checkbox')).toBeDisabled(); // dòng “Đã giao” không chọn được
   await expect(hni.getByRole('button', { name: 'Sửa', exact: true })).toHaveCount(0);
   await expect(hni.getByRole('button', { name: 'Sao chép', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Chốt số liệu giao KPI' })).toBeDisabled();

@@ -147,12 +147,33 @@ test('23.5 Xóa – Danh sách KPI', async ({ page }) => {
   await page.getByTestId('confirm-ok').click();
   await expectToast(page, 'Xóa thành công');
   // KPI cha có con → hỏi lại vì sẽ xóa cả KPI con
-  await searchKeyword(page, 'Năng suất lao động');
-  await rowAction(page, 'HP-003 –', 'Xóa');
+  const parent = `KPI cha xóa ${uid()}`;
+  await page.getByRole('button', { name: 'Thêm tiêu chí' }).click();
+  const dlg = page.getByRole('dialog', { name: 'Thêm mới tiêu chí KPI' });
+  await dlg.getByRole('radio', { name: 'KPI cha – con' }).click();
+  await fillKpi(page, dlg, parent);
+  await dlg.getByRole('button', { name: 'Thêm KPI con' }).click();
+  const sub = page.getByRole('dialog', { name: 'KPI con' });
+  await sub.getByLabel('Tên tiêu chí').fill(`Con của ${parent}`);
+  await sub.getByLabel('Tỷ trọng (1–100) nội bộ').fill('100');
+  await sub.getByLabel('Tên thành phần 1').fill('Con');
+  await sub.getByRole('button', { name: 'Xác nhận' }).click();
+  await dlg.getByRole('button', { name: 'Lưu' }).click();
+  await expectToast(page, 'Thêm mới thành công');
+  await searchKeyword(page, parent);
+  await expect(page.getByText('Tổng số: 1 bản ghi')).toBeVisible(); // lưới đã tải xong kết quả tìm kiếm
+  await rowAction(page, parent, 'Xóa');
   await page.getByTestId('confirm-ok').click();
   await expect(page.getByRole('dialog', { name: 'Xác nhận xóa' })).toContainText('xóa KPI cha sẽ xóa cả KPI con');
-  await page.getByRole('button', { name: 'Hủy' }).click();
-  void expectErrorToast;
+  await page.getByTestId('confirm-ok').click();
+  await expectToast(page, 'Xóa thành công');
+  await expect(page.getByRole('table', { name: 'Danh sách KPI' })).not.toContainText(`Con của ${parent}`);
+  // KPI đang được tham chiếu (đã giao) → chặn xóa, báo lý do
+  await searchKeyword(page, 'Tổng doanh thu');
+  await rowAction(page, 'TC-001 –', 'Xóa');
+  await page.getByTestId('confirm-ok').click();
+  if (await page.getByRole('dialog', { name: 'Xác nhận xóa' }).isVisible()) await page.getByTestId('confirm-ok').click();
+  await expectErrorToast(page, /đang được|tham chiếu|sử dụng/i);
 });
 
 test('23.6 Nhập dữ liệu – Danh sách KPI', async ({ page }) => {
